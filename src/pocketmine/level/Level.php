@@ -496,7 +496,7 @@ class Level implements ChunkManager, Metadatable{
 		$this->blockCache = [];
 		$this->temporalPosition = null;
 		$this->timings->close();
-		$this->timings = null;
+		unset($this->timings);
 
 		$this->closed = true;
 	}
