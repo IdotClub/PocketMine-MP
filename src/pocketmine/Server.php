@@ -1804,41 +1804,6 @@ class Server{
 	}
 
 	/**
-	 * @return void
-	 */
-	public function reload(){
-		$this->logger->info("Saving worlds...");
-
-		foreach($this->levels as $level){
-			$level->save();
-		}
-
-		$this->pluginManager->disablePlugins();
-		$this->pluginManager->clearPlugins();
-		PermissionManager::getInstance()->clearPermissions();
-		$this->commandMap->clearCommands();
-
-		$this->logger->info("Reloading properties...");
-		$this->properties->reload();
-		$this->maxPlayers = $this->getConfigInt("max-players", 20);
-
-		if($this->getConfigBool("hardcore", false) and $this->getDifficulty() < Level::DIFFICULTY_HARD){
-			$this->setConfigInt("difficulty", Level::DIFFICULTY_HARD);
-		}
-
-		$this->banByName->load();
-		$this->reloadWhitelist();
-		$this->operators->reload();
-
-		$this->pluginManager->registerInterface(new PharPluginLoader($this->autoloader));
-		$this->pluginManager->registerInterface(new ScriptPluginLoader());
-		$this->pluginManager->loadPlugins($this->pluginPath);
-		$this->enablePlugins(PluginLoadOrder::STARTUP);
-		$this->enablePlugins(PluginLoadOrder::POSTWORLD);
-		TimingsHandler::reload();
-	}
-
-	/**
 	 * Shuts the server down correctly
 	 *
 	 * @return void
