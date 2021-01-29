@@ -42,7 +42,11 @@ class DumpMemoryCommand extends VanillaCommand{
 			return true;
 		}
 
-		$sender->getServer()->getMemoryManager()->dumpServerMemory($args[0] ?? ($sender->getServer()->getDataPath() . "/memory_dumps/" . date("D_M_j-H.i.s-T_Y")), 48, 80);
+		try {
+			$sender->getServer()->getMemoryManager()->dumpServerMemory($args[0] ?? ($sender->getServer()->getDataPath() . "/memory_dumps/" . date("D_M_j-H.i.s-T_Y")), 48, 80);
+		} catch(\Throwable $ignored) {
+		}
+
 		return true;
 	}
 }
