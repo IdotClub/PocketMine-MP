@@ -92,4 +92,24 @@ class LevelTimings{
 
 		$this->doTick = new TimingsHandler($name . "doTick");
 	}
+
+	public function close() : void{
+		$this->setBlock->remove();
+		$this->doBlockLightUpdates->remove();
+		$this->doBlockSkyLightUpdates->remove();
+		$this->doChunkUnload->remove();
+		$this->doTickPending->remove();
+		$this->doTickTiles->remove();
+		$this->doChunkGC->remove();
+		$this->entityTick->remove();
+		$this->tileEntityTick->remove();
+		$this->syncChunkSendTimer->remove();
+		$this->syncChunkSendPrepareTimer->remove();
+		$this->syncChunkLoadTimer->remove();
+		$this->syncChunkLoadDataTimer->remove();
+		$this->syncChunkLoadEntitiesTimer->remove();
+		$this->syncChunkLoadTileEntitiesTimer->remove();
+		$this->syncChunkSaveTimer->remove();
+		$this->doTick->remove();
+	}
 }
