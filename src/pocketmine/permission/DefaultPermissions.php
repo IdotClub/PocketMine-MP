@@ -64,13 +64,11 @@ abstract class DefaultPermissions{
 
 		$ban = self::registerPermission(new Permission(self::ROOT . ".command.ban", "Allows the user to ban people", Permission::DEFAULT_OP), $commands);
 		self::registerPermission(new Permission(self::ROOT . ".command.ban.player", "Allows the user to ban players"), $ban);
-		self::registerPermission(new Permission(self::ROOT . ".command.ban.ip", "Allows the user to ban IP addresses"), $ban);
 		self::registerPermission(new Permission(self::ROOT . ".command.ban.list", "Allows the user to list banned players"), $ban);
 		$ban->recalculatePermissibles();
 
 		$unban = self::registerPermission(new Permission(self::ROOT . ".command.unban", "Allows the user to unban people", Permission::DEFAULT_OP), $commands);
 		self::registerPermission(new Permission(self::ROOT . ".command.unban.player", "Allows the user to unban players"), $unban);
-		self::registerPermission(new Permission(self::ROOT . ".command.unban.ip", "Allows the user to unban IP addresses"), $unban);
 		$unban->recalculatePermissibles();
 
 		$op = self::registerPermission(new Permission(self::ROOT . ".command.op", "Allows the user to change operators", Permission::DEFAULT_OP), $commands);

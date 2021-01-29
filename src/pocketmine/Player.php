@@ -2014,10 +2014,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			return true;
 		}
 
-		if(
-			($this->isBanned() or $this->server->getIPBans()->isBanned($this->getAddress())) and
-			$this->kick("You are banned", false)
-		){
+		if($this->isBanned() and $this->kick("You are banned", false)){
 			return true;
 		}
 

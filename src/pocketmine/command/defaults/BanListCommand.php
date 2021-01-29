@@ -50,31 +50,14 @@ class BanListCommand extends VanillaCommand{
 			return true;
 		}
 
-		if(isset($args[0])){
-			$args[0] = strtolower($args[0]);
-			if($args[0] === "ips"){
-				$list = $sender->getServer()->getIPBans();
-			}elseif($args[0] === "players"){
-				$list = $sender->getServer()->getNameBans();
-			}else{
-				throw new InvalidCommandSyntaxException();
-			}
-		}else{
-			$list = $sender->getServer()->getNameBans();
-			$args[0] = "players";
-		}
-
+		$list = $sender->getServer()->getNameBans();
 		$list = array_map(function(BanEntry $entry) : string{
 			return $entry->getName();
 		}, $list->getEntries());
 		sort($list, SORT_STRING);
 		$message = implode(", ", $list);
 
-		if($args[0] === "ips"){
-			$sender->sendMessage(new TranslationContainer("commands.banlist.ips", [count($list)]));
-		}else{
-			$sender->sendMessage(new TranslationContainer("commands.banlist.players", [count($list)]));
-		}
+		$sender->sendMessage(new TranslationContainer("commands.banlist.players", [count($list)]));
 
 		$sender->sendMessage($message);
 

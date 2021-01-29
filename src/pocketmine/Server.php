@@ -195,9 +195,6 @@ class Server{
 	/** @var BanList */
 	private $banByName;
 
-	/** @var BanList */
-	private $banByIP;
-
 	/** @var Config */
 	private $operators;
 
@@ -1179,13 +1176,6 @@ class Server{
 	}
 
 	/**
-	 * @return BanList
-	 */
-	public function getIPBans(){
-		return $this->banByIP;
-	}
-
-	/**
 	 * @return void
 	 */
 	public function addOp(string $name){
@@ -1452,9 +1442,6 @@ class Server{
 			@touch($this->dataPath . "banned-players.txt");
 			$this->banByName = new BanList($this->dataPath . "banned-players.txt");
 			$this->banByName->load();
-			@touch($this->dataPath . "banned-ips.txt");
-			$this->banByIP = new BanList($this->dataPath . "banned-ips.txt");
-			$this->banByIP->load();
 
 			$this->maxPlayers = $this->getConfigInt("max-players", 20);
 			$this->setAutoSave($this->getConfigBool("auto-save", true));
@@ -1839,14 +1826,9 @@ class Server{
 			$this->setConfigInt("difficulty", Level::DIFFICULTY_HARD);
 		}
 
-		$this->banByIP->load();
 		$this->banByName->load();
 		$this->reloadWhitelist();
 		$this->operators->reload();
-
-		foreach($this->getIPBans()->getEntries() as $entry){
-			$this->getNetwork()->blockAddress($entry->getName(), -1);
-		}
 
 		$this->pluginManager->registerInterface(new PharPluginLoader($this->autoloader));
 		$this->pluginManager->registerInterface(new ScriptPluginLoader());
@@ -1956,10 +1938,6 @@ class Server{
 	private function start() : void{
 		if($this->getConfigBool("enable-query", true)){
 			$this->queryHandler = new QueryHandler();
-		}
-
-		foreach($this->getIPBans()->getEntries() as $entry){
-			$this->network->blockAddress($entry->getName(), -1);
 		}
 
 		if((bool) $this->getProperty("settings.send-usage", true)){
