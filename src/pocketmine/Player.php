@@ -754,12 +754,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			$data->commandDescription = $this->server->getLanguage()->translateString($command->getDescription());
 			$data->flags = 0;
 			$data->permission = 0;
-
-			$parameter = new CommandParameter();
-			$parameter->paramName = "args";
-			$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_RAWTEXT;
-			$parameter->isOptional = true;
-			$data->overloads[0][0] = $parameter;
+			$data->overloads = $command->getOverloads();
 
 			$aliases = $command->getAliases();
 			if(count($aliases) > 0){
@@ -767,9 +762,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 					//work around a client bug which makes the original name not show when aliases are used
 					$aliases[] = $data->commandName;
 				}
-				$data->aliases = new CommandEnum();
-				$data->aliases->enumName = ucfirst($command->getName()) . "Aliases";
-				$data->aliases->enumValues = array_values($aliases);
+				$data->aliases = new CommandEnum(ucfirst($command->getName()) . "Aliases", array_values($aliases));
 			}
 
 			$pk->commandData[$command->getName()] = $data;

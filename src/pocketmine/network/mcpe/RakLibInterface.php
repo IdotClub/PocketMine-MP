@@ -173,8 +173,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 				$logger->debug("Packet " . (isset($pk) ? get_class($pk) : "unknown") . ": " . base64_encode($packet->buffer));
 				$logger->logException($e);
 
-				$player->close($player->getLeaveMessage(), "Internal server error");
-				$this->interface->blockAddress($address, 5);
+				$player->sendMessage("Internal server error");
 			}
 		}
 	}

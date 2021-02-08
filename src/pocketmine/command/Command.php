@@ -29,6 +29,8 @@ namespace pocketmine\command;
 use pocketmine\command\utils\CommandException;
 use pocketmine\lang\TextContainer;
 use pocketmine\lang\TranslationContainer;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\types\CommandParameter;
 use pocketmine\permission\PermissionManager;
 use pocketmine\Server;
 use pocketmine\timings\TimingsHandler;
@@ -71,15 +73,23 @@ abstract class Command{
 	/** @var TimingsHandler|null */
 	public $timings = null;
 
+	/** @var CommandParameter[][] */
+	public $overloads = [];
+
 	/**
 	 * @param string[] $aliases
 	 */
-	public function __construct(string $name, string $description = "", string $usageMessage = null, array $aliases = []){
+	public function __construct(string $name, string $description = "", string $usageMessage = null, array $aliases = []) {
 		$this->name = $name;
 		$this->setLabel($name);
 		$this->setDescription($description);
 		$this->usageMessage = $usageMessage ?? ("/" . $name);
 		$this->setAliases($aliases);
+		$parameter = new CommandParameter();
+		$parameter->paramName = "args";
+		$parameter->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_RAWTEXT;
+		$parameter->isOptional = true;
+		$this->setParameter($parameter, 0, 0);
 	}
 
 	/**
@@ -266,19 +276,63 @@ abstract class Command{
 		if($sendToSource and !($source instanceof ConsoleCommandSender)){
 			$source->sendMessage($message);
 		}
-
-		foreach($users as $user){
-			if($user instanceof CommandSender){
-				if($user instanceof ConsoleCommandSender){
+		
+		foreach ($users as $user) {
+			if ($user instanceof CommandSender) {
+				if ($user instanceof ConsoleCommandSender) {
 					$user->sendMessage($result);
-				}elseif($user !== $source){
+				} else if ($user !== $source) {
 					$user->sendMessage($colored);
 				}
 			}
 		}
 	}
 
-	public function __toString() : string{
+	public function addParameter(CommandParameter $parameter, int $overloadIndex = 0): void {
+		$this->overloads[$overloadIndex][] = $parameter;
+	}
+
+	public function setParameter(CommandParameter $parameter, int $parameterIndex, int $overloadIndex = 0): void {
+		$this->overloads[$overloadIndex][$parameterIndex] = $parameter;
+	}
+
+	/**
+	 * @param CommandParameter[] $parameters
+	 */
+	public function setParameters(array $parameters, int $overloadIndex = 0): void {
+		$this->overloads[$overloadIndex] = $parameters;
+	}
+
+	public function removeParameter(int $parameterIndex, int $overloadIndex = 0): void {
+		unset($this->overloads[$overloadIndex][$parameterIndex]);
+	}
+
+	public function removeAllParameters(): void {
+		$this->overloads = [];
+	}
+
+	/**
+	 * @param int $overloadIndex
+	 */
+	public function removeOverload(int $overloadIndex): void {
+		unset($this->overloads[$overloadIndex]);
+	}
+
+	/**
+	 * @return CommandParameter[]|null
+	 */
+	public function getOverload(int $index): ?array {
+		return $this->overloads[$index] ?? null;
+	}
+
+	/**
+	 * @return CommandParameter[][]
+	 */
+	public function getOverloads(): array {
+		return $this->overloads;
+	}
+
+	public function __toString(): string {
 		return $this->name;
 	}
 }
