@@ -29,7 +29,9 @@ use pocketmine\Player;
 use Throwable;
 
 class PlayerPacketErrorEvent extends PlayerEvent {
+	/** @var BatchPacket */
 	private $packet;
+	/** @var Throwable */
 	private $throwable;
 
 	public function __construct(Player $player, BatchPacket $packet, Throwable $throwable) {

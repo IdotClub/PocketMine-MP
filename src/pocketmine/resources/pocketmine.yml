@@ -6,7 +6,7 @@
 settings:
   #Whether to send all strings translated to server locale or let the device handle them
   force-language: false
-  shutdown-message: "Server closed"
+  shutdown-message: "Server Closed"
   #Allow listing plugins via Query
   query-plugins: true
   #Enable plugin and core profiling by default
@@ -33,12 +33,12 @@ memory:
 
   #Main thread hard memory limit in megabytes. Set to 0 to disable
   #This will stop the server when the limit is surpassed
-  main-hard-limit: 1024
+  main-hard-limit: 0
 
   #AsyncWorker threads' hard memory limit in megabytes. Set to 0 to disable
   #This will crash the task currently executing on the worker if the task exceeds the limit
   #NOTE: THIS LIMIT APPLIES PER WORKER, NOT TO THE WHOLE PROCESS.
-  async-worker-hard-limit: 256
+  async-worker-hard-limit: 0
 
   #Period in ticks to check memory (default 1 second)
   check-rate: 20
@@ -82,11 +82,11 @@ memory:
 network:
   #Threshold for batching packets, in bytes. Only these packets will be compressed
   #Set to 0 to compress everything, -1 to disable.
-  batch-threshold: 256
+  batch-threshold: 0
   #Compression level used when sending batched packets. Higher = more CPU, less bandwidth usage
   compression-level: 6
   #Use AsyncTasks for compression. Adds half/one tick delay, less CPU load on main thread
-  async-compression: false
+  async-compression: true
   #Experimental, only for Windows. Tries to use UPnP to automatically port forward
   upnp-forwarding: false
   #Maximum size in bytes of packets sent over the network (default 1492 bytes). Packets larger than this will be
@@ -109,7 +109,7 @@ player:
 
 level-settings:
   #The default format that levels will use when created
-  default-format: pmanvil
+  default-format: anvil
 
 chunk-sending:
   #To change server normal render distance, change view-distance in server.properties.
@@ -138,7 +138,7 @@ ticks-per:
 
 auto-report:
   #Send crash reports for processing
-  enabled: true
+  enabled: false
   send-code: true
   send-settings: true
   send-phpinfo: false
@@ -150,17 +150,6 @@ anonymous-statistics:
   enabled: false #TODO: re-enable this when we have a new stats host
   host: stats.pocketmine.net
 
-auto-updater:
-  enabled: true
-  on-update:
-    warn-console: true
-    warn-ops: true
-  #Can be development, alpha, beta or stable.
-  preferred-channel: stable
-  #If using a development version, it will suggest changing the channel
-  suggest-channels: true
-  host: update.pmmp.io
-
 timings:
   #Choose the host to use for viewing your timings results.
   host: timings.pmmp.io
@@ -168,7 +157,7 @@ timings:
 console:
   #Choose whether to enable server stats reporting on the console title.
   #NOTE: The title ticker will be disabled regardless if console colours are not enabled.
-  title-tick: true
+  title-tick: false
 
 aliases:
   #Examples:

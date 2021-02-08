@@ -81,7 +81,6 @@ use pocketmine\network\mcpe\RakLibInterface;
 use pocketmine\network\Network;
 use pocketmine\network\query\QueryHandler;
 use pocketmine\network\rcon\RCON;
-use pocketmine\network\upnp\UPnP;
 use pocketmine\permission\BanList;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\PermissionManager;
@@ -98,7 +97,6 @@ use pocketmine\snooze\SleeperNotifier;
 use pocketmine\tile\Tile;
 use pocketmine\timings\Timings;
 use pocketmine\timings\TimingsHandler;
-use pocketmine\updater\AutoUpdater;
 use pocketmine\utils\Config;
 use pocketmine\utils\Internet;
 use pocketmine\utils\MainLogger;
@@ -212,9 +210,6 @@ class Server{
 
 	/** @var float */
 	private $profilingTickRate = 20;
-
-	/** @var AutoUpdater */
-	private $updater;
 
 	/** @var AsyncPool */
 	private $asyncPool;
@@ -587,13 +582,6 @@ class Server{
 	 */
 	public function getLevelMetadata(){
 		return $this->levelMetadata;
-	}
-
-	/**
-	 * @return AutoUpdater
-	 */
-	public function getUpdater(){
-		return $this->updater;
 	}
 
 	/**
@@ -1512,8 +1500,6 @@ class Server{
 
 			$this->queryRegenerateTask = new QueryRegenerateEvent($this);
 
-			$this->updater = new AutoUpdater($this, $this->getProperty("auto-updater.host", "update.pmmp.io"));
-
 			$this->pluginManager->loadPlugins($this->pluginPath);
 			$this->enablePlugins(PluginLoadOrder::STARTUP);
 
@@ -1836,11 +1822,6 @@ class Server{
 				$this->rcon->stop();
 			}
 
-			if((bool) $this->getProperty("network.upnp-forwarding", false)){
-				$this->logger->info("[UPnP] Removing port forward...");
-				UPnP::RemovePortForward($this->getPort());
-			}
-
 			if($this->pluginManager instanceof PluginManager){
 				$this->getLogger()->debug("Disabling all plugins");
 				$this->pluginManager->disablePlugins();
@@ -1908,15 +1889,6 @@ class Server{
 		if((bool) $this->getProperty("settings.send-usage", true)){
 			$this->sendUsageTicker = 6000;
 			$this->sendUsage(SendUsageTask::TYPE_OPEN);
-		}
-
-		if((bool) $this->getProperty("network.upnp-forwarding", false)){
-			$this->logger->info("[UPnP] Trying to port forward...");
-			try{
-				UPnP::PortForward($this->getPort());
-			}catch(\Exception $e){
-				$this->logger->alert("UPnP portforward failed: " . $e->getMessage());
-			}
 		}
 
 		$this->tickCounter = 0;
