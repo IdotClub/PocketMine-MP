@@ -2302,7 +2302,8 @@ class Server{
 			if(strlen($payload) > 2 and substr($payload, 0, 2) === "\xfe\xfd" and $this->queryHandler instanceof QueryHandler){
 				$this->queryHandler->handle($interface, $address, $port, $payload);
 			}else{
-				$this->logger->debug("Unhandled raw packet from $address $port: " . base64_encode($payload));
+				$this->logger->warning("Unhandled raw packet from $address $port: " . base64_encode($payload));
+				$this->getNetwork()->blockAddress($address, 5000);
 			}
 		}catch(\Throwable $e){
 			$this->logger->logException($e);
