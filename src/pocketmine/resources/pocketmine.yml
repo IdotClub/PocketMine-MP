@@ -133,15 +133,6 @@ chunk-generation:
 ticks-per:
   autosave: 6000
 
-auto-report:
-  #Send crash reports for processing
-  enabled: false
-  send-code: true
-  send-settings: true
-  send-phpinfo: false
-  use-https: true
-  host: crash.pmmp.io
-
 timings:
   #Choose the host to use for viewing your timings results.
   host: timings.pmmp.io

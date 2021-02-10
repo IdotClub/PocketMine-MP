@@ -77,15 +77,7 @@ class EnchantCommand extends VanillaCommand{
 			return true;
 		}
 
-		$level = 1;
-		if(isset($args[2])){
-			$level = $this->getBoundedInt($sender, $args[2], 1, $enchantment->getMaxLevel());
-			if($level === null){
-				return false;
-			}
-		}
-
-		$item->addEnchantment(new EnchantmentInstance($enchantment, $level));
+		$item->addEnchantment(new EnchantmentInstance($enchantment, (int)$args[2] ?? 1));
 		$player->getInventory()->setItemInHand($item);
 
 		self::broadcastCommandMessage($sender, new TranslationContainer("%commands.enchant.success", [$player->getName()]));

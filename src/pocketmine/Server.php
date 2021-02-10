@@ -97,7 +97,6 @@ use pocketmine\tile\Tile;
 use pocketmine\timings\Timings;
 use pocketmine\timings\TimingsHandler;
 use pocketmine\utils\Config;
-use pocketmine\utils\Internet;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\Process;
 use pocketmine\utils\Terminal;
@@ -120,7 +119,6 @@ use function extension_loaded;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function filemtime;
 use function function_exists;
 use function get_class;
 use function getopt;
@@ -131,9 +129,7 @@ use function is_array;
 use function is_bool;
 use function is_dir;
 use function is_object;
-use function is_string;
 use function is_subclass_of;
-use function json_decode;
 use function max;
 use function microtime;
 use function min;
@@ -149,23 +145,17 @@ use function register_shutdown_function;
 use function rename;
 use function round;
 use function scandir;
-use function sleep;
 use function spl_object_hash;
 use function sprintf;
-use function str_repeat;
-use function str_replace;
 use function stripos;
 use function strlen;
-use function strrpos;
 use function strtolower;
 use function substr;
-use function time;
 use function touch;
 use function trim;
 use const DIRECTORY_SEPARATOR;
 use const INT32_MAX;
 use const INT32_MIN;
-use const PHP_EOL;
 use const PHP_INT_MAX;
 use const PTHREADS_INHERIT_NONE;
 use const SCANDIR_SORT_NONE;
@@ -1942,58 +1932,6 @@ class Server{
 			$dump = new CrashDump($this);
 
 			$this->logger->emergency($this->getLanguage()->translateString("pocketmine.crash.submit", [$dump->getPath()]));
-
-			if($this->getProperty("auto-report.enabled", true) !== false){
-				$report = true;
-
-				$stamp = $this->getDataPath() . "crashdumps/.last_crash";
-				$crashInterval = 120; //2 minutes
-				if(file_exists($stamp) and !($report = (filemtime($stamp) + $crashInterval < time()))){
-					$this->logger->debug("Not sending crashdump due to last crash less than $crashInterval seconds ago");
-				}
-				@touch($stamp); //update file timestamp
-
-				$plugin = $dump->getData()["plugin"];
-				if(is_string($plugin)){
-					$p = $this->pluginManager->getPlugin($plugin);
-					if($p instanceof Plugin and !($p->getPluginLoader() instanceof PharPluginLoader)){
-						$this->logger->debug("Not sending crashdump due to caused by non-phar plugin");
-						$report = false;
-					}
-				}
-
-				if($dump->getData()["error"]["type"] === \ParseError::class){
-					$report = false;
-				}
-
-				if(strrpos(\pocketmine\GIT_COMMIT, "-dirty") !== false or \pocketmine\GIT_COMMIT === str_repeat("00", 20)){
-					$this->logger->debug("Not sending crashdump due to locally modified");
-					$report = false; //Don't send crashdumps for locally modified builds
-				}
-
-				if($report){
-					$url = ((bool) $this->getProperty("auto-report.use-https", true) ? "https" : "http") . "://" . $this->getProperty("auto-report.host", "crash.pmmp.io") . "/submit/api";
-					$postUrlError = "Unknown error";
-					$reply = Internet::postURL($url, [
-						"report" => "yes",
-						"name" => $this->getName() . " " . $this->getPocketMineVersion(),
-						"email" => "crash@pocketmine.net",
-						"reportPaste" => base64_encode($dump->getEncodedData())
-					], 10, [], $postUrlError);
-
-					if($reply !== false and ($data = json_decode($reply)) !== null){
-						if(isset($data->crashId) and isset($data->crashUrl)){
-							$reportId = $data->crashId;
-							$reportUrl = $data->crashUrl;
-							$this->logger->emergency($this->getLanguage()->translateString("pocketmine.crash.archive", [$reportUrl, $reportId]));
-						}elseif(isset($data->error)){
-							$this->logger->emergency("Automatic crash report submission failed: $data->error");
-						}
-					}else{
-						$this->logger->emergency("Failed to communicate with crash archive: $postUrlError");
-					}
-				}
-			}
 		}catch(\Throwable $e){
 			$this->logger->logException($e);
 			try{
@@ -2004,12 +1942,6 @@ class Server{
 		$this->forceShutdown();
 		$this->isRunning = false;
 
-		//Force minimum uptime to be >= 120 seconds, to reduce the impact of spammy crash loops
-		$spacing = ((int) \pocketmine\START_TIME) - time() + 120;
-		if($spacing > 0){
-			echo "--- Waiting $spacing seconds to throttle automatic restart (you can kill the process safely now) ---" . PHP_EOL;
-			sleep($spacing);
-		}
 		@Process::kill(Process::pid());
 		exit(1);
 	}
