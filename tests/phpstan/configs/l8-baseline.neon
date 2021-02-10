@@ -1496,11 +1496,6 @@ parameters:
 			path: ../../../src/pocketmine/scheduler/DumpWorkerMemoryTask.php
 
 		-
-			message: "#^Cannot call method toBinary\\(\\) on pocketmine\\\\utils\\\\UUID\\|null\\.$#"
-			count: 1
-			path: ../../../src/pocketmine/scheduler/SendUsageTask.php
-
-		-
 			message: "#^Parameter \\#1 \\$tag of method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:setTag\\(\\) expects pocketmine\\\\nbt\\\\tag\\\\NamedTag, pocketmine\\\\nbt\\\\tag\\\\ListTag\\|null given\\.$#"
 			count: 1
 			path: ../../../src/pocketmine/tile/Banner.php

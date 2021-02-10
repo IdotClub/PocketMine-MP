@@ -18,9 +18,6 @@ settings:
   #Set this approximately to your number of cores.
   #If set to auto, it'll try to detect the number of cores (or use 2)
   async-workers: auto
-  #Whether to allow running development builds. Dev builds might crash, break your plugins, corrupt your world and more.
-  #It is recommended to avoid using development builds where possible.
-  enable-dev-builds: true
 
 memory:
   #Global soft memory limit in megabytes. Set to 0 to disable
@@ -144,11 +141,6 @@ auto-report:
   send-phpinfo: false
   use-https: true
   host: crash.pmmp.io
-
-anonymous-statistics:
-  #Sends anonymous statistics for data aggregation, plugin usage tracking
-  enabled: false #TODO: re-enable this when we have a new stats host
-  host: stats.pocketmine.net
 
 timings:
   #Choose the host to use for viewing your timings results.

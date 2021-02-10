@@ -91,7 +91,6 @@ use pocketmine\plugin\PluginManager;
 use pocketmine\plugin\ScriptPluginLoader;
 use pocketmine\resourcepacks\ResourcePackManager;
 use pocketmine\scheduler\AsyncPool;
-use pocketmine\scheduler\SendUsageTask;
 use pocketmine\snooze\SleeperHandler;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\tile\Tile;
@@ -234,9 +233,6 @@ class Server{
 	/** @var bool */
 	private $doTitleTick = true;
 
-	/** @var int */
-	private $sendUsageTicker = 0;
-
 	/** @var bool */
 	private $dispatchSignals = false;
 
@@ -305,12 +301,6 @@ class Server{
 	private $dataPath;
 	/** @var string */
 	private $pluginPath;
-
-	/**
-	 * @var string[]
-	 * @phpstan-var array<string, string>
-	 */
-	private $uniquePlayers = [];
 
 	/** @var QueryHandler|null */
 	private $queryHandler = null;
@@ -1300,11 +1290,7 @@ class Server{
 
 			$this->logger->info("Loading pocketmine.yml...");
 			if(!file_exists($this->dataPath . "pocketmine.yml")){
-				$content = file_get_contents(\pocketmine\RESOURCE_PATH . "pocketmine.yml");
-				if(\pocketmine\IS_DEVELOPMENT_BUILD){
-					$content = str_replace("preferred-channel: stable", "preferred-channel: beta", $content);
-				}
-				@file_put_contents($this->dataPath . "pocketmine.yml", $content);
+				@file_put_contents($this->dataPath . "pocketmine.yml", file_get_contents(\pocketmine\RESOURCE_PATH . "pocketmine.yml"));
 			}
 			$this->config = new Config($this->dataPath . "pocketmine.yml", Config::YAML, []);
 
@@ -1339,16 +1325,6 @@ class Server{
 			$this->forceLanguage = (bool) $this->getProperty("settings.force-language", false);
 			$this->baseLang = new BaseLang($this->getConfigString("language", $this->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE)));
 			$this->logger->info($this->getLanguage()->translateString("language.selected", [$this->getLanguage()->getName(), $this->getLanguage()->getLang()]));
-
-			if(\pocketmine\IS_DEVELOPMENT_BUILD and !((bool) $this->getProperty("settings.enable-dev-builds", false))){
-				$this->logger->emergency($this->baseLang->translateString("pocketmine.server.devBuild.error1", [\pocketmine\NAME]));
-				$this->logger->emergency($this->baseLang->translateString("pocketmine.server.devBuild.error2"));
-				$this->logger->emergency($this->baseLang->translateString("pocketmine.server.devBuild.error3"));
-				$this->logger->emergency($this->baseLang->translateString("pocketmine.server.devBuild.error4", ["settings.enable-dev-builds"]));
-				$this->logger->emergency($this->baseLang->translateString("pocketmine.server.devBuild.error5", ["https://github.com/pmmp/PocketMine-MP/releases"]));
-				$this->forceShutdown();
-				return;
-			}
 
 			if($this->logger instanceof MainLogger){
 				$this->logger->setLogDebug(\pocketmine\DEBUG > 1);
@@ -1811,10 +1787,6 @@ class Server{
 		}
 
 		try{
-			if(!$this->isRunning()){
-				$this->sendUsage(SendUsageTask::TYPE_CLOSE);
-			}
-
 			$this->hasStopped = true;
 
 			$this->shutdown();
@@ -1884,11 +1856,6 @@ class Server{
 	private function start() : void{
 		if($this->getConfigBool("enable-query", true)){
 			$this->queryHandler = new QueryHandler();
-		}
-
-		if((bool) $this->getProperty("settings.send-usage", true)){
-			$this->sendUsageTicker = 6000;
-			$this->sendUsage(SendUsageTask::TYPE_OPEN);
 		}
 
 		$this->tickCounter = 0;
@@ -1965,9 +1932,6 @@ class Server{
 		while(@ob_end_flush()){}
 		if(!$this->isRunning){
 			return;
-		}
-		if($this->sendUsageTicker > 0){
-			$this->sendUsage(SendUsageTask::TYPE_CLOSE);
 		}
 		$this->hasStopped = false;
 
@@ -2076,10 +2040,6 @@ class Server{
 	 * @return void
 	 */
 	public function onPlayerLogin(Player $player){
-		if($this->sendUsageTicker > 0){
-			$this->uniquePlayers[$player->getRawUniqueId()] = $player->getRawUniqueId();
-		}
-
 		$this->loggedInPlayers[$player->getRawUniqueId()] = $player;
 	}
 
@@ -2209,18 +2169,6 @@ class Server{
 	}
 
 	/**
-	 * @param int $type
-	 *
-	 * @return void
-	 */
-	public function sendUsage($type = SendUsageTask::TYPE_STATUS){
-		if((bool) $this->getProperty("anonymous-statistics.enabled", true)){
-			$this->asyncPool->submitTask(new SendUsageTask($this, $type, $this->uniquePlayers));
-		}
-		$this->uniquePlayers = [];
-	}
-
-	/**
 	 * @return BaseLang
 	 */
 	public function getLanguage(){
@@ -2336,11 +2284,6 @@ class Server{
 			$this->doAutoSave();
 			$time = (microtime(true) - $start);
 			$this->getLogger()->debug("[Auto Save] Save completed in " . ($time >= 1 ? round($time, 3) . "s" : round($time * 1000) . "ms"));
-		}
-
-		if($this->sendUsageTicker > 0 and --$this->sendUsageTicker === 0){
-			$this->sendUsageTicker = 6000;
-			$this->sendUsage(SendUsageTask::TYPE_STATUS);
 		}
 
 		if(($this->tickCounter % 100) === 0){
