@@ -110,6 +110,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 		while($this->interface->handlePacket()){}
 
 		if(!$this->rakLib->isRunning() and !$this->rakLib->isShutdown()){
+			Server::getInstance()->shutdown();
 			throw new \Exception("RakLib Thread crashed");
 		}
 	}
