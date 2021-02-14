@@ -23,7 +23,13 @@ declare(strict_types=1);
 
 namespace pocketmine\block;
 
-class NoteBlock extends Solid{
+use pocketmine\item\Item;
+use pocketmine\math\Vector3;
+use pocketmine\Player;
+use pocketmine\tile\NoteBlock as TileNoteBlock;
+use pocketmine\tile\Tile;
+
+class NoteBlock extends Solid {
 
 	protected $id = self::NOTE_BLOCK;
 
@@ -47,5 +53,19 @@ class NoteBlock extends Solid{
 		return BlockToolType::TYPE_AXE;
 	}
 
-	//TODO
+	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null): bool {
+		Tile::createTile("NoteBlock", $this->getLevelNonNull(), TileNoteBlock::createNBT($this, $face, $item, $player));
+		return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+	}
+	
+	public function onActivate(Item $item, Player $player = null): bool {
+		$tile = $this->getLevelNonNull()->getTile($this);
+		if($tile instanceof TileNoteBlock){
+			if($player->isSneaking()) {
+				$tile->changePitch();
+			}
+			return $tile->triggerNote();
+		}
+		return false;
+	}
 }

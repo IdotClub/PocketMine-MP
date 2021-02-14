@@ -34,8 +34,8 @@ use function assert;
 
 class Banner extends Spawnable implements Nameable{
 	use NameableTrait {
-		addAdditionalSpawnData as addNameSpawnData;
-		createAdditionalNBT as createNameNBT;
+		NameableTrait::addAdditionalSpawnData as addNameSpawnData;
+		NameableTrait::createAdditionalNBT as createNameNBT;
 	}
 
 	public const TAG_BASE = "Base";

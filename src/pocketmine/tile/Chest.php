@@ -32,7 +32,7 @@ use pocketmine\nbt\tag\IntTag;
 
 class Chest extends Spawnable implements InventoryHolder, Container, Nameable{
 	use NameableTrait {
-		addAdditionalSpawnData as addNameSpawnData;
+		NameableTrait::addAdditionalSpawnData as addNameSpawnData;
 	}
 	use ContainerTrait;
 

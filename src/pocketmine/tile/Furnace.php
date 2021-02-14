@@ -43,7 +43,7 @@ use function max;
 
 class Furnace extends Spawnable implements InventoryHolder, Container, Nameable{
 	use NameableTrait {
-		addAdditionalSpawnData as addNameSpawnData;
+		NameableTrait::addAdditionalSpawnData as addNameSpawnData;
 	}
 	use ContainerTrait;
 
