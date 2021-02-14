@@ -36,6 +36,7 @@ use pocketmine\entity\Human;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\entity\object\ItemEntity;
 use pocketmine\entity\projectile\Arrow;
+use pocketmine\entity\projectile\FishingHook;
 use pocketmine\entity\Skin;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -147,7 +148,6 @@ use pocketmine\network\mcpe\protocol\TextPacket;
 use pocketmine\network\mcpe\protocol\TransferPacket;
 use pocketmine\network\mcpe\protocol\types\CommandData;
 use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\DimensionIds;
 use pocketmine\network\mcpe\protocol\types\Experiments;
@@ -220,19 +220,19 @@ use const PHP_INT_MAX;
 /**
  * Main class that handles networking, recovery, and packet sending to the server part
  */
-class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
-
+class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
+	
 	public const SURVIVAL = 0;
 	public const CREATIVE = 1;
 	public const ADVENTURE = 2;
 	public const SPECTATOR = 3;
 	public const VIEW = Player::SPECTATOR;
-
+	
 	private const MOVES_PER_TICK = 2;
 	private const MOVE_BACKLOG_SIZE = 100 * self::MOVES_PER_TICK; //100 ticks backlog (5 seconds)
-
+	
 	private const RESOURCE_PACK_CHUNK_SIZE = 128 * 1024; //128KB
-
+	
 	//TODO: HACK!
 	//these IDs are used for 1.16 to restore 1.14ish crafting & inventory behaviour; since they don't seem to have any
 	//effect on the behaviour of inventory transactions I don't currently plan to integrate these into the main system.
@@ -401,7 +401,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	protected $startAction = -1;
 	/** @var int[] ID => ticks map */
 	protected $usedItemsCooldown = [];
-
+	
 	/** @var int */
 	protected $formIdCounter = 0;
 	/** @var Form[] */
@@ -411,6 +411,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 	protected $lastRightClickTime = 0.0;
 	/** @var \stdClass|null */
 	protected $lastRightClickData = null;
+
+	/** @var FishingHook|null */
+	protected $fishingHook;
 
 	/**
 	 * @return TranslationContainer|string
@@ -4173,11 +4176,19 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 	}
 
-	public function getLoaderId() : int{
+	public function getLoaderId(): int {
 		return $this->loaderId;
 	}
 
-	public function isLoaderActive() : bool{
+	public function isLoaderActive(): bool {
 		return $this->isConnected();
+	}
+
+	public function getFishingHook(): ?FishingHook {
+		return $this->fishingHook;
+	}
+
+	public function setFishingHook(?FishingHook $fishingHook): void {
+		$this->fishingHook = $fishingHook;
 	}
 }
