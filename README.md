@@ -3,16 +3,16 @@
 	<b>A highly customisable, open source server software for Minecraft: Bedrock Edition written in PHP</b>
 </p>
 
-<p align="center">
-	<img src="https://github.com/Blackjack200/pmmp/workflows/CI/badge.svg" alt="CI" />
-	<img src="http://jenkins.elaina.host/job/PMMP/badge/icon" alt="Build Status" />
-</p>
+![CI](https://github.com/Blackjack200/pmmp/workflows/CI/badge.svg)
+
+![Build Status](http://jenkins.elaina.host/job/PMMP/badge/icon)
 
 ## Getting started
 - [Documentation](http://pmmp.readthedocs.org/)
 - [Installation instructions](https://pmmp.readthedocs.io/en/rtfd/installation.html)
 - [Docker image](https://hub.docker.com/r/pmmp/pocketmine-mp)
 - [Plugin repository](https://poggit.pmmp.io/plugins)
+- [Jenkins](http://jenkins.elaina.host/job/PMMP/)
 
 ## Discussion/Help
 - [Forums](https://forums.pmmp.io/)
