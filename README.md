@@ -4,10 +4,8 @@
 </p>
 
 <p align="center">
-	<img src="https://github.com/pmmp/PocketMine-MP/workflows/CI/badge.svg" alt="CI" />
-	<a href="https://github.com/pmmp/PocketMine-MP/releases"><img src="https://img.shields.io/github/v/tag/pmmp/PocketMine-MP?label=release&logo=github" alt="GitHub tag (latest semver)" /></a>
-	<a href="https://hub.docker.com/r/pmmp/pocketmine-mp"><img src="https://img.shields.io/docker/v/pmmp/pocketmine-mp?logo=docker&label=image" alt="Docker image version (latest semver)" /></a>
-	<a href="https://discord.gg/bmSAZBG"><img src="https://img.shields.io/discord/373199722573201408?label=discord&color=7289DA&logo=discord" alt="Discord" /></a>
+	<img src="https://github.com/Blackjack200/pmmp/workflows/CI/badge.svg" alt="CI" />
+	<img src="http://jenkins.elaina.host/job/PMMP/badge/icon" alt="Build Status" />
 </p>
 
 ## Getting started
