@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace pocketmine\network\query;
 
 use pocketmine\network\AdvancedSourceInterface;
+use pocketmine\network\RawPacketHandler;
 use pocketmine\Server;
 use pocketmine\utils\Binary;
 use function base64_encode;
@@ -38,7 +39,7 @@ use function random_bytes;
 use function strlen;
 use function substr;
 
-class QueryHandler{
+class QueryHandler implements RawPacketHandler{
 	/** @var Server */
 	private $server;
 	/** @var string */
@@ -67,6 +68,7 @@ class QueryHandler{
 		$this->regenerateToken();
 		$this->lastToken = $this->token;
 		$this->server->getLogger()->info($this->server->getLanguage()->translateString("pocketmine.server.query.running", [$addr, $port]));
+		$this->server->getNetwork()->addRawPacketHandlers($this);
 	}
 
 	private function debug(string $message) : void{
@@ -95,10 +97,11 @@ class QueryHandler{
 		return Binary::readInt(substr(hash("sha512", $salt . ":" . $token, true), 7, 4));
 	}
 
-	/**
-	 * @return void
-	 */
-	public function handle(AdvancedSourceInterface $interface, string $address, int $port, string $packet){
+	public function handle(AdvancedSourceInterface $interface, string $address, int $port, string $packet) : bool {
+		if(!(strlen($packet) > 2 and substr($packet, 0, 2) === "\xfe\xfd")) {
+			return false;
+		}
+
 		$offset = 2;
 		$packetType = ord($packet[$offset++]);
 		$sessionID = Binary::readInt(substr($packet, $offset, 4));
@@ -133,5 +136,6 @@ class QueryHandler{
 				$this->debug("Unhandled packet from $address $port: " . base64_encode($packet));
 				break;
 		}
+		return true;
 	}
 }

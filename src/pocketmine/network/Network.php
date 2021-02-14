@@ -46,6 +46,9 @@ class Network{
 	/** @var AdvancedSourceInterface[] */
 	private $advancedInterfaces = [];
 
+	/** @var RawPacketHandler[] */
+	private $rawPacketHandlers = [];
+
 	/** @var float */
 	private $upload = 0;
 	/** @var float */
@@ -169,6 +172,36 @@ class Network{
 
 	public function getServer() : Server{
 		return $this->server;
+	}
+
+	/**
+	 * @return RawPacketHandler[]
+	 */
+	public function getRawPacketHandlers(): array {
+		return $this->rawPacketHandlers;
+	}
+
+	public function addRawPacketHandlers(RawPacketHandler $handler): void {
+		$this->rawPacketHandlers[] = $handler;
+	}
+
+	public function handleRawPacket(AdvancedSourceInterface $interface, string $address, int $port, string $payload) : void{
+		$handle = false;
+		foreach ($this->rawPacketHandlers as $handler) {
+			try{
+				if($handler->handle($interface, $address, $port, $payload)){
+					$handle = true;
+				}
+			}catch(\Throwable $e){
+				$this->server->getLogger()->logException($e);
+				$this->blockAddress($address, 600);
+			}
+		}
+
+		if(!$handle){
+			$this->server->getLogger()->warning("Unhandled raw packet from $address $port: " . base64_encode($payload));
+			$this->blockAddress($address, 5000);
+		}
 	}
 
 	/**

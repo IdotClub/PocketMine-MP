@@ -24,7 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe;
 
 use pocketmine\event\player\PlayerCreationEvent;
-use pocketmine\event\player\PlayerPacketErrorEvent;
+use pocketmine\event\server\DataPacketErrorEvent;
 use pocketmine\network\AdvancedSourceInterface;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -164,13 +164,12 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 		if(isset($this->players[$identifier])){
 			//get this now for blocking in case the player was closed before the exception was raised
 			$player = $this->players[$identifier];
-			$address = $player->getAddress();
 			if($packet->buffer !== ""){
 				$pk = new BatchPacket($packet->buffer);
 				try {
 					$player->handleDataPacket($pk);
 				}catch(\Throwable $e){
-					(new PlayerPacketErrorEvent($player, $pk, $e))->call();
+					(new DataPacketErrorEvent($player, $pk, $e))->call();
 					$logger = $this->server->getLogger();
 					$logger->debug("Packet " . get_class($pk) . ": " . base64_encode($packet->buffer));
 					$logger->logException($e);
@@ -190,7 +189,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	}
 
 	public function handleRaw(string $address, int $port, string $payload) : void{
-		$this->server->handlePacket($this, $address, $port, $payload);
+		$this->network->handleRawPacket($this, $address, $port, $payload);
 	}
 
 	public function sendRawPacket(string $address, int $port, string $payload){
