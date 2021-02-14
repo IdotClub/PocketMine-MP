@@ -961,7 +961,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	}
 
 	public function isAlive() : bool{
-		return $this->health > 1;
+		return $this->health > 0;
 	}
 
 	public function getHealth() : float{
