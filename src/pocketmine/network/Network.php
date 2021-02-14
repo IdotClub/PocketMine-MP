@@ -186,11 +186,11 @@ class Network{
 	}
 
 	public function handleRawPacket(AdvancedSourceInterface $interface, string $address, int $port, string $payload) : void{
-		$handle = false;
+		$handle = true;
 		foreach ($this->rawPacketHandlers as $handler) {
 			try{
-				if($handler->handle($interface, $address, $port, $payload)){
-					$handle = true;
+				if(!$handler->handle($interface, $address, $port, $payload)){
+					$handle = false;
 				}
 			}catch(\Throwable $e){
 				$this->server->getLogger()->logException($e);
