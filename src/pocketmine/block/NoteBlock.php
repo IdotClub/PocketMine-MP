@@ -61,7 +61,7 @@ class NoteBlock extends Solid {
 	public function onActivate(Item $item, Player $player = null): bool {
 		$tile = $this->getLevelNonNull()->getTile($this);
 		if($tile instanceof TileNoteBlock){
-			if($player->isSneaking()) {
+			if($player !== null && $player->isSneaking()) {
 				$tile->changePitch();
 			}
 			return $tile->triggerNote();
