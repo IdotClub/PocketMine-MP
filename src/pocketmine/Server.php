@@ -89,6 +89,7 @@ use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginLoadOrder;
 use pocketmine\plugin\PluginManager;
 use pocketmine\plugin\ScriptPluginLoader;
+use pocketmine\plugin\SourcePluginLoader;
 use pocketmine\resourcepacks\ResourcePackManager;
 use pocketmine\scheduler\AsyncPool;
 use pocketmine\snooze\SleeperHandler;
@@ -291,6 +292,8 @@ class Server{
 	private $dataPath;
 	/** @var string */
 	private $pluginPath;
+	/** @var string[] */
+	private $extraPluginPath = [];
 
 	/** @var QueryHandler|null */
 	private $queryHandler = null;
@@ -1460,6 +1463,9 @@ class Server{
 			$this->pluginManager = new PluginManager($this, $this->commandMap, ((bool) $this->getProperty("plugins.legacy-data-dir", true)) ? null : $this->getDataPath() . "plugin_data" . DIRECTORY_SEPARATOR);
 			$this->profilingTickRate = (float) $this->getProperty("settings.profile-report-trigger", 20);
 			$this->pluginManager->registerInterface(new PharPluginLoader($this->autoloader));
+			if((bool)$this->config->get("builtin-source-loader", true)) {
+				$this->pluginManager->registerInterface(new SourcePluginLoader($this->autoloader));
+			}
 			$this->pluginManager->registerInterface(new ScriptPluginLoader());
 
 			register_shutdown_function([$this, "crashDump"]);
@@ -1467,6 +1473,14 @@ class Server{
 			$this->queryRegenerateTask = new QueryRegenerateEvent($this);
 
 			$this->pluginManager->loadPlugins($this->pluginPath);
+
+			$extra = $this->config->getNested("plugins.extra-plugin-folder", []);
+			foreach(is_array($extra) ? $extra : [] as $path){
+				if(is_dir((string)$path)){
+					$this->pluginManager->loadPlugins($this->getDataPath() . (string)$path . DIRECTORY_SEPARATOR);
+				}
+			}
+
 			$this->enablePlugins(PluginLoadOrder::STARTUP);
 
 			$this->network->registerInterface(new RakLibInterface($this));
