@@ -158,7 +158,7 @@ plugins:
   #API Compat check
   compatible-check: false
   #Builtin Source PluginLoader
-  builtin-source-loader: true
+  builtin-source-loader: false
   #Setting this to true will cause the legacy structure to be used where plugin data is placed inside the --plugins dir.
   #False will place plugin data under plugin_data under --data.
   #This option exists for backwards compatibility with existing installations.
