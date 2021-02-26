@@ -30,7 +30,7 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\utils\Binary;
 use pocketmine\utils\Color;
 use function lcg_value;
-use function mt_rand;
+use function random_int;
 
 abstract class Armor extends Durable{
 
@@ -81,7 +81,7 @@ abstract class Armor extends Durable{
 
 			$chance = 1 / ($unbreakingLevel + 1);
 			for($i = 0; $i < $amount; ++$i){
-				if(mt_rand(1, 100) > 60 and lcg_value() > $chance){ //unbreaking only applies to armor 40% of the time at best
+				if(random_int(1, 100) > 60 and lcg_value() > $chance){ //unbreaking only applies to armor 40% of the time at best
 					$negated++;
 				}
 			}

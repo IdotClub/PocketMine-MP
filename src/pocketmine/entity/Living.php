@@ -63,7 +63,7 @@ use function lcg_value;
 use function max;
 use function min;
 use function mt_getrandmax;
-use function mt_rand;
+use function random_int;
 use function sqrt;
 use const M_PI;
 
@@ -464,7 +464,7 @@ abstract class Living extends Entity implements Damageable{
 				$totalEpf += $item->getEnchantmentProtectionFactor($source);
 			}
 		}
-		$source->setModifier(-$source->getFinalDamage() * min(ceil(min($totalEpf, 25) * (mt_rand(50, 100) / 100)), 20) * 0.04, EntityDamageEvent::MODIFIER_ARMOR_ENCHANTMENTS);
+		$source->setModifier(-$source->getFinalDamage() * min(ceil(min($totalEpf, 25) * (random_int(50, 100) / 100)), 20) * 0.04, EntityDamageEvent::MODIFIER_ARMOR_ENCHANTMENTS);
 
 		$source->setModifier(-min($this->getAbsorption(), $source->getFinalDamage()), EntityDamageEvent::MODIFIER_ABSORPTION);
 	}
@@ -482,9 +482,9 @@ abstract class Living extends Entity implements Damageable{
 			$damage = 0;
 			foreach($this->armorInventory->getContents() as $k => $item){
 				if($item instanceof Armor and ($thornsLevel = $item->getEnchantmentLevel(Enchantment::THORNS)) > 0){
-					if(mt_rand(0, 99) < $thornsLevel * 15){
+					if(random_int(0, 99) < $thornsLevel * 15){
 						$this->damageItem($item, 3);
-						$damage += ($thornsLevel > 10 ? $thornsLevel - 10 : 1 + mt_rand(0, 3));
+						$damage += ($thornsLevel > 10 ? $thornsLevel - 10 : 1 + random_int(0, 3));
 					}else{
 						$this->damageItem($item, 1); //thorns causes an extra +1 durability loss even if it didn't activate
 					}
@@ -587,7 +587,7 @@ abstract class Living extends Entity implements Damageable{
 		if($f <= 0){
 			return;
 		}
-		if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+		if(random_int() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
 			$f = 1 / $f;
 
 			$motion = clone $this->motion;

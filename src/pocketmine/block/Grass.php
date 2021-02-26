@@ -32,7 +32,7 @@ use pocketmine\level\generator\object\TallGrass as TallGrassObject;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\Random;
-use function mt_rand;
+use function random_int;
 
 class Grass extends Solid{
 
@@ -76,9 +76,9 @@ class Grass extends Solid{
 		}elseif($lightAbove >= 9){
 			//try grass spread
 			for($i = 0; $i < 4; ++$i){
-				$x = mt_rand($this->x - 1, $this->x + 1);
-				$y = mt_rand($this->y - 3, $this->y + 1);
-				$z = mt_rand($this->z - 1, $this->z + 1);
+				$x = random_int($this->x - 1, $this->x + 1);
+				$y = random_int($this->y - 3, $this->y + 1);
+				$z = random_int($this->z - 1, $this->z + 1);
 				if(
 					$this->level->getBlockIdAt($x, $y, $z) !== Block::DIRT or
 					$this->level->getBlockDataAt($x, $y, $z) === 1 or
@@ -100,7 +100,7 @@ class Grass extends Solid{
 	public function onActivate(Item $item, Player $player = null) : bool{
 		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){
 			$item->pop();
-			TallGrassObject::growGrass($this->getLevelNonNull(), $this, new Random(mt_rand()), 8, 2);
+			TallGrassObject::growGrass($this->getLevelNonNull(), $this, new Random(random_int()), 8, 2);
 
 			return true;
 		}elseif($item instanceof Hoe){

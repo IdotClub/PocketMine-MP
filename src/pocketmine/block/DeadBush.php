@@ -27,7 +27,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 
 class DeadBush extends Flowable{
 
@@ -66,7 +66,7 @@ class DeadBush extends Flowable{
 	public function getDrops(Item $item) : array{
 		if(!$this->isCompatibleWithTool($item)){
 			return [
-				ItemFactory::get(Item::STICK, 0, mt_rand(0, 2))
+				ItemFactory::get(Item::STICK, 0, random_int(0, 2))
 			];
 		}
 

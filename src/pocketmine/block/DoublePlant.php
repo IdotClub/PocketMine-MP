@@ -27,7 +27,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 
 class DoublePlant extends Flowable{
 	public const BITFLAG_TOP = 0x08;
@@ -107,7 +107,7 @@ class DoublePlant extends Flowable{
 				return parent::getDrops($item);
 			}
 
-			if(mt_rand(0, 24) === 0){
+			if(random_int(0, 24) === 0){
 				return [
 					ItemFactory::get(Item::SEEDS)
 				];

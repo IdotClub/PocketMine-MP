@@ -26,7 +26,7 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use function mt_rand;
+use function random_int;
 
 class CocoaBlock extends Transparent{
 
@@ -56,7 +56,7 @@ class CocoaBlock extends Transparent{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get(ItemIds::DYE, 3, ($this->meta >> 2) === 2 ? mt_rand(2, 3) : 1)
+			ItemFactory::get(ItemIds::DYE, 3, ($this->meta >> 2) === 2 ? random_int(2, 3) : 1)
 		];
 	}
 

@@ -26,7 +26,7 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\TieredTool;
-use function mt_rand;
+use function random_int;
 
 class DiamondOre extends Solid{
 
@@ -59,6 +59,6 @@ class DiamondOre extends Solid{
 	}
 
 	protected function getXpDropAmount() : int{
-		return mt_rand(3, 7);
+		return random_int(3, 7);
 	}
 }

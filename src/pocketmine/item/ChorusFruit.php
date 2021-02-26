@@ -28,7 +28,7 @@ use pocketmine\entity\Living;
 use pocketmine\level\sound\EndermanTeleportSound;
 use pocketmine\math\Vector3;
 use function min;
-use function mt_rand;
+use function random_int;
 
 class ChorusFruit extends Food{
 
@@ -60,9 +60,9 @@ class ChorusFruit extends Food{
 		$maxZ = $minZ + 16;
 
 		for($attempts = 0; $attempts < 16; ++$attempts){
-			$x = mt_rand($minX, $maxX);
-			$y = mt_rand($minY, $maxY);
-			$z = mt_rand($minZ, $maxZ);
+			$x = random_int($minX, $maxX);
+			$y = random_int($minY, $maxY);
+			$z = random_int($minZ, $maxZ);
 
 			while($y >= 0 and !$level->getBlockAt($x, $y, $z)->isSolid()){
 				$y--;

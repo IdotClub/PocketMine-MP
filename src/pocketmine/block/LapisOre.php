@@ -26,7 +26,7 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\TieredTool;
-use function mt_rand;
+use function random_int;
 
 class LapisOre extends Solid{
 
@@ -54,11 +54,11 @@ class LapisOre extends Solid{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get(Item::DYE, 4, mt_rand(4, 8))
+			ItemFactory::get(Item::DYE, 4, random_int(4, 8))
 		];
 	}
 
 	protected function getXpDropAmount() : int{
-		return mt_rand(2, 5);
+		return random_int(2, 5);
 	}
 }

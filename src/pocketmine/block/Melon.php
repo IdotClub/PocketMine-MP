@@ -25,7 +25,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use function mt_rand;
+use function random_int;
 
 class Melon extends Transparent{
 
@@ -49,7 +49,7 @@ class Melon extends Transparent{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get(Item::MELON_SLICE, 0, mt_rand(3, 7))
+			ItemFactory::get(Item::MELON_SLICE, 0, random_int(3, 7))
 		];
 	}
 }

@@ -30,7 +30,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use function atan2;
-use function mt_rand;
+use function random_int;
 use function sqrt;
 use const M_PI;
 
@@ -64,7 +64,7 @@ class Squid extends WaterAnimal{
 		}
 
 		if($source instanceof EntityDamageByEntityEvent){
-			$this->swimSpeed = mt_rand(150, 350) / 2000;
+			$this->swimSpeed = random_int(150, 350) / 2000;
 			$e = $source->getDamager();
 			if($e !== null){
 				$this->swimDirection = (new Vector3($this->x - $e->x, $this->y - $e->y, $this->z - $e->z))->normalize();
@@ -75,7 +75,7 @@ class Squid extends WaterAnimal{
 	}
 
 	private function generateRandomDirection() : Vector3{
-		return new Vector3(mt_rand(-1000, 1000) / 1000, mt_rand(-500, 500) / 1000, mt_rand(-1000, 1000) / 1000);
+		return new Vector3(random_int(-1000, 1000) / 1000, random_int(-500, 500) / 1000, random_int(-1000, 1000) / 1000);
 	}
 
 	public function entityBaseTick(int $tickDiff = 1) : bool{
@@ -85,7 +85,7 @@ class Squid extends WaterAnimal{
 
 		if(++$this->switchDirectionTicker === 100){
 			$this->switchDirectionTicker = 0;
-			if(mt_rand(0, 100) < 50){
+			if(random_int(0, 100) < 50){
 				$this->swimDirection = null;
 			}
 		}
@@ -107,7 +107,7 @@ class Squid extends WaterAnimal{
 				}
 			}else{
 				$this->swimDirection = $this->generateRandomDirection();
-				$this->swimSpeed = mt_rand(50, 100) / 2000;
+				$this->swimSpeed = random_int(50, 100) / 2000;
 			}
 
 			$f = sqrt(($this->motion->x ** 2) + ($this->motion->z ** 2));
@@ -126,7 +126,7 @@ class Squid extends WaterAnimal{
 
 	public function getDrops() : array{
 		return [
-			ItemFactory::get(Item::DYE, 0, mt_rand(1, 3))
+			ItemFactory::get(Item::DYE, 0, random_int(1, 3))
 		];
 	}
 }

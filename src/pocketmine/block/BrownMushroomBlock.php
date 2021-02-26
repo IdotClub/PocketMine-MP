@@ -24,7 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
-use function mt_rand;
+use function random_int;
 
 class BrownMushroomBlock extends RedMushroomBlock{
 
@@ -36,7 +36,7 @@ class BrownMushroomBlock extends RedMushroomBlock{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			Item::get(Item::BROWN_MUSHROOM, 0, mt_rand(0, 2))
+			Item::get(Item::BROWN_MUSHROOM, 0, random_int(0, 2))
 		];
 	}
 }

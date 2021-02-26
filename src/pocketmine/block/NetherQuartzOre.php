@@ -26,7 +26,7 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\TieredTool;
-use function mt_rand;
+use function random_int;
 
 class NetherQuartzOre extends Solid{
 
@@ -59,6 +59,6 @@ class NetherQuartzOre extends Solid{
 	}
 
 	protected function getXpDropAmount() : int{
-		return mt_rand(2, 5);
+		return random_int(2, 5);
 	}
 }

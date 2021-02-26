@@ -36,7 +36,7 @@ use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 use function sqrt;
 
 class Arrow extends Projectile{
@@ -96,7 +96,7 @@ class Arrow extends Projectile{
 	public function getResultDamage() : int{
 		$base = parent::getResultDamage();
 		if($this->isCritical()){
-			return ($base + mt_rand(0, (int) ($base / 2) + 1));
+			return ($base + random_int(0, (int) ($base / 2) + 1));
 		}else{
 			return $base;
 		}

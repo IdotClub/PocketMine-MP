@@ -28,7 +28,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\TieredTool;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 
 class RedstoneOre extends Solid{
 
@@ -69,11 +69,11 @@ class RedstoneOre extends Solid{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get(Item::REDSTONE_DUST, 0, mt_rand(4, 5))
+			ItemFactory::get(Item::REDSTONE_DUST, 0, random_int(4, 5))
 		];
 	}
 
 	protected function getXpDropAmount() : int{
-		return mt_rand(1, 5);
+		return random_int(1, 5);
 	}
 }

@@ -25,7 +25,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use function mt_rand;
+use function random_int;
 
 class Carrot extends Crops{
 
@@ -41,7 +41,7 @@ class Carrot extends Crops{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get(Item::CARROT, 0, $this->meta >= 0x07 ? mt_rand(1, 4) : 1)
+			ItemFactory::get(Item::CARROT, 0, $this->meta >= 0x07 ? random_int(1, 4) : 1)
 		];
 	}
 

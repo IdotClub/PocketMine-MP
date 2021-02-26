@@ -27,7 +27,7 @@ use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
-use function mt_rand;
+use function random_int;
 
 class Mycelium extends Solid{
 
@@ -61,9 +61,9 @@ class Mycelium extends Solid{
 
 	public function onRandomTick() : void{
 		//TODO: light levels
-		$x = mt_rand($this->x - 1, $this->x + 1);
-		$y = mt_rand($this->y - 2, $this->y + 2);
-		$z = mt_rand($this->z - 1, $this->z + 1);
+		$x = random_int($this->x - 1, $this->x + 1);
+		$y = random_int($this->y - 2, $this->y + 2);
+		$z = random_int($this->z - 1, $this->z + 1);
 		$block = $this->getLevelNonNull()->getBlockAt($x, $y, $z);
 		if($block->getId() === Block::DIRT){
 			if($block->getSide(Vector3::SIDE_UP) instanceof Transparent){

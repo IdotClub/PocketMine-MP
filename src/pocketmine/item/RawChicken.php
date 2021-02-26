@@ -25,7 +25,7 @@ namespace pocketmine\item;
 
 use pocketmine\entity\Effect;
 use pocketmine\entity\EffectInstance;
-use function mt_rand;
+use function random_int;
 
 class RawChicken extends Food{
 	public function __construct(int $meta = 0){
@@ -41,6 +41,6 @@ class RawChicken extends Food{
 	}
 
 	public function getAdditionalEffects() : array{
-		return mt_rand(0, 9) < 3 ? [new EffectInstance(Effect::getEffect(Effect::HUNGER), 600)] : [];
+		return random_int(0, 9) < 3 ? [new EffectInstance(Effect::getEffect(Effect::HUNGER), 600)] : [];
 	}
 }

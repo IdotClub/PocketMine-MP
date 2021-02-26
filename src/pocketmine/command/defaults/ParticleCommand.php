@@ -66,8 +66,6 @@ use pocketmine\utils\TextFormat;
 use function count;
 use function explode;
 use function max;
-use function microtime;
-use function mt_rand;
 use function strpos;
 use function strtolower;
 
@@ -122,7 +120,7 @@ class ParticleCommand extends VanillaCommand{
 
 		$sender->sendMessage(new TranslationContainer("commands.particle.success", [$name, $count]));
 
-		$random = new Random((int) (microtime(true) * 1000) + mt_rand());
+		$random = new Random();
 
 		for($i = 0; $i < $count; ++$i){
 			$particle->setComponents(

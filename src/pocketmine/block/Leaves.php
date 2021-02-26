@@ -28,7 +28,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 
 class Leaves extends Transparent{
 	public const OAK = 0;
@@ -177,10 +177,10 @@ class Leaves extends Transparent{
 		}
 
 		$drops = [];
-		if(mt_rand(1, 20) === 1){ //Saplings
+		if(random_int(1, 20) === 1){ //Saplings
 			$drops[] = $this->getSaplingItem();
 		}
-		if($this->canDropApples() and mt_rand(1, 200) === 1){ //Apples
+		if($this->canDropApples() and random_int(1, 200) === 1){ //Apples
 			$drops[] = ItemFactory::get(Item::APPLE);
 		}
 

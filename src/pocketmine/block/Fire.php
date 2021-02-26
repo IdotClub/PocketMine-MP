@@ -32,7 +32,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use function min;
-use function mt_rand;
+use function random_int;
 
 class Fire extends Flowable{
 
@@ -84,7 +84,7 @@ class Fire extends Flowable{
 		if(!$this->getSide(Vector3::SIDE_DOWN)->isSolid() and !$this->hasAdjacentFlammableBlocks()){
 			$this->getLevelNonNull()->setBlock($this, BlockFactory::get(Block::AIR), true);
 		}else{
-			$this->level->scheduleDelayedBlockUpdate($this, mt_rand(30, 40));
+			$this->level->scheduleDelayedBlockUpdate($this, random_int(30, 40));
 		}
 	}
 
@@ -96,7 +96,7 @@ class Fire extends Flowable{
 		$down = $this->getSide(Vector3::SIDE_DOWN);
 
 		$result = null;
-		if($this->meta < 15 and mt_rand(0, 2) === 0){
+		if($this->meta < 15 and random_int(0, 2) === 0){
 			$this->meta++;
 			$result = $this;
 		}
@@ -105,7 +105,7 @@ class Fire extends Flowable{
 		if(!$down->burnsForever()){
 			//TODO: check rain
 			if($this->meta === 15){
-				if(!$down->isFlammable() and mt_rand(0, 3) === 3){ //1/4 chance to extinguish
+				if(!$down->isFlammable() and random_int(0, 3) === 3){ //1/4 chance to extinguish
 					$canSpread = false;
 					$result = BlockFactory::get(Block::AIR);
 				}
@@ -121,7 +121,7 @@ class Fire extends Flowable{
 			$this->level->setBlock($this, $result);
 		}
 
-		$this->level->scheduleDelayedBlockUpdate($this, mt_rand(30, 40));
+		$this->level->scheduleDelayedBlockUpdate($this, random_int(30, 40));
 
 		if($canSpread){
 			//TODO: raise upper bound for chance in humid biomes
@@ -153,14 +153,14 @@ class Fire extends Flowable{
 	}
 
 	private function burnBlock(Block $block, int $chanceBound) : void{
-		if(mt_rand(0, $chanceBound) < $block->getFlammability()){
+		if(random_int(0, $chanceBound) < $block->getFlammability()){
 			$ev = new BlockBurnEvent($block, $this);
 			$ev->call();
 			if(!$ev->isCancelled()){
 				$block->onIncinerate();
 
-				if(mt_rand(0, $this->meta + 9) < 5){ //TODO: check rain
-					$this->level->setBlock($block, BlockFactory::get(Block::FIRE, min(15, $this->meta + (mt_rand(0, 4) >> 2))));
+				if(random_int(0, $this->meta + 9) < 5){ //TODO: check rain
+					$this->level->setBlock($block, BlockFactory::get(Block::FIRE, min(15, $this->meta + (random_int(0, 4) >> 2))));
 				}else{
 					$this->level->setBlock($block, BlockFactory::get(Block::AIR));
 				}

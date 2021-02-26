@@ -25,7 +25,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use function mt_rand;
+use function random_int;
 
 class Beetroot extends Crops{
 
@@ -43,7 +43,7 @@ class Beetroot extends Crops{
 		if($this->meta >= 0x07){
 			return [
 				ItemFactory::get(Item::BEETROOT),
-				ItemFactory::get(Item::BEETROOT_SEEDS, 0, mt_rand(0, 3))
+				ItemFactory::get(Item::BEETROOT_SEEDS, 0, random_int(0, 3))
 			];
 		}
 

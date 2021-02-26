@@ -25,7 +25,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\TieredTool;
-use function mt_rand;
+use function random_int;
 
 class MonsterSpawner extends Transparent{
 
@@ -60,6 +60,6 @@ class MonsterSpawner extends Transparent{
 	}
 
 	protected function getXpDropAmount() : int{
-		return mt_rand(15, 43);
+		return random_int(15, 43);
 	}
 }

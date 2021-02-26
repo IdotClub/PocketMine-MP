@@ -28,7 +28,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 
 class NetherWartPlant extends Flowable{
 	protected $id = Block::NETHER_WART_PLANT;
@@ -65,7 +65,7 @@ class NetherWartPlant extends Flowable{
 	}
 
 	public function onRandomTick() : void{
-		if($this->meta < 3 and mt_rand(0, 10) === 0){ //Still growing
+		if($this->meta < 3 and random_int(0, 10) === 0){ //Still growing
 			$block = clone $this;
 			$block->meta++;
 			$ev = new BlockGrowEvent($this, $block);
@@ -78,7 +78,7 @@ class NetherWartPlant extends Flowable{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get($this->getItemId(), 0, ($this->getDamage() === 3 ? mt_rand(2, 4) : 1))
+			ItemFactory::get($this->getItemId(), 0, ($this->getDamage() === 3 ? random_int(2, 4) : 1))
 		];
 	}
 

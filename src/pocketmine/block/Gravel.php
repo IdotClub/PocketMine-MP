@@ -25,7 +25,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use function mt_rand;
+use function random_int;
 
 class Gravel extends Fallable{
 
@@ -48,7 +48,7 @@ class Gravel extends Fallable{
 	}
 
 	public function getDropsForCompatibleTool(Item $item) : array{
-		if(mt_rand(1, 10) === 1){
+		if(random_int(1, 10) === 1){
 			return [
 				ItemFactory::get(Item::FLINT)
 			];

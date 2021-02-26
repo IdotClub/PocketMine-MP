@@ -25,7 +25,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use function mt_rand;
+use function random_int;
 
 class Potato extends Crops{
 
@@ -41,9 +41,9 @@ class Potato extends Crops{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		$result = [
-			ItemFactory::get(Item::POTATO, 0, $this->getDamage() >= 0x07 ? mt_rand(1, 5) : 1)
+			ItemFactory::get(Item::POTATO, 0, $this->getDamage() >= 0x07 ? random_int(1, 5) : 1)
 		];
-		if($this->getDamage() >= 7 && mt_rand(0, 49) === 0){
+		if($this->getDamage() >= 7 && random_int(0, 49) === 0){
 			$result[] = ItemFactory::get(Item::POISONOUS_POTATO);
 		}
 		return $result;

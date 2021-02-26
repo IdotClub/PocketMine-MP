@@ -27,7 +27,7 @@ use pocketmine\event\block\BlockGrowEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
-use function mt_rand;
+use function random_int;
 
 class MelonStem extends Crops{
 
@@ -42,7 +42,7 @@ class MelonStem extends Crops{
 	}
 
 	public function onRandomTick() : void{
-		if(mt_rand(0, 2) === 1){
+		if(random_int(0, 2) === 1){
 			if($this->meta < 0x07){
 				$block = clone $this;
 				++$block->meta;
@@ -58,7 +58,7 @@ class MelonStem extends Crops{
 						return;
 					}
 				}
-				$side = $this->getSide(mt_rand(2, 5));
+				$side = $this->getSide(random_int(2, 5));
 				$d = $side->getSide(Vector3::SIDE_DOWN);
 				if($side->getId() === self::AIR and ($d->getId() === self::FARMLAND or $d->getId() === self::GRASS or $d->getId() === self::DIRT)){
 					$ev = new BlockGrowEvent($side, BlockFactory::get(Block::MELON_BLOCK));
@@ -73,7 +73,7 @@ class MelonStem extends Crops{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get(Item::MELON_SEEDS, 0, mt_rand(0, 2))
+			ItemFactory::get(Item::MELON_SEEDS, 0, random_int(0, 2))
 		];
 	}
 

@@ -27,7 +27,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use function mt_rand;
+use function random_int;
 
 class TallGrass extends Flowable{
 
@@ -80,7 +80,7 @@ class TallGrass extends Flowable{
 			return parent::getDrops($item);
 		}
 
-		if(mt_rand(0, 15) === 0){
+		if(random_int(0, 15) === 0){
 			return [
 				ItemFactory::get(Item::WHEAT_SEEDS)
 			];
