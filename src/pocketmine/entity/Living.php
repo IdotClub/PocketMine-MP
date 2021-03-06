@@ -587,7 +587,7 @@ abstract class Living extends Entity implements Damageable{
 		if($f <= 0){
 			return;
 		}
-		if(random_int() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+		if(random_int(0, mt_getrandmax()) / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
 			$f = 1 / $f;
 
 			$motion = clone $this->motion;

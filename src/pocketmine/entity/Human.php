@@ -415,7 +415,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 				if((int) ($newLevel / 5) > (int) ($oldLevel / 5)){
 					$this->playLevelUpSound($newLevel);
 				}elseif($this->getCurrentTotalXp() > $oldTotal){
-					$this->level->broadcastLevelEvent($this, LevelEventPacket::EVENT_SOUND_ORB, random_int());
+					$this->level->broadcastLevelEvent($this, LevelEventPacket::EVENT_SOUND_ORB, random_int(0, INT32_MAX));
 				}
 			}
 

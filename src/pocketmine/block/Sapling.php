@@ -70,7 +70,7 @@ class Sapling extends Flowable{
 	public function onActivate(Item $item, Player $player = null) : bool{
 		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
 			//TODO: change log type
-			Tree::growTree($this->getLevelNonNull(), $this->x, $this->y, $this->z, new Random(random_int()), $this->getVariant());
+			Tree::growTree($this->getLevelNonNull(), $this->x, $this->y, $this->z, new Random(random_int(0, INT32_MAX)), $this->getVariant());
 
 			$item->pop();
 
@@ -93,7 +93,7 @@ class Sapling extends Flowable{
 	public function onRandomTick() : void{
 		if($this->level->getFullLightAt($this->x, $this->y, $this->z) >= 8 and random_int(1, 7) === 1){
 			if(($this->meta & 0x08) === 0x08){
-				Tree::growTree($this->getLevelNonNull(), $this->x, $this->y, $this->z, new Random(random_int()), $this->getVariant());
+				Tree::growTree($this->getLevelNonNull(), $this->x, $this->y, $this->z, new Random(random_int(0, INT32_MAX)), $this->getVariant());
 			}else{
 				$this->meta |= 0x08;
 				$this->getLevelNonNull()->setBlock($this, $this, true);

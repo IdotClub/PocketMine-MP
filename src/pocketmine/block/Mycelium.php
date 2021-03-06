@@ -61,9 +61,9 @@ class Mycelium extends Solid{
 
 	public function onRandomTick() : void{
 		//TODO: light levels
-		$x = random_int($this->x - 1, $this->x + 1);
-		$y = random_int($this->y - 2, $this->y + 2);
-		$z = random_int($this->z - 1, $this->z + 1);
+		$x = random_int((int)$this->x - 1, (int)$this->x + 1);
+		$y = random_int((int)$this->y - 2, (int)$this->y + 2);
+		$z = random_int((int)$this->z - 1, (int)$this->z + 1);
 		$block = $this->getLevelNonNull()->getBlockAt($x, $y, $z);
 		if($block->getId() === Block::DIRT){
 			if($block->getSide(Vector3::SIDE_UP) instanceof Transparent){
