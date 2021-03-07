@@ -186,11 +186,10 @@ class Network{
 	}
 
 	public function handleRawPacket(AdvancedSourceInterface $interface, string $address, int $port, string $payload) : void{
-		$handle = true;
 		foreach ($this->rawPacketHandlers as $handler) {
 			try{
-				if(!$handler->handle($interface, $address, $port, $payload)){
-					$handle = false;
+				if($handler->handle($interface, $address, $port, $payload)){
+					return;
 				}
 			}catch(\Throwable $e){
 				$this->server->getLogger()->logException($e);
@@ -198,10 +197,7 @@ class Network{
 			}
 		}
 
-		if(!$handle){
-			$this->server->getLogger()->warning("Unhandled raw packet from $address $port: " . base64_encode($payload));
-			$this->blockAddress($address, 5000);
-		}
+		$this->server->getLogger()->warning("Unhandled raw packet from $address $port: " . base64_encode($payload));
 	}
 
 	/**
