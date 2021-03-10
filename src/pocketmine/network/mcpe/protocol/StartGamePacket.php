@@ -236,6 +236,8 @@ class StartGamePacket extends DataPacket{
 		$this->premiumWorldTemplateId = $this->getString();
 		$this->isTrial = $this->getBool();
 		$this->playerMovementType = $this->getVarInt();
+		$this->getVarInt();
+		$this->getBool();
 		$this->currentTick = $this->getLLong();
 
 		$this->enchantmentSeed = $this->getVarInt();
@@ -318,6 +320,8 @@ class StartGamePacket extends DataPacket{
 		$this->putString($this->premiumWorldTemplateId);
 		$this->putBool($this->isTrial);
 		$this->putVarInt($this->playerMovementType);
+		$this->putVarInt(0);
+		$this->putBool(false);
 		$this->putLLong($this->currentTick);
 
 		$this->putVarInt($this->enchantmentSeed);
