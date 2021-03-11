@@ -298,6 +298,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	protected $username = "";
 	/** @var string */
 	protected $iusername = "";
+	/** @var int */
+	protected $protocol = ProtocolInfo::CURRENT_PROTOCOL;
 	/** @var string */
 	protected $displayName = "";
 	/** @var int */
@@ -801,6 +803,10 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	 */
 	public function getName() : string{
 		return $this->username;
+	}
+
+	public function getProtocol() : int{
+		return $this->protocol;
 	}
 
 	public function getLowerCaseName() : string{
@@ -1876,6 +1882,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			return false;
 		}
 		$this->seenLoginPacket = true;
+		$this->protocol = $packet->protocol;
 
 		if(!in_array($packet->protocol, ProtocolInfo::ACCEPT_PROTOCOL, true)){
 			if($packet->protocol < ProtocolInfo::CURRENT_PROTOCOL){

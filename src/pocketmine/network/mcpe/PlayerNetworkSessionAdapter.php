@@ -98,6 +98,7 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 		$timings = Timings::getReceiveDataPacketTimings($packet);
 		$timings->startTiming();
 
+		$packet->protocol = $this->player->getProtocol();
 		$packet->decode();
 		if(!$packet->feof() and !$packet->mayHaveUnreadBytes()){
 			$remains = substr($packet->buffer, $packet->offset);

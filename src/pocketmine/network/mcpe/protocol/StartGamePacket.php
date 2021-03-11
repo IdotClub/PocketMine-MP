@@ -236,8 +236,10 @@ class StartGamePacket extends DataPacket{
 		$this->premiumWorldTemplateId = $this->getString();
 		$this->isTrial = $this->getBool();
 		$this->playerMovementType = $this->getVarInt();
-		$this->getVarInt();
-		$this->getBool();
+		if($this->protocol >= 428){
+			$this->getVarInt(); //rewindHistorySize
+			$this->getBool(); //isServerAuthoritativeBlockBreaking
+		}
 		$this->currentTick = $this->getLLong();
 
 		$this->enchantmentSeed = $this->getVarInt();
@@ -320,8 +322,10 @@ class StartGamePacket extends DataPacket{
 		$this->putString($this->premiumWorldTemplateId);
 		$this->putBool($this->isTrial);
 		$this->putVarInt($this->playerMovementType);
-		$this->putVarInt(0);
-		$this->putBool(false);
+		if($this->protocol >= 428){
+			$this->putVarInt(0); //rewindHistorySize
+			$this->putBool(false); //isServerAuthoritativeBlockBreaking
+		}
 		$this->putLLong($this->currentTick);
 
 		$this->putVarInt($this->enchantmentSeed);

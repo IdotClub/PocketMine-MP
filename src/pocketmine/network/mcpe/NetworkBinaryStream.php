@@ -38,6 +38,7 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\convert\ItemTypeDictionary;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\CommandOriginData;
 use pocketmine\network\mcpe\protocol\types\EntityLink;
 use pocketmine\network\mcpe\protocol\types\GameRuleType;
@@ -58,6 +59,9 @@ class NetworkBinaryStream extends BinaryStream{
 
 	private const DAMAGE_TAG = "Damage"; //TAG_Int
 	private const DAMAGE_TAG_CONFLICT_RESOLUTION = "___Damage_ProtocolCollisionResolution___";
+
+	/** @var int */
+	public $protocol = ProtocolInfo::CURRENT_PROTOCOL;
 
 	public function getString() : string{
 		return $this->get($this->getUnsignedVarInt());
@@ -87,7 +91,9 @@ class NetworkBinaryStream extends BinaryStream{
 
 	public function getSkin() : SkinData{
 		$skinId = $this->getString();
-		$this->getString(); //playFabId
+		if($this->protocol >= 428){
+			$this->getString(); //playFabId
+		}
 		$skinResourcePatch = $this->getString();
 		$skinData = $this->getSkinImage();
 		$animationCount = $this->getLInt();
@@ -142,7 +148,9 @@ class NetworkBinaryStream extends BinaryStream{
 	 */
 	public function putSkin(SkinData $skin){
 		$this->putString($skin->getSkinId());
-		$this->putString(""); //playFabId
+		if($this->protocol >= 428){
+			$this->putString(""); //playFabId
+		}
 		$this->putString($skin->getResourcePatch());
 		$this->putSkinImage($skin->getSkinImage());
 		$this->putLInt(count($skin->getAnimations()));
