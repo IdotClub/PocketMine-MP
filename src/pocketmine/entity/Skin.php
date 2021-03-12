@@ -49,7 +49,7 @@ class Skin{
 	/** @var string */
 	private $geometryData;
 
-	public function __construct(string $skinId,string $playFabId, string $skinData, string $capeData = "", string $geometryName = "", string $geometryData = ""){
+	public function __construct(string $skinId, ?string $playFabId, string $skinData, string $capeData = "", string $geometryName = "", string $geometryData = ""){
 		$this->skinId = $skinId;
 		$this->playFabId = $playFabId;
 		$this->skinData = $skinData;

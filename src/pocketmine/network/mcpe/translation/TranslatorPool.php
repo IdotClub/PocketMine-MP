@@ -8,7 +8,7 @@ class TranslatorPool {
 	/** @var Translator[] */
 	private static $translators = [];
 	
-	public static function init() {
+	public static function init(): void {
 		self::$translators[] = new Protocol428();
 	}
 	
