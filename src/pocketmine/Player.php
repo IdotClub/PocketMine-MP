@@ -165,6 +165,8 @@ use pocketmine\network\mcpe\protocol\types\SpawnSettings;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateAttributesPacket;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
+use pocketmine\network\mcpe\translation\Translator;
+use pocketmine\network\mcpe\translation\TranslatorPool;
 use pocketmine\network\mcpe\VerifyLoginTask;
 use pocketmine\network\SourceInterface;
 use pocketmine\permission\PermissibleBase;
@@ -262,6 +264,9 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	 * TODO: remove this once player and network are divorced properly
 	 */
 	protected $sessionAdapter;
+
+	/** @var Translator|null */
+	protected $translator;
 
 	/** @var string */
 	protected $ip;
@@ -1883,6 +1888,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		}
 		$this->seenLoginPacket = true;
 		$this->protocol = $packet->protocol;
+		$this->translator = TranslatorPool::getTranslator($this->protocol);
 
 		if(!in_array($packet->protocol, ProtocolInfo::ACCEPT_PROTOCOL, true)){
 			if($packet->protocol < ProtocolInfo::CURRENT_PROTOCOL){
@@ -1951,6 +1957,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 		$skinData = new SkinData(
 			$packet->clientData["SkinId"],
+			$packet->clientData["PlayFabId"] ?? null,
 			base64_decode($packet->clientData["SkinResourcePatch"] ?? "", true),
 			new SkinImage(
 				$packet->clientData["SkinImageHeight"],
@@ -4176,5 +4183,13 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 	public function setFishingHook(?FishingHook $fishingHook): void {
 		$this->fishingHook = $fishingHook;
+	}
+
+	public function getTranslator(): ?Translator {
+		return $this->translator;
+	}
+
+	public function setTranslator(?Translator $translator): void {
+		$this->translator = $translator;
 	}
 }

@@ -29,6 +29,7 @@ namespace pocketmine\network;
 use pocketmine\event\server\NetworkInterfaceRegisterEvent;
 use pocketmine\event\server\NetworkInterfaceUnregisterEvent;
 use pocketmine\network\mcpe\protocol\PacketPool;
+use pocketmine\network\mcpe\translation\TranslatorPool;
 use pocketmine\Server;
 use function spl_object_hash;
 
@@ -59,6 +60,7 @@ class Network{
 
 	public function __construct(Server $server){
 		PacketPool::init();
+		TranslatorPool::init();
 
 		$this->server = $server;
 

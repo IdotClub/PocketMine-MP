@@ -38,6 +38,8 @@ class Skin{
 
 	/** @var string */
 	private $skinId;
+	/** @var string|null */
+	private $playFabId;
 	/** @var string */
 	private $skinData;
 	/** @var string */
@@ -47,8 +49,9 @@ class Skin{
 	/** @var string */
 	private $geometryData;
 
-	public function __construct(string $skinId, string $skinData, string $capeData = "", string $geometryName = "", string $geometryData = ""){
+	public function __construct(string $skinId,string $playFabId, string $skinData, string $capeData = "", string $geometryName = "", string $geometryData = ""){
 		$this->skinId = $skinId;
+		$this->playFabId = $playFabId;
 		$this->skinData = $skinData;
 		$this->capeData = $capeData;
 		$this->geometryName = $geometryName;
@@ -86,6 +89,10 @@ class Skin{
 
 	public function getSkinId() : string{
 		return $this->skinId;
+	}
+
+	public function getPlayFabId(): ?string {
+		return $this->playFabId;
 	}
 
 	public function getSkinData() : string{

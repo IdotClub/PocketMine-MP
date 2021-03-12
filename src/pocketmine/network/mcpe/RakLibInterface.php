@@ -244,6 +244,9 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 			$packet->protocol = $player->getProtocol();
 
 			if(!$packet->isEncoded){
+				if(($translator = $player->getTranslator()) !== null){
+					$translator->translatorServer($player, $packet);
+				}
 				$packet->encode();
 			}
 

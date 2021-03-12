@@ -69,7 +69,6 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\LongTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\AdvancedSourceInterface;
 use pocketmine\network\CompressBatchedTask;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -1974,11 +1973,7 @@ class Server{
 		$this->nextTick = microtime(true);
 
 		while($this->isRunning){
-			try {
-				$this->tick();
-			}catch(\Throwable $throwable){
-				$this->getLogger()->logException($throwable);
-			}
+			$this->tick();
 
 			//sleeps are self-correcting - if we undersleep 1ms on this tick, we'll sleep an extra ms on the next tick
 			$this->tickSleeper->sleepUntil($this->nextTick);

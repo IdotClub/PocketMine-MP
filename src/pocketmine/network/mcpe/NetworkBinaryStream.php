@@ -91,8 +91,9 @@ class NetworkBinaryStream extends BinaryStream{
 
 	public function getSkin() : SkinData{
 		$skinId = $this->getString();
+		$playFabId = null;
 		if($this->protocol >= 428){
-			$this->getString(); //playFabId
+			$playFabId = $this->getString();
 		}
 		$skinResourcePatch = $this->getString();
 		$skinData = $this->getSkinImage();
@@ -140,7 +141,7 @@ class NetworkBinaryStream extends BinaryStream{
 			);
 		}
 
-		return new SkinData($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId, $fullSkinId, $armSize, $skinColor, $personaPieces, $pieceTintColors);
+		return new SkinData($skinId, $playFabId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId, $fullSkinId, $armSize, $skinColor, $personaPieces, $pieceTintColors);
 	}
 
 	/**
@@ -149,7 +150,7 @@ class NetworkBinaryStream extends BinaryStream{
 	public function putSkin(SkinData $skin){
 		$this->putString($skin->getSkinId());
 		if($this->protocol >= 428){
-			$this->putString(""); //playFabId
+			$this->putString($skin->getPlayFabId() ?? random_bytes(16));
 		}
 		$this->putString($skin->getResourcePatch());
 		$this->putSkinImage($skin->getSkinImage());

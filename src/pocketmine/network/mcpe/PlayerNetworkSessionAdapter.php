@@ -50,6 +50,8 @@ use pocketmine\network\mcpe\protocol\MobEquipmentPacket;
 use pocketmine\network\mcpe\protocol\ModalFormResponsePacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
+use pocketmine\network\mcpe\protocol\PacketPool;
+use pocketmine\network\mcpe\protocol\PacketViolationWarningPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\PlayerHotbarPacket;
 use pocketmine\network\mcpe\protocol\PlayerInputPacket;
@@ -84,10 +86,13 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 	private $server;
 	/** @var Player */
 	private $player;
+	/** @var int */
+	private $protocol;
 
 	public function __construct(Server $server, Player $player){
 		$this->server = $server;
 		$this->player = $player;
+		$this->protocol = $player->getProtocol();
 	}
 
 	public function handleDataPacket(DataPacket $packet){
@@ -98,8 +103,13 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 		$timings = Timings::getReceiveDataPacketTimings($packet);
 		$timings->startTiming();
 
-		$packet->protocol = $this->player->getProtocol();
+		$packet->protocol = $this->protocol;
 		$packet->decode();
+
+		if(($translator = $this->player->getTranslator()) !== null){
+			$translator->translatorServer($this->player, $packet);
+		}
+
 		if(!$packet->feof() and !$packet->mayHaveUnreadBytes()){
 			$remains = substr($packet->buffer, $packet->offset);
 			$this->server->getLogger()->debug("Still " . strlen($remains) . " bytes unread in " . $packet->getName() . ": 0x" . bin2hex($remains));
@@ -222,6 +232,11 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 		$this->player->setViewDistance($packet->radius);
 
 		return true;
+	}
+
+	public function handlePacketViolationWarning(PacketViolationWarningPacket $packet): bool {
+		$this->server->getLogger()->warning("Received PacketViolationWarning: type: {$packet->getType()} severity={$packet->getSeverity()} packet=" . PacketPool::getPacketById($packet->getPacketId())->getName() . "({$packet->getPacketId()}) message: " . base64_encode($packet->getMessage()));
+		return false;
 	}
 
 	public function handleItemFrameDropItem(ItemFrameDropItemPacket $packet) : bool{
