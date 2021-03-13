@@ -1654,7 +1654,6 @@ class Server{
 	 * @return void
 	 */
 	public function broadcastPacket(array $players, DataPacket $packet){
-		$packet->encode();
 		$this->batchPackets($players, [$packet], false);
 	}
 
@@ -1672,27 +1671,44 @@ class Server{
 		}
 		Timings::$playerNetworkTimer->startTiming();
 
+		/** @var array[] $batches */
+		$batches = [];
 		$targets = array_filter($players, function(Player $player) : bool{ return $player->isConnected(); });
 
 		if(count($targets) > 0){
-			$pk = new BatchPacket();
-
-			foreach($packets as $p){
-				$pk->addPacket($p);
+			foreach ($targets as $target) {
+				$protocol = $target->getProtocol();
+				if(!isset($batches[$protocol])){
+					$batch = new BatchPacket();
+					$batch->protocol = $protocol;
+					foreach($packets as $p){
+						$p->clean();
+						$p->protocol = $protocol;
+						$p->encode();
+						$batch->addPacket($p);
+					}
+					$batches[$protocol][0] = $batch;
+					$batches[$protocol][1] = [];
+				}
+				$batches[$protocol][1][] = $target;
 			}
 
-			if(Network::$BATCH_THRESHOLD >= 0 and strlen($pk->payload) >= Network::$BATCH_THRESHOLD){
-				$pk->setCompressionLevel($this->networkCompressionLevel);
-			}else{
-				$pk->setCompressionLevel(0); //Do not compress packets under the threshold
-				$forceSync = true;
-			}
+			foreach ($batches as $batchData) {
+				$pk = &$batchData[0];
+				$targets = &$batchData[1];
+				if(Network::$BATCH_THRESHOLD >= 0 and strlen($pk->payload) >= Network::$BATCH_THRESHOLD){
+					$pk->setCompressionLevel($this->networkCompressionLevel);
+				}else{
+					$pk->setCompressionLevel(0); //Do not compress packets under the threshold
+					$forceSync = true;
+				}
 
-			if(!$forceSync and !$immediate and $this->networkCompressionAsync){
-				$task = new CompressBatchedTask($pk, $targets);
-				$this->asyncPool->submitTask($task);
-			}else{
-				$this->broadcastPacketsCallback($pk, $targets, $immediate);
+				if(!$forceSync and !$immediate and $this->networkCompressionAsync){
+					$task = new CompressBatchedTask($pk, $targets);
+					$this->asyncPool->submitTask($task);
+				}else{
+					$this->broadcastPacketsCallback($pk, $targets, $immediate);
+				}
 			}
 		}
 
