@@ -67,10 +67,13 @@ final class ItemStackResponseSlotInfo{
 		$hotbarSlot = $in->getByte();
 		$count = $in->getByte();
 		$itemStackId = $in->readGenericTypeNetworkId();
-		$customName = $in->getString();
+		$customName = "";
 		$durabilityCorrection = 0;
-		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
-			$durabilityCorrection = $in->getVarInt();
+		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_200) {
+			$customName = $in->getString();
+			if ($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
+				$durabilityCorrection = $in->getVarInt();
+			}
 		}
 		return new self($slot, $hotbarSlot, $count, $itemStackId, $customName, $durabilityCorrection);
 	}
@@ -80,9 +83,11 @@ final class ItemStackResponseSlotInfo{
 		$out->putByte($this->hotbarSlot);
 		$out->putByte($this->count);
 		$out->writeGenericTypeNetworkId($this->itemStackId);
-		$out->putString($this->customName);
-		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
-			$out->putVarInt($this->durabilityCorrection);
+		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_200) {
+			$out->putString($this->customName);
+			if ($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
+				$out->putVarInt($this->durabilityCorrection);
+			}
 		}
 	}
 }

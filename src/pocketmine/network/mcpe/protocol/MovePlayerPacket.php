@@ -72,7 +72,9 @@ class MovePlayerPacket extends DataPacket{
 			$this->teleportCause = $this->getLInt();
 			$this->teleportItem = $this->getLInt();
 		}
-		$this->tick = $this->getUnsignedVarLong();
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->tick = $this->getUnsignedVarLong();
+		}
 	}
 
 	protected function encodePayload(){
@@ -88,7 +90,9 @@ class MovePlayerPacket extends DataPacket{
 			$this->putLInt($this->teleportCause);
 			$this->putLInt($this->teleportItem);
 		}
-		$this->putUnsignedVarLong($this->tick);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->putUnsignedVarLong($this->tick);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{

@@ -44,13 +44,17 @@ class SetActorDataPacket extends DataPacket{
 	protected function decodePayload(){
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
 		$this->metadata = $this->getEntityMetadata();
-		$this->tick = $this->getUnsignedVarLong();
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->tick = $this->getUnsignedVarLong();
+		}
 	}
 
 	protected function encodePayload(){
 		$this->putEntityRuntimeId($this->entityRuntimeId);
 		$this->putEntityMetadata($this->metadata);
-		$this->putUnsignedVarLong($this->tick);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->putUnsignedVarLong($this->tick);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{

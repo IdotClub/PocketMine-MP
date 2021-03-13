@@ -41,13 +41,17 @@ class UpdateAttributesPacket extends DataPacket{
 	protected function decodePayload(){
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
 		$this->entries = $this->getAttributeList();
-		$this->tick = $this->getUnsignedVarLong();
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->tick = $this->getUnsignedVarLong();
+		}
 	}
 
 	protected function encodePayload(){
 		$this->putEntityRuntimeId($this->entityRuntimeId);
 		$this->putAttributeList(...$this->entries);
-		$this->putUnsignedVarLong($this->tick);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->putUnsignedVarLong($this->tick);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{

@@ -48,21 +48,30 @@ final class PlayerMovementSettings{
 	public function isServerAuthoritativeBlockBreaking() : bool{ return $this->serverAuthoritativeBlockBreaking; }
 
 	public static function read(NetworkBinaryStream $in) : self{
-		$movementType = $in->getVarInt();
 		$rewindHistorySize = 0;
 		$serverAuthBlockBreaking = false;
-		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
-			$rewindHistorySize = $in->getVarInt();
-			$serverAuthBlockBreaking = $in->getBool();
+
+		if ($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$movementType = $in->getVarInt();
+			if ($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
+				$rewindHistorySize = $in->getVarInt();
+				$serverAuthBlockBreaking = $in->getBool();
+			}
+		} else {
+			$movementType = $in->getBool() ? PlayerMovementType::SERVER_AUTHORITATIVE_V1 : PlayerMovementType::LEGACY;
 		}
 		return new self($movementType, $rewindHistorySize, $serverAuthBlockBreaking);
 	}
 
-	public function write(NetworkBinaryStream $out) : void{
-		$out->putVarInt($this->movementType);
-		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
-			$out->putVarInt($this->rewindHistorySize);
-			$out->putBool($this->serverAuthoritativeBlockBreaking);
+	public function write(NetworkBinaryStream $out) : void {
+		if ($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$out->putVarInt($this->movementType);
+			if ($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
+				$out->putVarInt($this->rewindHistorySize);
+				$out->putBool($this->serverAuthoritativeBlockBreaking);
+			}
+		} else {
+			$out->putBool($this->movementType !== PlayerMovementType::LEGACY);
 		}
 	}
 }

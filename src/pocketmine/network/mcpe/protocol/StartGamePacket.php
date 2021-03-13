@@ -209,7 +209,9 @@ class StartGamePacket extends DataPacket{
 		$this->commandsEnabled = $this->getBool();
 		$this->isTexturePacksRequired = $this->getBool();
 		$this->gameRules = $this->getGameRules();
-		$this->experiments = Experiments::read($this);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->experiments = Experiments::read($this);
+		}
 		$this->hasBonusChestEnabled = $this->getBool();
 		$this->hasStartWithMapEnabled = $this->getBool();
 		$this->defaultPlayerPermission = $this->getVarInt();
@@ -292,7 +294,9 @@ class StartGamePacket extends DataPacket{
 		$this->putBool($this->commandsEnabled);
 		$this->putBool($this->isTexturePacksRequired);
 		$this->putGameRules($this->gameRules);
-		$this->experiments->write($this);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->experiments->write($this);
+		}
 		$this->putBool($this->hasBonusChestEnabled);
 		$this->putBool($this->hasStartWithMapEnabled);
 		$this->putVarInt($this->defaultPlayerPermission);
