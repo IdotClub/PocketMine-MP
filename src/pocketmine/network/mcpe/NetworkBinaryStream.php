@@ -36,6 +36,7 @@ use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\NamedTag;
+use pocketmine\network\mcpe\convert\EntityMetaTranslator;
 use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\convert\ItemTypeDictionary;
 use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
@@ -348,6 +349,7 @@ class NetworkBinaryStream extends BinaryStream{
 		$data = [];
 		for($i = 0; $i < $count; ++$i){
 			$key = $this->getUnsignedVarInt();
+			$key = EntityMetaTranslator::getInstance()->translateNewEntityMetaId($key, $this->protocol) ?? $key;
 			$type = $this->getUnsignedVarInt();
 			$value = null;
 			switch($type){
@@ -401,6 +403,8 @@ class NetworkBinaryStream extends BinaryStream{
 	public function putEntityMetadata(array $metadata) : void{
 		$this->putUnsignedVarInt(count($metadata));
 		foreach($metadata as $key => $d){
+			$key = EntityMetaTranslator::getInstance()->translateLegacyEntityMetaId($key, $this->protocol) ?? $key;
+
 			$this->putUnsignedVarInt($key); //data key
 			$this->putUnsignedVarInt($d[0]); //data type
 			switch($d[0]){
