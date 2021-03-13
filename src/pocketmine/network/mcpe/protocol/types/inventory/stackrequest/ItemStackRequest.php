@@ -61,6 +61,10 @@ final class ItemStackRequest{
 	public function getFilterStrings() : array{ return $this->filterStrings; }
 
 	private static function readAction(NetworkBinaryStream $in, int $typeId) : ItemStackRequestAction{
+		if($typeId >= 9 && $in->protocol < 428){
+			//MineBlockStackRequestAction
+			$typeId += 1;
+		}
 		switch($typeId){
 			case TakeStackRequestAction::getTypeId(): return TakeStackRequestAction::read($in);
 			case PlaceStackRequestAction::getTypeId(): return PlaceStackRequestAction::read($in);

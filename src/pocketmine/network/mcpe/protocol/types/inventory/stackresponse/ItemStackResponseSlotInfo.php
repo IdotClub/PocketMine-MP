@@ -67,7 +67,10 @@ final class ItemStackResponseSlotInfo{
 		$count = $in->getByte();
 		$itemStackId = $in->readGenericTypeNetworkId();
 		$customName = $in->getString();
-		$durabilityCorrection = $in->getVarInt();
+		$durabilityCorrection = 0;
+		if($in->protocol >= 428) {
+			$durabilityCorrection = $in->getVarInt();
+		}
 		return new self($slot, $hotbarSlot, $count, $itemStackId, $customName, $durabilityCorrection);
 	}
 
@@ -77,6 +80,8 @@ final class ItemStackResponseSlotInfo{
 		$out->putByte($this->count);
 		$out->writeGenericTypeNetworkId($this->itemStackId);
 		$out->putString($this->customName);
-		$out->putVarInt($this->durabilityCorrection);
+		if($out->protocol >= 428) {
+			$out->putVarInt($this->durabilityCorrection);
+		}
 	}
 }
