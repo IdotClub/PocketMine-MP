@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\protocol\types\inventory\stackresponse;
 
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 
 final class ItemStackResponseSlotInfo{
 
@@ -68,7 +69,7 @@ final class ItemStackResponseSlotInfo{
 		$itemStackId = $in->readGenericTypeNetworkId();
 		$customName = $in->getString();
 		$durabilityCorrection = 0;
-		if($in->protocol >= 428) {
+		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
 			$durabilityCorrection = $in->getVarInt();
 		}
 		return new self($slot, $hotbarSlot, $count, $itemStackId, $customName, $durabilityCorrection);
@@ -80,7 +81,7 @@ final class ItemStackResponseSlotInfo{
 		$out->putByte($this->count);
 		$out->writeGenericTypeNetworkId($this->itemStackId);
 		$out->putString($this->customName);
-		if($out->protocol >= 428) {
+		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
 			$out->putVarInt($this->durabilityCorrection);
 		}
 	}

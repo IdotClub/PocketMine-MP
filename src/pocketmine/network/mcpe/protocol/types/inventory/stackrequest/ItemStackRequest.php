@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
 
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use function count;
 
 final class ItemStackRequest{
@@ -61,7 +62,7 @@ final class ItemStackRequest{
 	public function getFilterStrings() : array{ return $this->filterStrings; }
 
 	private static function readAction(NetworkBinaryStream $in, int $typeId) : ItemStackRequestAction{
-		if($typeId >= 9 && $in->protocol < 428){
+		if($typeId >= 9 && $in->protocol < BedrockProtocolInfo::PROTOCOL_1_16_210){
 			//MineBlockStackRequestAction
 			$typeId += 1;
 		}

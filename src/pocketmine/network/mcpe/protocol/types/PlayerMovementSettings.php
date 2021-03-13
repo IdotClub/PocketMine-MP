@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\protocol\types;
 
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 
 final class PlayerMovementSettings{
 	/** @var int */
@@ -50,7 +51,7 @@ final class PlayerMovementSettings{
 		$movementType = $in->getVarInt();
 		$rewindHistorySize = 0;
 		$serverAuthBlockBreaking = false;
-		if($in->protocol >= 428) {
+		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
 			$rewindHistorySize = $in->getVarInt();
 			$serverAuthBlockBreaking = $in->getBool();
 		}
@@ -59,7 +60,7 @@ final class PlayerMovementSettings{
 
 	public function write(NetworkBinaryStream $out) : void{
 		$out->putVarInt($this->movementType);
-		if($out->protocol >= 428) {
+		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
 			$out->putVarInt($this->rewindHistorySize);
 			$out->putBool($this->serverAuthoritativeBlockBreaking);
 		}

@@ -38,6 +38,7 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\convert\ItemTypeDictionary;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\CommandOriginData;
 use pocketmine\network\mcpe\protocol\types\EntityLink;
@@ -92,7 +93,7 @@ class NetworkBinaryStream extends BinaryStream{
 	public function getSkin() : SkinData{
 		$skinId = $this->getString();
 		$playFabId = null;
-		if($this->protocol >= 428){
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
 			$playFabId = $this->getString();
 		}
 		$skinResourcePatch = $this->getString();
@@ -149,7 +150,7 @@ class NetworkBinaryStream extends BinaryStream{
 	 */
 	public function putSkin(SkinData $skin){
 		$this->putString($skin->getSkinId());
-		if($this->protocol >= 428){
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
 			$this->putString($skin->getPlayFabId() ?? "");
 		}
 		$this->putString($skin->getResourcePatch());
