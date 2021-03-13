@@ -1936,8 +1936,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 					$animation["ImageWidth"],
 					base64_decode($animation["Image"], true)),
 				$animation["Type"],
-				$animation["Frames"],
-				$animation["AnimationExpression"]
+				$animation["Frames"] ?? 0,
+				$animation["AnimationExpression"] ?? 0
 			);
 		}
 

@@ -4,31 +4,24 @@
 namespace pocketmine\network\mcpe\convert;
 
 
-use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\SingletonTrait;
 
 class BlockRuntimeTranslator {
 	use SingletonTrait;
 
-	/** @var array<int, int[]> */
+	/** @var BlockMapping[] */
 	private $mapping = [];
 
 	public function __construct() {
-		$runtimeMapping = file_get_contents(\pocketmine\RESOURCE_PATH . "pallet/408_422_runtime.json");
-		if ($runtimeMapping === false) {
-			throw new AssumptionFailedError("Missing required resource file");
-		}
-		/** @var array<string, int> */
-		$data = json_decode($runtimeMapping, true);
-		$newData = [];
-
-		foreach ($data as $new => $old) {
-			$newData[(int) $new] = $old;
-		}
-		$this->mapping[408] = $newData;
+		/** @var int[] $runtimeMapping */
+		$runtimeMapping = json_decode((string) file_get_contents(\pocketmine\RESOURCE_PATH . "pallet/408runtime.json"), true);
+		/** @var int[] $legacyMapping */
+		$legacyMapping = json_decode((string) file_get_contents(\pocketmine\RESOURCE_PATH . "pallet/408legacy.json"), true);
+		$this->mapping[408] = new BlockMapping($legacyMapping, $runtimeMapping);
 	}
 
 	public function translate(int $protocol, int $runtime) : ?int {
-		return $this->mapping[$protocol][$runtime] ?? null;
+		[$id, $meta] = RuntimeBlockMapping::fromStaticRuntimeId($runtime);
+		return $this->mapping[$protocol]->toStaticRuntimeId($id, $meta) ?? null;
 	}
 }

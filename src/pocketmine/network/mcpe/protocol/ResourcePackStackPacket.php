@@ -63,8 +63,13 @@ class ResourcePackStackPacket extends DataPacket{
 			$this->getString();
 		}
 
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->experiments = new Experiments([], $this->getBool());
+		}
 		$this->baseGameVersion = $this->getString();
-		$this->experiments = Experiments::read($this);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->experiments = Experiments::read($this);
+		}
 	}
 
 	protected function encodePayload(){
@@ -84,8 +89,13 @@ class ResourcePackStackPacket extends DataPacket{
 			$this->putString(""); //TODO: subpack name
 		}
 
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->putBool($this->experiments->hasPreviouslyUsedExperiments());
+		}
 		$this->putString($this->baseGameVersion);
-		$this->experiments->write($this);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->experiments->write($this);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{

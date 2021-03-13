@@ -11,14 +11,11 @@ class TranslatorPool {
 	private static $translators = [];
 
 	public static function init() : void {
-
+		self::$translators[BedrockProtocolInfo::PROTOCOL_1_16_20] = new Protocol408();
 	}
 
 	public static function getTranslator(int $protocol) : ?Translator {
-		return self::$translators[self::translateProtocol($protocol)] ?? null;
-	}
-
-	public static function translateProtocol(int $protocol) : int {
-		return $protocol >= BedrockProtocolInfo::PROTOCOL_1_16_20 ? BedrockProtocolInfo::PROTOCOL_1_16_20 : -1;
+		var_dump($protocol);
+		return self::$translators[BedrockProtocolInfo::PROTOCOL_1_16_20] ?? null;
 	}
 }

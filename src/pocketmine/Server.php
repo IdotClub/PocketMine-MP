@@ -1684,6 +1684,9 @@ class Server{
 					foreach($packets as $p){
 						$p->clean();
 						$p->protocol = $protocol;
+						if(($translator = $target->getTranslator()) !== null){
+							$translator->translatorServer($target, $p);
+						}
 						$p->encode();
 						$batch->addPacket($p);
 					}

@@ -105,7 +105,10 @@ class NetworkBinaryStream extends BinaryStream{
 			$skinImage = $this->getSkinImage();
 			$animationType = $this->getLInt();
 			$animationFrames = $this->getLFloat();
-			$expressionType = $this->getLInt();
+			$expressionType = 0;
+			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+				$expressionType = $this->getLInt();
+			}
 			$animations[] = new SkinAnimation($skinImage, $animationType, $animationFrames, $expressionType);
 		}
 		$capeData = $this->getSkinImage();
@@ -161,7 +164,9 @@ class NetworkBinaryStream extends BinaryStream{
 			$this->putSkinImage($animation->getImage());
 			$this->putLInt($animation->getType());
 			$this->putLFloat($animation->getFrames());
-			$this->putLInt($animation->getExpressionType());
+			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+				$this->putLInt($animation->getExpressionType());
+			}
 		}
 		$this->putSkinImage($skin->getCapeImage());
 		$this->putString($skin->getGeometryData());

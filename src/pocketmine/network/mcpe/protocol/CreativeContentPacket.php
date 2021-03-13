@@ -55,6 +55,10 @@ class CreativeContentPacket extends DataPacket/* implements ClientboundPacket*/{
 	}
 
 	protected function encodePayload() : void{
+		//TODO
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->entries = [];
+		}
 		$this->putUnsignedVarInt(count($this->entries));
 		foreach($this->entries as $entry){
 			$entry->write($this);
