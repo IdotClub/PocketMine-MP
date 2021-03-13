@@ -208,5 +208,6 @@ interface ProtocolInfo{
 	public const CORRECT_PLAYER_MOVE_PREDICTION_PACKET = 0xa1;
 	public const ITEM_COMPONENT_PACKET = 0xa2;
 	public const FILTER_TEXT_PACKET = 0xa3;
+	public const CLIENTBOUND_DEBUG_RENDERER_PACKET = 0xa4;
 
 }

@@ -150,7 +150,7 @@ class NetworkBinaryStream extends BinaryStream{
 	public function putSkin(SkinData $skin){
 		$this->putString($skin->getSkinId());
 		if($this->protocol >= 428){
-			$this->putString($skin->getPlayFabId() ?? random_bytes(16));
+			$this->putString($skin->getPlayFabId() ?? "");
 		}
 		$this->putString($skin->getResourcePatch());
 		$this->putSkinImage($skin->getSkinImage());
