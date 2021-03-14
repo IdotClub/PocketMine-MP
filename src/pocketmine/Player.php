@@ -110,6 +110,7 @@ use pocketmine\network\mcpe\protocol\AnimatePacket;
 use pocketmine\network\mcpe\protocol\AvailableActorIdentifiersPacket;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\BatchPacket;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\network\mcpe\protocol\BiomeDefinitionListPacket;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\protocol\BlockPickRequestPacket;
@@ -117,6 +118,7 @@ use pocketmine\network\mcpe\protocol\BookEditPacket;
 use pocketmine\network\mcpe\protocol\ChunkRadiusUpdatedPacket;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
+use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\DisconnectPacket;
 use pocketmine\network\mcpe\protocol\InteractPacket;
@@ -1889,7 +1891,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			return false;
 		}
 		$this->seenLoginPacket = true;
-		$this->protocol = $packet->protocol;
+		$this->protocol = TranslatorPool::translateProtocol($packet->protocol);
 		$this->translator = TranslatorPool::getTranslator($this->protocol);
 
 		if(!in_array($packet->protocol, ProtocolInfo::ACCEPT_PROTOCOL, true)){
@@ -2305,7 +2307,12 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		$this->sendAllInventories();
 		$this->inventory->sendCreativeContents();
 		$this->inventory->sendHeldItem($this);
-		$this->dataPacket($this->server->getCraftingManager()->getCraftingDataPacket());
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+			$this->dataPacket($this->server->getCraftingManager()->getCraftingDataPacket());
+		} else {
+			//TODO
+			$this->dataPacket(new CraftingDataPacket());
+		}
 
 		$this->server->addOnlinePlayer($this);
 		$this->server->sendFullPlayerListData($this);

@@ -40,9 +40,9 @@ interface ProtocolInfo{
 	public const CURRENT_PROTOCOL = 408;
 	/** Accept Minecraft: PE protocol version */
 	public const ACCEPT_PROTOCOL = [
-		400, 406, 407, 408, 409, 410, 411, 412, 413,
+		400, 406, 407, 408,
 		419, 420, 421, 422,
-		428
+		423, 424, 425, 426, 427, 428
 	];
 	/** Current Minecraft PE version reported by the server. This is usually the earliest currently supported version. */
 	public const MINECRAFT_VERSION = 'v1.16.100-1.16.210';

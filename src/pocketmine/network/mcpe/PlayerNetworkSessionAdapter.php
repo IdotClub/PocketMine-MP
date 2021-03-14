@@ -67,6 +67,7 @@ use pocketmine\network\mcpe\protocol\ShowCreditsPacket;
 use pocketmine\network\mcpe\protocol\SpawnExperienceOrbPacket;
 use pocketmine\network\mcpe\protocol\TextPacket;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
+use pocketmine\network\mcpe\translation\TranslatorPool;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\timings\Timings;
@@ -125,6 +126,7 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 	}
 
 	public function handleLogin(LoginPacket $packet) : bool{
+		$this->protocol = TranslatorPool::translateProtocol($packet->protocol);
 		return $this->player->handleLogin($packet);
 	}
 
