@@ -3320,7 +3320,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 		//Basic safety restriction. TODO: improve this
 		if(!$this->loggedIn and !$packet->canBeSentBeforeLogin()){
-			throw new \InvalidArgumentException("Attempted to send " . get_class($packet) . " to " . $this->getName() . " too early");
+			return false;
 		}
 
 		$timings = Timings::getSendDataPacketTimings($packet);
