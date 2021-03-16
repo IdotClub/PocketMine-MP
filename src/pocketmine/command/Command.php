@@ -276,12 +276,12 @@ abstract class Command{
 		if($sendToSource and !($source instanceof ConsoleCommandSender)){
 			$source->sendMessage($message);
 		}
-		
-		foreach ($users as $user) {
-			if ($user instanceof CommandSender) {
-				if ($user instanceof ConsoleCommandSender) {
+
+		foreach($users as $user){
+			if($user instanceof CommandSender){
+				if($user instanceof ConsoleCommandSender){
 					$user->sendMessage($result);
-				} else if ($user !== $source) {
+				}elseif($user !== $source){
 					$user->sendMessage($colored);
 				}
 			}
