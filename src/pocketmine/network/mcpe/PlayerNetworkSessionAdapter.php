@@ -67,7 +67,7 @@ use pocketmine\network\mcpe\protocol\ShowCreditsPacket;
 use pocketmine\network\mcpe\protocol\SpawnExperienceOrbPacket;
 use pocketmine\network\mcpe\protocol\TextPacket;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
-use pocketmine\network\mcpe\translation\TranslatorPool;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\timings\Timings;
@@ -107,10 +107,6 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 		$packet->protocol = $this->protocol;
 		$packet->decode();
 
-		if(($translator = $this->player->getTranslator()) !== null){
-			$translator->translatorServer($this->player, $packet);
-		}
-
 		if(!$packet->feof() and !$packet->mayHaveUnreadBytes()){
 			$remains = substr($packet->buffer, $packet->offset);
 			$this->server->getLogger()->debug("Still " . strlen($remains) . " bytes unread in " . $packet->getName() . ": 0x" . bin2hex($remains));
@@ -126,7 +122,7 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 	}
 
 	public function handleLogin(LoginPacket $packet) : bool{
-		$this->protocol = TranslatorPool::translateProtocol($packet->protocol);
+		$this->protocol = BedrockProtocolInfo::translateProtocol($packet->protocol);
 		return $this->player->handleLogin($packet);
 	}
 

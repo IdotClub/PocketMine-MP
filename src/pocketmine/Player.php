@@ -169,8 +169,7 @@ use pocketmine\network\mcpe\protocol\types\SpawnSettings;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\network\mcpe\protocol\UpdateAttributesPacket;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
-use pocketmine\network\mcpe\translation\Translator;
-use pocketmine\network\mcpe\translation\TranslatorPool;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\network\mcpe\VerifyLoginTask;
 use pocketmine\network\SourceInterface;
 use pocketmine\permission\PermissibleBase;
@@ -268,9 +267,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	 * TODO: remove this once player and network are divorced properly
 	 */
 	protected $sessionAdapter;
-
-	/** @var Translator|null */
-	protected $translator;
 
 	/** @var string */
 	protected $ip;
@@ -1891,8 +1887,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			return false;
 		}
 		$this->seenLoginPacket = true;
-		$this->protocol = TranslatorPool::translateProtocol($packet->protocol);
-		$this->translator = TranslatorPool::getTranslator($this->protocol);
+		$this->protocol = BedrockProtocolInfo::translateProtocol($packet->protocol);
 
 		if(!in_array($packet->protocol, ProtocolInfo::ACCEPT_PROTOCOL, true)){
 			if($packet->protocol < ProtocolInfo::CURRENT_PROTOCOL){
@@ -4193,13 +4188,5 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 	public function setFishingHook(?FishingHook $fishingHook): void {
 		$this->fishingHook = $fishingHook;
-	}
-
-	public function getTranslator(): ?Translator {
-		return $this->translator;
-	}
-
-	public function setTranslator(?Translator $translator): void {
-		$this->translator = $translator;
 	}
 }
