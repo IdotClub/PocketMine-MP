@@ -23,10 +23,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory;
 
-use pocketmine\network\mcpe\NetworkBinaryStream as PacketSerializer;
+use pocketmine\network\mcpe\NetworkBinaryStream;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\utils\BinaryDataException;
-use UnexpectedValueException as PacketDecodeException;
+use UnexpectedValueException;
 use function count;
 
 abstract class TransactionData{
@@ -44,9 +44,9 @@ abstract class TransactionData{
 
 	/**
 	 * @throws BinaryDataException
-	 * @throws PacketDecodeException
+	 * @throws UnexpectedValueException
 	 */
-	final public function decode(PacketSerializer $stream, bool $hasItemStackIds) : void{
+	final public function decode(NetworkBinaryStream $stream, bool $hasItemStackIds) : void{
 		$actionCount = $stream->getUnsignedVarInt();
 		for($i = 0; $i < $actionCount; ++$i){
 			$this->actions[] = (new NetworkInventoryAction())->read($stream, $hasItemStackIds);
@@ -56,11 +56,11 @@ abstract class TransactionData{
 
 	/**
 	 * @throws BinaryDataException
-	 * @throws PacketDecodeException
+	 * @throws UnexpectedValueException
 	 */
-	abstract protected function decodeData(PacketSerializer $stream) : void;
+	abstract protected function decodeData(NetworkBinaryStream $stream) : void;
 
-	final public function encode(PacketSerializer $stream, bool $hasItemStackIds) : void{
+	final public function encode(NetworkBinaryStream $stream, bool $hasItemStackIds) : void{
 		$stream->putUnsignedVarInt(count($this->actions));
 		foreach($this->actions as $action){
 			$action->write($stream, $hasItemStackIds);
@@ -68,5 +68,5 @@ abstract class TransactionData{
 		$this->encodeData($stream);
 	}
 
-	abstract protected function encodeData(PacketSerializer $stream) : void;
+	abstract protected function encodeData(NetworkBinaryStream $stream) : void;
 }

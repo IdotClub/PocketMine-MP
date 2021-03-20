@@ -55,18 +55,17 @@ class InventoryTransactionPacket extends DataPacket{
 	public $trData;
 
 	protected function decodePayload() : void{
-		$in = $this;
-		$this->requestId = $in->readGenericTypeNetworkId();
+		$this->requestId = $this->readGenericTypeNetworkId();
 		$this->requestChangedSlots = [];
 		if($this->requestId !== 0){
-			for($i = 0, $len = $in->getUnsignedVarInt(); $i < $len; ++$i){
-				$this->requestChangedSlots[] = InventoryTransactionChangedSlotsHack::read($in);
+			for($i = 0, $len = $this->getUnsignedVarInt(); $i < $len; ++$i){
+				$this->requestChangedSlots[] = InventoryTransactionChangedSlotsHack::read($this);
 			}
 		}
 
-		$transactionType = $in->getUnsignedVarInt();
+		$transactionType = $this->getUnsignedVarInt();
 
-		$this->hasItemStackIds = $in->getBool();
+		$this->hasItemStackIds = $this->getBool();
 
 		switch($transactionType){
 			case self::TYPE_NORMAL:
@@ -88,24 +87,23 @@ class InventoryTransactionPacket extends DataPacket{
 				throw new PacketDecodeException("Unknown transaction type $transactionType");
 		}
 
-		$this->trData->decode($in, $this->hasItemStackIds);
+		$this->trData->decode($this, $this->hasItemStackIds);
 	}
 
 	protected function encodePayload() : void{
-		$out = $this;
-		$out->writeGenericTypeNetworkId($this->requestId);
+		$this->writeGenericTypeNetworkId($this->requestId);
 		if($this->requestId !== 0){
-			$out->putUnsignedVarInt(count($this->requestChangedSlots));
+			$this->putUnsignedVarInt(count($this->requestChangedSlots));
 			foreach($this->requestChangedSlots as $changedSlots){
-				$changedSlots->write($out);
+				$changedSlots->write($this);
 			}
 		}
 
-		$out->putUnsignedVarInt($this->trData->getTypeId());
+		$this->putUnsignedVarInt($this->trData->getTypeId());
 
-		$out->putBool($this->hasItemStackIds);
+		$this->putBool($this->hasItemStackIds);
 
-		$this->trData->encode($out, $this->hasItemStackIds);
+		$this->trData->encode($this, $this->hasItemStackIds);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
