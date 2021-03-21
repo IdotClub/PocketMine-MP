@@ -48,7 +48,6 @@ use function chr;
 use function count;
 use function defined;
 use function explode;
-use function extension_loaded;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -103,10 +102,6 @@ class LevelDB extends BaseLevelProvider{
 	protected $db;
 
 	private static function checkForLevelDBExtension() : void{
-		if(!extension_loaded('leveldb')){
-			throw new LevelException("The leveldb PHP extension is required to use this world format");
-		}
-
 		if(!defined('LEVELDB_ZLIB_RAW_COMPRESSION')){
 			throw new LevelException("Given version of php-leveldb doesn't support zlib raw compression");
 		}

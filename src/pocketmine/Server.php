@@ -38,7 +38,6 @@ use pocketmine\entity\Skin;
 use pocketmine\event\HandlerList;
 use pocketmine\event\level\LevelInitEvent;
 use pocketmine\event\level\LevelLoadEvent;
-use pocketmine\event\player\PlayerDataSaveEvent;
 use pocketmine\event\server\CommandEvent;
 use pocketmine\event\server\QueryRegenerateEvent;
 use pocketmine\event\server\ServerCommandEvent;
@@ -58,17 +57,6 @@ use pocketmine\level\LevelException;
 use pocketmine\metadata\EntityMetadataStore;
 use pocketmine\metadata\LevelMetadataStore;
 use pocketmine\metadata\PlayerMetadataStore;
-use pocketmine\nbt\BigEndianNBTStream;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ByteTag;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\DoubleTag;
-use pocketmine\nbt\tag\FloatTag;
-use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\tag\LongTag;
-use pocketmine\nbt\tag\ShortTag;
-use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\CompressBatchedTask;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -115,20 +103,17 @@ use function cli_set_process_title;
 use function count;
 use function define;
 use function explode;
-use function extension_loaded;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function function_exists;
 use function get_class;
 use function getopt;
-use function gettype;
 use function implode;
 use function ini_set;
 use function is_array;
 use function is_bool;
 use function is_dir;
-use function is_object;
 use function is_subclass_of;
 use function max;
 use function microtime;
@@ -322,6 +307,9 @@ class Server{
 
 	/** @var Level|null */
 	private $levelDefault = null;
+
+	/** @var OfflinePlayerDataManager */
+	private $offlinePlayerDataManager;
 
 	public function getName() : string{
 		return \pocketmine\NAME;
@@ -657,100 +645,6 @@ class Server{
 		}
 
 		return $result;
-	}
-
-	private function getPlayerDataPath(string $username) : string{
-		return $this->getDataPath() . '/players/' . strtolower($username) . '.dat';
-	}
-
-	/**
-	 * Returns whether the server has stored any saved data for this player.
-	 */
-	public function hasOfflinePlayerData(string $name) : bool{
-		return file_exists($this->getPlayerDataPath($name));
-	}
-
-	public function getOfflinePlayerData(string $name) : CompoundTag{
-		$name = strtolower($name);
-		$path = $this->getPlayerDataPath($name);
-		if($this->shouldSavePlayerData()){
-			if(file_exists($path)){
-				try{
-					$nbt = new BigEndianNBTStream();
-					$compound = $nbt->readCompressed(file_get_contents($path));
-					if(!($compound instanceof CompoundTag)){
-						throw new \RuntimeException("Invalid data found in \"$name.dat\", expected " . CompoundTag::class . ", got " . (is_object($compound) ? get_class($compound) : gettype($compound)));
-					}
-
-					return $compound;
-				}catch(\Throwable $e){ //zlib decode error / corrupt data
-					rename($path, $path . '.bak');
-					$this->logger->notice($this->getLanguage()->translateString("pocketmine.data.playerCorrupted", [$name]));
-				}
-			}else{
-				$this->logger->notice($this->getLanguage()->translateString("pocketmine.data.playerNotFound", [$name]));
-			}
-		}
-		$spawn = $this->getDefaultLevel()->getSafeSpawn();
-		$currentTimeMillis = (int) (microtime(true) * 1000);
-
-		$nbt = new CompoundTag("", [
-			new LongTag("firstPlayed", $currentTimeMillis),
-			new LongTag("lastPlayed", $currentTimeMillis),
-			new ListTag("Pos", [
-				new DoubleTag("", $spawn->x),
-				new DoubleTag("", $spawn->y),
-				new DoubleTag("", $spawn->z)
-			], NBT::TAG_Double),
-			new StringTag("Level", $this->getDefaultLevel()->getFolderName()),
-			//new StringTag("SpawnLevel", $this->getDefaultLevel()->getFolderName()),
-			//new IntTag("SpawnX", $spawn->getFloorX()),
-			//new IntTag("SpawnY", $spawn->getFloorY()),
-			//new IntTag("SpawnZ", $spawn->getFloorZ()),
-			//new ByteTag("SpawnForced", 1), //TODO
-			new ListTag("Inventory", [], NBT::TAG_Compound),
-			new ListTag("EnderChestInventory", [], NBT::TAG_Compound),
-			new CompoundTag("Achievements", []),
-			new IntTag("playerGameType", $this->getGamemode()),
-			new ListTag("Motion", [
-				new DoubleTag("", 0.0),
-				new DoubleTag("", 0.0),
-				new DoubleTag("", 0.0)
-			], NBT::TAG_Double),
-			new ListTag("Rotation", [
-				new FloatTag("", 0.0),
-				new FloatTag("", 0.0)
-			], NBT::TAG_Float),
-			new FloatTag("FallDistance", 0.0),
-			new ShortTag("Fire", 0),
-			new ShortTag("Air", 300),
-			new ByteTag("OnGround", 1),
-			new ByteTag("Invulnerable", 0),
-			new StringTag("NameTag", $name)
-		]);
-
-		return $nbt;
-
-	}
-
-	/**
-	 * @return void
-	 */
-	public function saveOfflinePlayerData(string $name, CompoundTag $nbtTag){
-		$ev = new PlayerDataSaveEvent($nbtTag, $name);
-		$ev->setCancelled(!$this->shouldSavePlayerData());
-
-		$ev->call();
-
-		if(!$ev->isCancelled()){
-			$nbt = new BigEndianNBTStream();
-			try{
-				file_put_contents($this->getPlayerDataPath($name), $nbt->writeCompressed($ev->getSaveData()));
-			}catch(\Throwable $e){
-				$this->logger->critical($this->getLanguage()->translateString("pocketmine.data.saveError", [$name, $e->getMessage()]));
-				$this->logger->logException($e);
-			}
-		}
 	}
 
 	/**
@@ -1269,8 +1163,8 @@ class Server{
 				mkdir($dataPath . "worlds/", 0777);
 			}
 
-			if(!file_exists($dataPath . "players/")){
-				mkdir($dataPath . "players/", 0777);
+			if(!file_exists($dataPath . "player_data/")){
+				mkdir($dataPath . "player_data/", 0777);
 			}
 
 			if(!file_exists($pluginPath)){
@@ -1426,6 +1320,8 @@ class Server{
 			$this->getLogger()->debug("Server unique id: " . $this->getServerUniqueId());
 			$this->getLogger()->debug("Machine unique id: " . Utils::getMachineUniqueId());
 
+			$this->offlinePlayerDataManager = new OfflinePlayerDataManager($this->getDataPath()."player_data/");
+
 			$this->network = new Network($this);
 			$this->network->setName($this->getMotd());
 
@@ -1449,9 +1345,7 @@ class Server{
 			Biome::init();
 
 			LevelProviderManager::init();
-			if(extension_loaded("leveldb")){
-				$this->logger->debug($this->getLanguage()->translateString("pocketmine.debug.enable"));
-			}
+
 			GeneratorManager::registerDefaultGenerators();
 
 			$this->craftingManager = new CraftingManager();
@@ -1853,6 +1747,8 @@ class Server{
 					$this->network->unregisterInterface($interface);
 				}
 			}
+
+			$this->offlinePlayerDataManager->close();
 		}catch(\Throwable $e){
 			$this->logger->logException($e);
 			$this->logger->emergency("Crashed while crashing, killing process");
@@ -2137,6 +2033,10 @@ class Server{
 
 	public function isLanguageForced() : bool{
 		return $this->forceLanguage;
+	}
+
+	public function getOfflinePlayerDataManager() : OfflinePlayerDataManager {
+		return $this->offlinePlayerDataManager;
 	}
 
 	/**

@@ -40,8 +40,8 @@ class OfflinePlayer implements IPlayer, Metadatable{
 	public function __construct(Server $server, string $name){
 		$this->server = $server;
 		$this->name = $name;
-		if($this->server->hasOfflinePlayerData($this->name)){
-			$this->namedtag = $this->server->getOfflinePlayerData($this->name);
+		if($this->server->getOfflinePlayerDataManager()->hasOfflinePlayerData($this->name)){
+			$this->namedtag = $this->server->getOfflinePlayerDataManager()->getOfflinePlayerData($this->name);
 		}
 	}
 

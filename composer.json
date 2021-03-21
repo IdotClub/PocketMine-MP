@@ -12,6 +12,7 @@
       "ext-date": "*",
       "ext-hash": "*",
       "ext-json": "*",
+      "ext-leveldb": "^0.2.1",
       "ext-mbstring": "*",
       "ext-openssl": "*",
       "ext-pcre": "*",

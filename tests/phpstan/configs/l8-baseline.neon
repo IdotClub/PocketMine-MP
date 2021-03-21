@@ -1604,4 +1604,23 @@ parameters:
 			message: "#^Cannot call method cancel\\(\\) on pocketmine\\\\scheduler\\\\TaskHandler\\|null\\.$#"
 			count: 1
 			path: ../../plugins/TesterPlugin/src/pmmp/TesterPlugin/CheckTestCompletionTask.php
+		-
+			message: "#^Parameter \\#2 \\$value of method LevelDB\\:\\:put\\(\\) expects string, string\\|false given\\.$#"
+			count: 1
+			path: ../../../src/pocketmine/OfflinePlayerDataManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$buffer of method pocketmine\\\\nbt\\\\NBTStream\\:\\:readCompressed\\(\\) expects string, string\\|false given\\.$#"
+			count: 1
+			path: ../../../src/pocketmine/OfflinePlayerDataManager.php
+
+		-
+			message: "#^Cannot call method getSafeSpawn\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: ../../../src/pocketmine/OfflinePlayerDataManager.php
+
+		-
+			message: "#^Cannot call method getFolderName\\(\\) on pocketmine\\\\level\\\\Level\\|null\\.$#"
+			count: 1
+			path: ../../../src/pocketmine/OfflinePlayerDataManager.php
 

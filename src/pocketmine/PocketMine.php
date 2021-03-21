@@ -79,6 +79,7 @@ namespace pocketmine {
 			"date" => "Date",
 			"hash" => "Hash",
 			"json" => "JSON",
+			"leveldb" => "LevelDB",
 			"mbstring" => "Multibyte String",
 			"openssl" => "OpenSSL",
 			"pcre" => "PCRE",

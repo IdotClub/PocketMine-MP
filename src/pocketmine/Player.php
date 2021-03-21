@@ -2105,7 +2105,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			}
 		}
 
-		$this->namedtag = $this->server->getOfflinePlayerData($this->username);
+		$this->namedtag = $this->server->getOfflinePlayerDataManager()->getOfflinePlayerData($this->username);
 		if($checkXUID){
 			$recordedXUID = $this->namedtag->getTag("LastKnownXUID");
 			if(!($recordedXUID instanceof StringTag)){
@@ -3800,7 +3800,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		$this->namedtag->setLong("lastPlayed", (int) floor(microtime(true) * 1000));
 
 		if($this->username != ""){
-			$this->server->saveOfflinePlayerData($this->username, $this->namedtag);
+			$this->server->getOfflinePlayerDataManager()->saveOfflinePlayerData($this->username, $this->namedtag);
 		}
 	}
 
