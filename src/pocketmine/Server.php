@@ -1575,8 +1575,8 @@ class Server{
 				if(!isset($batches[$protocol])){
 					$batch = new BatchPacket();
 					$batch->protocol = $protocol;
-					foreach($packets as $p){
-						$p->clean();
+					foreach($packets as $originPacket){
+						$p = clone $originPacket;
 						$p->protocol = $protocol;
 						$p->encode();
 						$batch->addPacket($p);
