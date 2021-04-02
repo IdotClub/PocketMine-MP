@@ -2927,6 +2927,16 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 					break;
 				}
 
+				$tile = $this->level->getTile($pos);
+				if($tile instanceof ItemFrame and $tile->hasItem()){
+					if (lcg_value() <= $tile->getItemDropChance()){
+						$this->level->dropItem($tile->getBlock(), $tile->getItem());
+					}
+					$tile->setItem(null);
+					$tile->setItemRotation(0);
+					break;
+				}
+
 				$block = $target->getSide($packet->face);
 				if($block->getId() === Block::FIRE){
 					$this->level->setBlock($block, BlockFactory::get(Block::AIR));
@@ -3114,11 +3124,12 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		$handled = false;
 
 		$isFlying = $packet->getFlag(AdventureSettingsPacket::FLYING);
-		if($isFlying and !$this->allowFlight){
-			$this->kick($this->server->getLanguage()->translateString("kick.reason.cheat", ["%ability.flight"]));
-			return true;
-		}elseif($isFlying !== $this->isFlying()){
+		if($isFlying !== $this->isFlying()){
 			$ev = new PlayerToggleFlightEvent($this, $isFlying);
+			if($isFlying and !$this->allowFlight){
+				$ev->setCancelled();
+			}
+
 			$ev->call();
 			if($ev->isCancelled()){
 				$this->sendSettings();
