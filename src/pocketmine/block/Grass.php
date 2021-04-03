@@ -76,9 +76,9 @@ class Grass extends Solid{
 		}elseif($lightAbove >= 9){
 			//try grass spread
 			for($i = 0; $i < 4; ++$i){
-				$x = random_int((int)$this->x - 1, (int)$this->x + 1);
-				$y = random_int((int)$this->y - 3, (int)$this->y + 1);
-				$z = random_int((int)$this->z - 1, (int)$this->z + 1);
+				$x = random_int((int) $this->x - 1, (int) $this->x + 1);
+				$y = random_int((int) $this->y - 3, (int) $this->y + 1);
+				$z = random_int((int) $this->z - 1, (int) $this->z + 1);
 				if(
 					$this->level->getBlockIdAt($x, $y, $z) !== Block::DIRT or
 					$this->level->getBlockDataAt($x, $y, $z) === 1 or

@@ -1,24 +1,28 @@
 <?php
 
+declare(strict_types=1);
 
 namespace pocketmine\plugin;
 
+use function file_exists;
+use function file_get_contents;
+use function is_dir;
 
 class SourcePluginLoader implements PluginLoader {
-	
+
 	/** @var \ClassLoader */
 	private $loader;
-	
+
 	public function __construct(\ClassLoader $loader) {
 		$this->loader = $loader;
 	}
-	
+
 	public function canLoadPlugin(string $path): bool {
 		return is_dir($path) &&
 			file_exists($path . "/plugin.yml") &&
 			file_exists($path . "/src/");
 	}
-	
+
 	/**
 	 * Loads the plugin contained in $file
 	 */
@@ -35,7 +39,7 @@ class SourcePluginLoader implements PluginLoader {
 		}*/
 		$this->loader->addPath("$file/src");
 	}
-	
+
 	/**
 	 * Gets the PluginDescription from the file
 	 */
@@ -46,10 +50,10 @@ class SourcePluginLoader implements PluginLoader {
 				return new PluginDescription($yaml);
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public function getAccessProtocol(): string {
 		return "";
 	}

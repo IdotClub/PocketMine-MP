@@ -311,9 +311,6 @@ abstract class Command{
 		$this->overloads = [];
 	}
 
-	/**
-	 * @param int $overloadIndex
-	 */
 	public function removeOverload(int $overloadIndex): void {
 		unset($this->overloads[$overloadIndex]);
 	}

@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
 
 namespace pocketmine\command\utils;
 
-
 use pocketmine\entity\Entity;
 use pocketmine\level\Level;
-use pocketmine\Player;
 use pocketmine\Server;
+use function array_rand;
+use function count;
+use function mb_strtolower;
 
 class CommandSelector {
 	public const SELECTOR_ALL_PLAYERS = "@a";
@@ -15,11 +17,11 @@ class CommandSelector {
 	public const SELECTOR_CLOSEST_PLAYER = "@p";
 	public const SELECTOR_RANDOM_PLAYER = "@r";
 	public const SELECTOR_YOURSELF = "@s";
-	
+
 	private function __construct() {
 		// NOOP
 	}
-	
+
 	/**
 	 * @return Entity[]|null
 	 */

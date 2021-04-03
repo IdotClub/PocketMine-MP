@@ -37,7 +37,7 @@ class FishingRod extends Item {
 	public function onClickAir(Player $player, Vector3 $directionVector): bool {
 		if (!$player->hasItemCooldown($this)) {
 			$player->resetItemCooldown($this);
-			
+
 			if ($player->getFishingHook() === null) {
 				/** @var FishingHook $hook */
 				$hook = Entity::createEntity("FishingHook",

@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace pocketmine;
-
 
 use pocketmine\event\player\PlayerDataSaveEvent;
 use pocketmine\nbt\BigEndianNBTStream;
@@ -16,6 +16,11 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\LongTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
+use function get_class;
+use function gettype;
+use function is_object;
+use function microtime;
+use function strtolower;
 
 class OfflinePlayerDataManager {
 	/** @var \LevelDB */

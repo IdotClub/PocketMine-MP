@@ -57,7 +57,7 @@ class NoteBlock extends Solid {
 		Tile::createTile("NoteBlock", $this->getLevelNonNull(), TileNoteBlock::createNBT($this, $face, $item, $player));
 		return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
-	
+
 	public function onActivate(Item $item, Player $player = null): bool {
 		$tile = $this->getLevelNonNull()->getTile($this);
 		if($tile instanceof TileNoteBlock){

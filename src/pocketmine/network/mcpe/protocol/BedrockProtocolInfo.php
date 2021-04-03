@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
+use function in_array;
 
 final class BedrockProtocolInfo {
 	public const PROTOCOL_1_16_20 = 408;
 	public const PROTOCOL_1_16_100 = 419;
 	public const PROTOCOL_1_16_200 = 422;
 	public const PROTOCOL_1_16_210 = 428;
-	
+
 	public static function translateProtocol(int $protocol) : int {
 		if (in_array($protocol, [400, 406, 407, 408, 409, 410, 411, 412, 413], true)) {
 			return BedrockProtocolInfo::PROTOCOL_1_16_20;

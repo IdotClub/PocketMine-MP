@@ -24,14 +24,12 @@ declare(strict_types=1);
 namespace pocketmine\command\defaults;
 
 use pocketmine\command\CommandSender;
-use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\lang\TranslationContainer;
 use pocketmine\permission\BanEntry;
 use function array_map;
 use function count;
 use function implode;
 use function sort;
-use function strtolower;
 use const SORT_STRING;
 
 class BanListCommand extends VanillaCommand{

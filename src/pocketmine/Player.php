@@ -232,18 +232,18 @@ use const PHP_INT_MAX;
  * Main class that handles networking, recovery, and packet sending to the server part
  */
 class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
-	
+
 	public const SURVIVAL = 0;
 	public const CREATIVE = 1;
 	public const ADVENTURE = 2;
 	public const SPECTATOR = 3;
 	public const VIEW = Player::SPECTATOR;
-	
+
 	private const MOVES_PER_TICK = 2;
 	private const MOVE_BACKLOG_SIZE = 100 * self::MOVES_PER_TICK; //100 ticks backlog (5 seconds)
-	
+
 	private const RESOURCE_PACK_CHUNK_SIZE = 128 * 1024; //128KB
-	
+
 	//TODO: HACK!
 	//these IDs are used for 1.16 to restore 1.14ish crafting & inventory behaviour; since they don't seem to have any
 	//effect on the behaviour of inventory transactions I don't currently plan to integrate these into the main system.
@@ -414,7 +414,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	protected $startAction = -1;
 	/** @var int[] ID => ticks map */
 	protected $usedItemsCooldown = [];
-	
+
 	/** @var int */
 	protected $formIdCounter = 0;
 	/** @var Form[] */
