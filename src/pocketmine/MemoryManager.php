@@ -387,60 +387,62 @@ class MemoryManager{
 		do{
 			$continue = false;
 			foreach($objects as $hash => $object){
-				if(!is_object($object)){
-					continue;
-				}
-				$continue = true;
+				try {
+					if(!is_object($object)){
+						continue;
+					}
+					$continue = true;
 
-				$className = get_class($object);
-				if(!isset($instanceCounts[$className])){
-					$instanceCounts[$className] = 1;
-				}else{
-					$instanceCounts[$className]++;
-				}
+					$className = get_class($object);
+					if(!isset($instanceCounts[$className])){
+						$instanceCounts[$className] = 1;
+					}else{
+						$instanceCounts[$className]++;
+					}
 
-				$objects[$hash] = true;
+					$objects[$hash] = true;
 
-				$reflection = new \ReflectionObject($object);
+					$reflection = new \ReflectionObject($object);
 
-				$info = [
-					"information" => "$hash@$className",
-					"properties" => []
-				];
+					$info = [
+						"information" => "$hash@$className",
+						"properties" => []
+					];
 
-				if(($parent = $reflection->getParentClass()) !== false){
-					$info["parent"] = $parent->getName();
-				}
+					if(($parent = $reflection->getParentClass()) !== false){
+						$info["parent"] = $parent->getName();
+					}
 
-				if(count($reflection->getInterfaceNames()) > 0){
-					$info["implements"] = implode(", ", $reflection->getInterfaceNames());
-				}
+					if(count($reflection->getInterfaceNames()) > 0){
+						$info["implements"] = implode(", ", $reflection->getInterfaceNames());
+					}
 
-				for($original = $reflection; $reflection !== false; $reflection = $reflection->getParentClass()){
-					foreach($reflection->getProperties() as $property){
-						if($property->isStatic()){
-							continue;
-						}
-
-						$name = $property->getName();
-						if($reflection !== $original){
-							if($property->isPrivate()){
-								$name = $reflection->getName() . ":" . $name;
-							}else{
+					for($original = $reflection; $reflection !== false; $reflection = $reflection->getParentClass()){
+						foreach($reflection->getProperties() as $property){
+							if($property->isStatic()){
 								continue;
 							}
-						}
-						if(!$property->isPublic()){
-							$property->setAccessible(true);
-						}
 
-						$info["properties"][$name] = self::continueDump($property->getValue($object), $objects, $refCounts, 0, $maxNesting, $maxStringSize);
+							$name = $property->getName();
+							if($reflection !== $original){
+								if($property->isPrivate()){
+									$name = $reflection->getName() . ":" . $name;
+								}else{
+									continue;
+								}
+							}
+							if(!$property->isPublic()){
+								$property->setAccessible(true);
+							}
+
+							$info["properties"][$name] = self::continueDump($property->getValue($object), $objects, $refCounts, 0, $maxNesting, $maxStringSize);
+						}
 					}
+
+					fwrite($obData, "$hash@$className: " . json_encode($info, JSON_UNESCAPED_SLASHES) . "\n");
+				}catch(\Throwable $throwable){
 				}
-
-				fwrite($obData, "$hash@$className: " . json_encode($info, JSON_UNESCAPED_SLASHES) . "\n");
 			}
-
 		}while($continue);
 
 		$logger->info("[Dump] Wrote " . count($objects) . " objects");
