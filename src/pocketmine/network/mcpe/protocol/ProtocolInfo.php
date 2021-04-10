@@ -40,7 +40,6 @@ interface ProtocolInfo{
 	public const CURRENT_PROTOCOL = 408;
 	/** Accept Minecraft: PE protocol version */
 	public const ACCEPT_PROTOCOL = [
-		400, 406, 407, 408,
 		419, 420, 421, 422,
 		423, 424, 425, 426, 427, 428,
 		431
