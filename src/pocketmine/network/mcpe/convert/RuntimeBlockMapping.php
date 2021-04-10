@@ -139,7 +139,7 @@ final class RuntimeBlockMapping{
 		 * if not found, try id+0 (strip meta)
 		 * if still not found, return update! block
 		 */
-		return self::getMapping(self::toStaticRuntimeId(-1))->toStaticRuntimeId($id, $meta);
+		return self::getMapping(-1)->toStaticRuntimeId($id, $meta);
 	}
 
 	/**
@@ -147,7 +147,7 @@ final class RuntimeBlockMapping{
 	 */
 	public static function fromStaticRuntimeId(int $runtimeId) : array{
 		self::lazyInit();
-		return self::getMapping(self::toStaticRuntimeId(-1))->fromStaticRuntimeId($runtimeId);
+		return self::getMapping(-1)->fromStaticRuntimeId($runtimeId);
 	}
 
 	/**
