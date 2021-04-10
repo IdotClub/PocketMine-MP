@@ -30,6 +30,7 @@ use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
 use pocketmine\Player;
@@ -84,11 +85,13 @@ class NetworkInventoryAction{
 	public $oldItem;
 	/** @var ItemStackWrapper */
 	public $newItem;
+	/** @var int|null */
+	public $newItemStackId = null;
 
 	/**
 	 * @return $this
 	 */
-	public function read(NetworkBinaryStream $packet){
+	public function read(NetworkBinaryStream $packet, bool $hasItemStackIds){
 		$this->sourceType = $packet->getUnsignedVarInt();
 
 		switch($this->sourceType){
@@ -110,6 +113,9 @@ class NetworkInventoryAction{
 		$this->inventorySlot = $packet->getUnsignedVarInt();
 		$this->oldItem = $packet->getItem();
 		$this->newItem = $packet->getItem();
+		if($packet->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $hasItemStackIds){
+			$this->newItemStackId = $packet->readGenericTypeNetworkId();
+		}
 
 		return $this;
 	}
@@ -117,7 +123,7 @@ class NetworkInventoryAction{
 	/**
 	 * @return void
 	 */
-	public function write(NetworkBinaryStream $packet){
+	public function write(NetworkBinaryStream $packet, bool $hasItemStackIds){
 		$packet->putUnsignedVarInt($this->sourceType);
 
 		switch($this->sourceType){
@@ -139,6 +145,9 @@ class NetworkInventoryAction{
 		$packet->putUnsignedVarInt($this->inventorySlot);
 		$packet->putItem($this->oldItem);
 		$packet->putItem($this->newItem);
+		if($packet->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $hasItemStackIds){
+			$packet->writeGenericTypeNetworkId($this->newItemStackId);
+		}
 	}
 
 	/**

@@ -93,7 +93,7 @@ class UseItemTransactionData extends TransactionData{
 		$this->blockPos = new Vector3($x, $y, $z);
 		$this->face = $stream->getVarInt();
 		$this->hotbarSlot = $stream->getVarInt();
-		$this->itemInHand = ItemStackWrapper::read($stream);
+		$this->itemInHand = $stream->getItem();
 		$this->playerPos = $stream->getVector3();
 		$this->clickPos = $stream->getVector3();
 		$this->blockRuntimeId = $stream->getUnsignedVarInt();
@@ -104,7 +104,7 @@ class UseItemTransactionData extends TransactionData{
 		$stream->putBlockPosition($this->blockPos->x, $this->blockPos->y, $this->blockPos->z);
 		$stream->putVarInt($this->face);
 		$stream->putVarInt($this->hotbarSlot);
-		$this->itemInHand->write($stream);
+		$stream->putItem($this->itemInHand);
 		$stream->putVector3($this->playerPos);
 		$stream->putVector3($this->clickPos);
 		$stream->putUnsignedVarInt($this->blockRuntimeId);
