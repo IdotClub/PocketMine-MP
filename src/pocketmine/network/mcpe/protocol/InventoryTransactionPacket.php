@@ -50,22 +50,24 @@ class InventoryTransactionPacket extends DataPacket{
 	/** @var InventoryTransactionChangedSlotsHack[] */
 	public $requestChangedSlots;
 	/** @var bool */
-	public $hasItemStackIds;
+	public $hasItemStackIds = false;
 	/** @var TransactionData */
 	public $trData;
 
 	protected function decodePayload() : void{
-		$this->requestId = $this->readGenericTypeNetworkId();
+		$in = $this;
+		$this->requestId = $in->readGenericTypeNetworkId();
 		$this->requestChangedSlots = [];
 		if($this->requestId !== 0){
-			for($i = 0, $len = $this->getUnsignedVarInt(); $i < $len; ++$i){
-				$this->requestChangedSlots[] = InventoryTransactionChangedSlotsHack::read($this);
+			for($i = 0, $len = $in->getUnsignedVarInt(); $i < $len; ++$i){
+				$this->requestChangedSlots[] = $in->getItem();
 			}
 		}
 
-		$transactionType = $this->getUnsignedVarInt();
-
-		$this->hasItemStackIds = $this->getBool();
+		$transactionType = $in->getUnsignedVarInt();
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220){
+			$this->hasItemStackIds = $this->getBool();
+		}
 
 		switch($transactionType){
 			case self::TYPE_NORMAL:
@@ -87,23 +89,25 @@ class InventoryTransactionPacket extends DataPacket{
 				throw new PacketDecodeException("Unknown transaction type $transactionType");
 		}
 
-		$this->trData->decode($this, $this->hasItemStackIds);
+		$this->trData->decode($in, $this->hasItemStackIds);
 	}
 
 	protected function encodePayload() : void{
-		$this->writeGenericTypeNetworkId($this->requestId);
+		$out = $this;
+		$out->writeGenericTypeNetworkId($this->requestId);
 		if($this->requestId !== 0){
-			$this->putUnsignedVarInt(count($this->requestChangedSlots));
+			$out->putUnsignedVarInt(count($this->requestChangedSlots));
 			foreach($this->requestChangedSlots as $changedSlots){
-				$changedSlots->write($this);
+				$changedSlots->write($out);
 			}
 		}
 
-		$this->putUnsignedVarInt($this->trData->getTypeId());
+		$out->putUnsignedVarInt($this->trData->getTypeId());
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220) {
+			$this->putBool($this->hasItemStackIds);
+		}
 
-		$this->putBool($this->hasItemStackIds);
-
-		$this->trData->encode($this, $this->hasItemStackIds);
+		$this->trData->encode($out, $this->hasItemStackIds);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

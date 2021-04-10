@@ -26,6 +26,7 @@ namespace pocketmine\inventory;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CraftingDataPacket;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\Server;
 use pocketmine\timings\Timings;
 use pocketmine\utils\AssumptionFailedError;
@@ -45,8 +46,8 @@ class CraftingManager{
 	/** @var FurnaceRecipe[] */
 	protected $furnaceRecipes = [];
 
-	/** @var BatchPacket|null */
-	private $craftingDataCache;
+	/** @var BatchPacket[] */
+	private $craftingDataCache = [];
 
 	public function __construct(){
 		$this->init();
@@ -89,15 +90,16 @@ class CraftingManager{
 			);
 		}
 
-		$this->buildCraftingDataCache();
+		//$this->buildCraftingDataCache(ProtocolInfo::CURRENT_PROTOCOL);
 	}
 
 	/**
 	 * Rebuilds the cached CraftingDataPacket.
 	 */
-	public function buildCraftingDataCache() : void{
+	public function buildCraftingDataCache(int $protocol) : void{
 		Timings::$craftingDataCacheRebuildTimer->startTiming();
 		$pk = new CraftingDataPacket();
+		$pk->protocol = $protocol;
 		$pk->cleanRecipes = true;
 
 		foreach($this->shapelessRecipes as $list){
@@ -115,8 +117,6 @@ class CraftingManager{
 			$pk->addFurnaceRecipe($recipe);
 		}
 
-		$pk->encode();
-
 		$batch = new BatchPacket();
 		$batch->addPacket($pk);
 		$batch->setCompressionLevel(Server::getInstance()->networkCompressionLevel);
@@ -129,12 +129,12 @@ class CraftingManager{
 	/**
 	 * Returns a pre-compressed CraftingDataPacket for sending to players. Rebuilds the cache if it is not found.
 	 */
-	public function getCraftingDataPacket() : BatchPacket{
+	public function getCraftingDataPacket(int $protocol=ProtocolInfo::CURRENT_PROTOCOL) : ?BatchPacket{
 		if($this->craftingDataCache === null){
-			$this->buildCraftingDataCache();
+			$this->buildCraftingDataCache($protocol);
 		}
 
-		return $this->craftingDataCache;
+		return $this->craftingDataCache[$protocol] ?? null;
 	}
 
 	/**
@@ -211,19 +211,19 @@ class CraftingManager{
 	public function registerShapedRecipe(ShapedRecipe $recipe) : void{
 		$this->shapedRecipes[self::hashOutputs($recipe->getResults())][] = $recipe;
 
-		$this->craftingDataCache = null;
+		$this->craftingDataCache = [];
 	}
 
 	public function registerShapelessRecipe(ShapelessRecipe $recipe) : void{
 		$this->shapelessRecipes[self::hashOutputs($recipe->getResults())][] = $recipe;
 
-		$this->craftingDataCache = null;
+		$this->craftingDataCache = [];
 	}
 
 	public function registerFurnaceRecipe(FurnaceRecipe $recipe) : void{
 		$input = $recipe->getInput();
 		$this->furnaceRecipes[$input->getId() . ":" . ($input->hasAnyDamageValue() ? "?" : $input->getDamage())] = $recipe;
-		$this->craftingDataCache = null;
+		$this->craftingDataCache = [];
 	}
 
 	/**

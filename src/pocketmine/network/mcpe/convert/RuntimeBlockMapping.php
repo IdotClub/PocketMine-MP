@@ -28,6 +28,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\utils\AssumptionFailedError;
 use function file_get_contents;
 use function json_decode;
@@ -54,6 +55,7 @@ final class RuntimeBlockMapping{
 			throw new AssumptionFailedError("Missing required resource file");
 		}
 		$stream = new NetworkBinaryStream($canonicalBlockStatesFile);
+		$stream->protocol = ProtocolInfo::CURRENT_PROTOCOL;
 		$list = [];
 		while(!$stream->feof()){
 			$list[] = $stream->getNbtCompoundRoot();

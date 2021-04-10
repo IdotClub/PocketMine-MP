@@ -30,6 +30,8 @@ use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
+use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\network\mcpe\protocol\types\inventory\UIInventorySlotOffset;
 use pocketmine\Player;
 use function array_key_exists;
@@ -79,9 +81,9 @@ class NetworkInventoryAction{
 	public $sourceFlags = 0;
 	/** @var int */
 	public $inventorySlot;
-	/** @var Item */
+	/** @var ItemStackWrapper */
 	public $oldItem;
-	/** @var Item */
+	/** @var ItemStackWrapper */
 	public $newItem;
 	/** @var int|null */
 	public $newItemStackId = null;
@@ -109,9 +111,9 @@ class NetworkInventoryAction{
 		}
 
 		$this->inventorySlot = $packet->getUnsignedVarInt();
-		$this->oldItem = $packet->getSlot();
-		$this->newItem = $packet->getSlot();
-		if($hasItemStackIds){
+		$this->oldItem = $packet->getItem();
+		$this->newItem = $packet->getItem();
+		if($packet->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $hasItemStackIds){
 			$this->newItemStackId = $packet->readGenericTypeNetworkId();
 		}
 
@@ -141,12 +143,9 @@ class NetworkInventoryAction{
 		}
 
 		$packet->putUnsignedVarInt($this->inventorySlot);
-		$packet->putSlot($this->oldItem);
-		$packet->putSlot($this->newItem);
-		if($hasItemStackIds){
-			if($this->newItemStackId === null){
-				throw new \InvalidStateException("Item stack ID for newItem must be provided");
-			}
+		$packet->putItem($this->oldItem);
+		$packet->putItem($this->newItem);
+		if($packet->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $hasItemStackIds){
 			$packet->writeGenericTypeNetworkId($this->newItemStackId);
 		}
 	}
@@ -157,7 +156,9 @@ class NetworkInventoryAction{
 	 * @throws \UnexpectedValueException
 	 */
 	public function createInventoryAction(Player $player){
-		if($this->oldItem->equalsExact($this->newItem)){
+		$oldItem = $this->oldItem->getItemStack();
+		$newItem = $this->newItem->getItemStack();
+		if($oldItem->equalsExact($newItem)){
 			//filter out useless noise in 1.13
 			return null;
 		}
@@ -187,7 +188,7 @@ class NetworkInventoryAction{
 					$slot = $this->inventorySlot;
 				}
 				if($window !== null){
-					return new SlotChangeAction($window, $slot, $this->oldItem, $this->newItem);
+					return new SlotChangeAction($window, $slot, $oldItem, $newItem);
 				}
 
 				throw new \UnexpectedValueException("Player " . $player->getName() . " has no open container with window ID $this->windowId");
@@ -196,7 +197,7 @@ class NetworkInventoryAction{
 					throw new \UnexpectedValueException("Only expecting drop-item world actions from the client!");
 				}
 
-				return new DropItemAction($this->newItem);
+				return new DropItemAction($newItem);
 			case self::SOURCE_CREATIVE:
 				switch($this->inventorySlot){
 					case self::ACTION_MAGIC_SLOT_CREATIVE_DELETE_ITEM:
@@ -210,7 +211,7 @@ class NetworkInventoryAction{
 
 				}
 
-				return new CreativeInventoryAction($this->oldItem, $this->newItem, $type);
+				return new CreativeInventoryAction($oldItem, $newItem, $type);
 			case self::SOURCE_TODO:
 				//These types need special handling.
 				switch($this->windowId){
