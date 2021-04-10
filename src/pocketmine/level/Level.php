@@ -550,10 +550,11 @@ class Level implements ChunkManager, Metadatable{
 	 *
 	 * @return void
 	 */
-	public function broadcastLevelEvent(?Vector3 $pos, int $evid, int $data = 0){
+	public function broadcastLevelEvent(?Vector3 $pos, int $evid, int $data = 0, ?callable $dataConsumer = null){
 		$pk = new LevelEventPacket();
 		$pk->evid = $evid;
 		$pk->data = $data;
+		$pk->consumer = $dataConsumer;
 		if($pos !== null){
 			$pk->position = $pos->asVector3();
 			$this->broadcastPacketToViewers($pos, $pk);
@@ -567,13 +568,15 @@ class Level implements ChunkManager, Metadatable{
 	 * Broadcasts a LevelSoundEvent to players in the area.
 	 *
 	 * @param bool    $disableRelativeVolume If true, all players receiving this sound-event will hear the sound at full volume regardless of distance
+	 * @param (callable(int $protocol) : int)|null $consumer
 	 *
 	 * @return void
 	 */
-	public function broadcastLevelSoundEvent(Vector3 $pos, int $soundId, int $extraData = -1, int $entityTypeId = -1, bool $isBabyMob = false, bool $disableRelativeVolume = false){
+	public function broadcastLevelSoundEvent(Vector3 $pos, int $soundId, int $extraData = -1, int $entityTypeId = -1, bool $isBabyMob = false, bool $disableRelativeVolume = false, ?callable $consumer = null){
 		$pk = new LevelSoundEventPacket();
 		$pk->sound = $soundId;
 		$pk->extraData = $extraData;
+		$pk->extraDataConsumer = $consumer;
 		$pk->entityType = AddActorPacket::LEGACY_ID_MAP_BC[$entityTypeId] ?? ":";
 		$pk->isBabyMob = $isBabyMob;
 		$pk->disableRelativeVolume = $disableRelativeVolume;
@@ -994,10 +997,10 @@ class Level implements ChunkManager, Metadatable{
 				$pk->z = $b->z;
 
 				if($b instanceof Block){
-					$pk->blockRuntimeId = $b->getRuntimeId();
+					$pk->block = $b;
 				}else{
 					$fullBlock = $this->getFullBlock($b->x, $b->y, $b->z);
-					$pk->blockRuntimeId = RuntimeBlockMapping::toStaticRuntimeId($fullBlock >> 4, $fullBlock & 0xf);
+					$pk->block = Block::get($fullBlock >> 4, $fullBlock & 0xf);
 				}
 
 				$pk->flags = $first ? $flags : UpdateBlockPacket::FLAG_NONE;
@@ -1016,10 +1019,10 @@ class Level implements ChunkManager, Metadatable{
 				$pk->z = $b->z;
 
 				if($b instanceof Block){
-					$pk->blockRuntimeId = $b->getRuntimeId();
+					$pk->block = $b;
 				}else{
 					$fullBlock = $this->getFullBlock($b->x, $b->y, $b->z);
-					$pk->blockRuntimeId = RuntimeBlockMapping::toStaticRuntimeId($fullBlock >> 4, $fullBlock & 0xf);
+					$pk->block = Block::get($fullBlock >> 4, $fullBlock & 0xf);
 				}
 
 				$pk->flags = $flags;
@@ -1949,7 +1952,10 @@ class Level implements ChunkManager, Metadatable{
 		}
 
 		if($playSound){
-			$this->broadcastLevelSoundEvent($hand, LevelSoundEventPacket::SOUND_PLACE, $hand->getRuntimeId());
+			$this->broadcastLevelSoundEvent($hand, LevelSoundEventPacket::SOUND_PLACE, $hand->getRuntimeId(), -1, false, false,
+			function (int $protocol) use ($hand) : int {
+				return RuntimeBlockMapping::getMapping($protocol)->toStaticRuntimeId($hand->getId(), $hand->getDamage());
+			});
 		}
 
 		$item->pop();

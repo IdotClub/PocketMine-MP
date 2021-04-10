@@ -22,7 +22,7 @@ class BlockMapping {
 	}
 
 	public function toStaticRuntimeId(int $id, int $meta = 0) : int {
-		return $this->legacyToRuntimeMap[($id << 4) | $meta] ?? $this->legacyToRuntimeMap[$id << 4] ?? $this->legacyToRuntimeMap[BlockIds::INFO_UPDATE << 4];
+		return $this->legacyToRuntimeMap[($id << 4) | $meta] ?? $this->legacyToRuntimeMap[$id << 4] ?? $this->legacyToRuntimeMap[BlockIds::INFO_UPDATE << 4] ?? 0;
 	}
 
 	/**
@@ -31,5 +31,10 @@ class BlockMapping {
 	public function fromStaticRuntimeId(int $runtimeId) : array {
 		$v = $this->runtimeToLegacyMap[$runtimeId];
 		return [$v >> 4, $v & 0xf];
+	}
+
+	public function registerMapping(int $staticRuntimeId, int $legacyId, int $legacyMeta) : void {
+		$this->legacyToRuntimeMap[($legacyId << 4) | $legacyMeta] = $staticRuntimeId;
+		$this->runtimeToLegacyMap[$staticRuntimeId] = ($legacyId << 4) | $legacyMeta;
 	}
 }

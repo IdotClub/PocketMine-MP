@@ -120,6 +120,9 @@ class LevelEventPacket extends DataPacket{
 	/** @var int */
 	public $data;
 
+	/** @var (callable(int $protocol) : int)| null */
+	public $consumer;
+
 	protected function decodePayload(){
 		$this->evid = $this->getVarInt();
 		$this->position = $this->getVector3();
@@ -129,7 +132,11 @@ class LevelEventPacket extends DataPacket{
 	protected function encodePayload(){
 		$this->putVarInt($this->evid);
 		$this->putVector3Nullable($this->position);
-		$this->putVarInt($this->data);
+		if($this->consumer !== null) {
+			$this->putVarInt(($this->consumer)($this->protocol));
+		} else{
+			$this->putVarInt($this->data);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{

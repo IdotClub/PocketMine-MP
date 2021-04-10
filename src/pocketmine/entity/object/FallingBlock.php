@@ -73,6 +73,7 @@ class FallingBlock extends Entity{
 
 		$this->block = BlockFactory::get($blockId, $damage);
 
+		//TODO
 		$this->propertyManager->setInt(self::DATA_VARIANT, $this->block->getRuntimeId());
 	}
 
