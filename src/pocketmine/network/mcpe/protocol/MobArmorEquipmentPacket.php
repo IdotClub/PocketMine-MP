@@ -47,18 +47,18 @@ class MobArmorEquipmentPacket extends DataPacket{
 
 	protected function decodePayload(){
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
-		$this->head = ItemStackWrapper::read($this);
-		$this->chest = ItemStackWrapper::read($this);
-		$this->legs = ItemStackWrapper::read($this);
-		$this->feet = ItemStackWrapper::read($this);
+		$this->head = $this->getItem();
+		$this->chest = $this->getItem();
+		$this->legs = $this->getItem();
+		$this->feet = $this->getItem();
 	}
 
 	protected function encodePayload(){
 		$this->putEntityRuntimeId($this->entityRuntimeId);
-		$this->head->write($this);
-		$this->chest->write($this);
-		$this->legs->write($this);
-		$this->feet->write($this);
+		$this->putItem($this->head);
+		$this->putItem($this->chest);
+		$this->putItem($this->legs);
+		$this->putItem($this->feet);
 	}
 
 	public function handle(NetworkSession $session) : bool{

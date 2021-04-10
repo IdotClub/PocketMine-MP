@@ -25,6 +25,7 @@ namespace pocketmine\network\mcpe\protocol\types\inventory;
 
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 
 final class ItemStackWrapper{
 
@@ -47,22 +48,32 @@ final class ItemStackWrapper{
 	public function getItemStack() : Item{ return $this->itemStack; }
 
 	public static function read(NetworkBinaryStream $in) : self{
-		$stackId = 0;
-		$stack = $in->getItemStack(function(NetworkBinaryStream $in) use (&$stackId) : void{
-			$hasNetId = $in->getBool();
-			if($hasNetId){
-				$stackId = $in->readGenericTypeNetworkId();
-			}
-		});
-		return new self($stackId, $stack);
+		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220) {
+			$stackId = 0;
+			$stack = $in->getItemStack(function (NetworkBinaryStream $in) use (&$stackId) : void {
+				$hasNetId = $in->getBool();
+				if ($hasNetId) {
+					$stackId = $in->readGenericTypeNetworkId();
+				}
+			});
+			return new self($stackId, $stack);
+		} else {
+			$stackId = $in->readGenericTypeNetworkId();
+			return new self($stackId, $in->getSlot());
+		}
 	}
 
 	public function write(NetworkBinaryStream $out) : void{
-		$out->putItemStack($this->itemStack, function(NetworkBinaryStream $out) : void{
-			$out->putBool($this->stackId !== 0);
-			if($this->stackId !== 0){
-				$out->writeGenericTypeNetworkId($this->stackId);
-			}
-		});
+		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220) {
+			$out->putItemStack($this->itemStack, function (NetworkBinaryStream $out) : void {
+				$out->putBool($this->stackId !== 0);
+				if ($this->stackId !== 0) {
+					$out->writeGenericTypeNetworkId($this->stackId);
+				}
+			});
+		} else {
+			$out->writeGenericTypeNetworkId($this->stackId);
+			$out->putSlot($this->getItemStack());
+		}
 	}
 }

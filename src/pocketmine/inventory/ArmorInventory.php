@@ -102,7 +102,6 @@ class ArmorInventory extends BaseInventory{
 		$pk->chest = ItemStackWrapper::legacy($this->getChestplate());
 		$pk->legs = ItemStackWrapper::legacy($this->getLeggings());
 		$pk->feet = ItemStackWrapper::legacy($this->getBoots());
-		$pk->encode();
 
 		foreach($target as $player){
 			if($player === $this->getHolder()){
@@ -130,7 +129,6 @@ class ArmorInventory extends BaseInventory{
 		$pk->chest = ItemStackWrapper::legacy($this->getChestplate());
 		$pk->legs = ItemStackWrapper::legacy($this->getLeggings());
 		$pk->feet = ItemStackWrapper::legacy($this->getBoots());
-		$pk->encode();
 
 		foreach($target as $player){
 			if($player === $this->getHolder()){

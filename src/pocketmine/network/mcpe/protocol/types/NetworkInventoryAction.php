@@ -108,8 +108,8 @@ class NetworkInventoryAction{
 		}
 
 		$this->inventorySlot = $packet->getUnsignedVarInt();
-		$this->oldItem = ItemStackWrapper::read($packet);
-		$this->newItem = ItemStackWrapper::read($packet);
+		$this->oldItem = $packet->getItem();
+		$this->newItem = $packet->getItem();
 
 		return $this;
 	}
@@ -137,8 +137,8 @@ class NetworkInventoryAction{
 		}
 
 		$packet->putUnsignedVarInt($this->inventorySlot);
-		$this->oldItem->write($packet);
-		$this->newItem->write($packet);
+		$packet->putItem($this->oldItem);
+		$packet->putItem($this->newItem);
 	}
 
 	/**

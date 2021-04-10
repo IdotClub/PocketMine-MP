@@ -274,6 +274,7 @@ class CraftingDataPacket extends DataPacket{
 		$this->putUnsignedVarInt(count($this->entries));
 
 		$writer = new NetworkBinaryStream();
+		$writer->protocol = $this->protocol;
 		$counter = 0;
 		foreach($this->entries as $d){
 			$entryType = self::writeEntry($d, $writer, $counter++);

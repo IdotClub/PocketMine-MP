@@ -41,12 +41,14 @@ use pocketmine\nbt\tag\NamedTag;
 use pocketmine\network\mcpe\convert\EntityMetaTranslator;
 use pocketmine\network\mcpe\convert\ItemTranslator;
 use pocketmine\network\mcpe\convert\ItemTypeDictionary;
-use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
-use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
+use pocketmine\network\mcpe\protocol\DataPacket;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\CommandOriginData;
 use pocketmine\network\mcpe\protocol\types\EntityLink;
 use pocketmine\network\mcpe\protocol\types\GameRuleType;
+use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
 use pocketmine\network\mcpe\protocol\types\PersonaPieceTintColor;
 use pocketmine\network\mcpe\protocol\types\PersonaSkinPiece;
 use pocketmine\network\mcpe\protocol\types\SkinAnimation;
@@ -214,13 +216,20 @@ class NetworkBinaryStream extends BinaryStream{
 	}
 
 	public function getItemStackWithoutStackId() : Item{
-		return $this->getItemStack(function() : void{
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $this instanceof DataPacket) {
+			return $this->getSlot();
+		}
+		return $this->getItemStack(function () : void {
 			//NOOP
 		});
 	}
 
 	public function putItemStackWithoutStackId(Item $item) : void{
-		$this->putItemStack($item, function() : void{
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220) {
+			$this->putSlot($item);
+			return;
+		}
+		$this->putItemStack($item, function () : void {
 			//NOOP
 		});
 	}
@@ -244,6 +253,7 @@ class NetworkBinaryStream extends BinaryStream{
 		$this->getVarInt();
 
 		$extraData = new NetworkBinaryStream($this->getString());
+		$extraData->protocol = $this->protocol;
 		return (static function() use ($extraData, $netId, $id, $meta, $cnt) : Item{
 			$nbtLen = $extraData->getLShort();
 
@@ -350,8 +360,9 @@ class NetworkBinaryStream extends BinaryStream{
 		}
 
 		$this->putString(
-		(static function() use ($nbt, $netId) : string{
+		(function() use ($nbt, $netId) : string{
 			$extraData = new NetworkBinaryStream();
+			$extraData->protocol = $this->protocol;
 
 			if($nbt !== null){
 				$extraData->putLShort(0xffff);
@@ -864,5 +875,125 @@ class NetworkBinaryStream extends BinaryStream{
 
 	public function writeGenericTypeNetworkId(int $id) : void{
 		$this->putVarInt($id);
+	}
+
+	public function getSlot() : Item{
+		$netId = $this->getVarInt();
+		if($netId === 0){
+			return ItemFactory::get(0, 0, 0);
+		}
+
+		$auxValue = $this->getVarInt();
+		$netData = $auxValue >> 8;
+		$cnt = $auxValue & 0xff;
+
+		[$id, $meta] = ItemTranslator::getInstance()->fromNetworkId($netId, $netData);
+
+		$nbtLen = $this->getLShort();
+
+		/** @var CompoundTag|null $nbt */
+		$nbt = null;
+		if($nbtLen === 0xffff){
+			$nbtDataVersion = $this->getByte();
+			if($nbtDataVersion !== 1){
+				throw new \UnexpectedValueException("Unexpected NBT data version $nbtDataVersion");
+			}
+			$decodedNBT = (new NetworkLittleEndianNBTStream())->read($this->buffer, false, $this->offset, 512);
+			if(!($decodedNBT instanceof CompoundTag)){
+				throw new \UnexpectedValueException("Unexpected root tag type for itemstack");
+			}
+			$nbt = $decodedNBT;
+		}elseif($nbtLen !== 0){
+			throw new \UnexpectedValueException("Unexpected fake NBT length $nbtLen");
+		}
+
+		//TODO
+		for($i = 0, $canPlaceOn = $this->getVarInt(); $i < $canPlaceOn; ++$i){
+			$this->getString();
+		}
+
+		//TODO
+		for($i = 0, $canDestroy = $this->getVarInt(); $i < $canDestroy; ++$i){
+			$this->getString();
+		}
+
+		if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
+			$this->getVarLong(); //"blocking tick" (ffs mojang)
+		}
+		if($nbt !== null){
+			if($nbt->hasTag(self::DAMAGE_TAG, IntTag::class)){
+				$meta = $nbt->getInt(self::DAMAGE_TAG);
+				$nbt->removeTag(self::DAMAGE_TAG);
+				if(($conflicted = $nbt->getTag(self::DAMAGE_TAG_CONFLICT_RESOLUTION)) !== null){
+					$nbt->removeTag(self::DAMAGE_TAG_CONFLICT_RESOLUTION);
+					$conflicted->setName(self::DAMAGE_TAG);
+					$nbt->setTag($conflicted);
+				}elseif($nbt->count() === 0){
+					$nbt = null;
+				}
+			}
+		}
+		return ItemFactory::get($id, $meta, $cnt, $nbt);
+	}
+
+	public function putSlot(Item $item) : void{
+		if($item->getId() === 0){
+			$this->putVarInt(0);
+
+			return;
+		}
+
+		[$netId, $netData] = ItemTranslator::getInstance()->toNetworkId($item->getId(), $item->getDamage());
+
+		$this->putVarInt($netId);
+		$auxValue = (($netData & 0x7fff) << 8) | $item->getCount();
+		$this->putVarInt($auxValue);
+
+		$nbt = null;
+		if($item->hasCompoundTag()){
+			$nbt = clone $item->getNamedTag();
+		}
+		if($item instanceof Durable and $item->getDamage() > 0){
+			if($nbt !== null){
+				if(($existing = $nbt->getTag(self::DAMAGE_TAG)) !== null){
+					$nbt->removeTag(self::DAMAGE_TAG);
+					$existing->setName(self::DAMAGE_TAG_CONFLICT_RESOLUTION);
+					$nbt->setTag($existing);
+				}
+			}else{
+				$nbt = new CompoundTag();
+			}
+			$nbt->setInt(self::DAMAGE_TAG, $item->getDamage());
+		}
+
+		if($nbt !== null){
+			$this->putLShort(0xffff);
+			$this->putByte(1); //TODO: NBT data version (?)
+			$this->put((new NetworkLittleEndianNBTStream())->write($nbt));
+		}else{
+			$this->putLShort(0);
+		}
+
+		$this->putVarInt(0); //CanPlaceOn entry count (TODO)
+		$this->putVarInt(0); //CanDestroy entry count (TODO)
+
+		if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
+			$this->putVarLong(0); //"blocking tick" (ffs mojang)
+		}
+	}
+
+	public function putItem(ItemStackWrapper $item) : void {
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220) {
+			$item->write($this);
+			return;
+		}
+		$this->putSlot($item->getItemStack());
+	}
+
+	public function getItem() : ItemStackWrapper {
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220) {
+			return ItemStackWrapper::read($this);
+		}
+		return ItemStackWrapper::legacy($this->getSlot());
 	}
 }

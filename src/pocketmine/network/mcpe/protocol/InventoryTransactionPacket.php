@@ -58,7 +58,7 @@ class InventoryTransactionPacket extends DataPacket{
 		$this->requestChangedSlots = [];
 		if($this->requestId !== 0){
 			for($i = 0, $len = $in->getUnsignedVarInt(); $i < $len; ++$i){
-				$this->requestChangedSlots[] = InventoryTransactionChangedSlotsHack::read($in);
+				$this->requestChangedSlots[] = $in->getItem();
 			}
 		}
 

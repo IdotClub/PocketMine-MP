@@ -2312,7 +2312,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		$this->sendAllInventories();
 		$this->inventory->sendCreativeContents();
 		$this->inventory->sendHeldItem($this);
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+		$pk = $this->server->getCraftingManager()->getCraftingDataPacket($this->protocol);
+		if($pk !== null){
 			$this->dataPacket($this->server->getCraftingManager()->getCraftingDataPacket());
 		} else {
 			//TODO
