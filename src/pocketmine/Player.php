@@ -2314,7 +2314,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		$this->inventory->sendHeldItem($this);
 		$pk = $this->server->getCraftingManager()->getCraftingDataPacket($this->protocol);
 		if($pk !== null){
-			$this->dataPacket($this->server->getCraftingManager()->getCraftingDataPacket());
+			$this->dataPacket($pk);
 		} else {
 			//TODO
 			$this->dataPacket(new CraftingDataPacket());
