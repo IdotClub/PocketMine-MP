@@ -25,6 +25,7 @@
       "ext-yaml": ">=2.0.0",
       "ext-zip": "*",
       "ext-zlib": ">=1.2.11",
+      "ext-igbinary": "*",
       "composer-runtime-api": "^2.0",
       "adhocore/json-comment": "^1.1",
       "pocketmine/binaryutils": "^0.1.9",

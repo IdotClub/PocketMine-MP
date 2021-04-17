@@ -90,7 +90,8 @@ namespace pocketmine {
 			"spl" => "SPL",
 			"yaml" => "YAML",
 			"zip" => "Zip",
-			"zlib" => "Zlib"
+			"zlib" => "Zlib",
+			"igbinary" => 'igbinary',
 		];
 
 		foreach($extensions as $ext => $name){

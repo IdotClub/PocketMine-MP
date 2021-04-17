@@ -26,10 +26,10 @@ namespace pocketmine\scheduler;
 use pocketmine\Collectable;
 use pocketmine\Server;
 use pocketmine\utils\AssumptionFailedError;
+use function igbinary_serialize;
+use function igbinary_unserialize;
 use function is_scalar;
 use function is_string;
-use function serialize;
-use function unserialize;
 
 /**
  * Class used to run async tasks in other threads.
@@ -102,7 +102,7 @@ abstract class AsyncTask extends Collectable{
 	public function getResult(){
 		if($this->serialized){
 			if(!is_string($this->result)) throw new AssumptionFailedError("Result expected to be a serialized string");
-			return unserialize($this->result);
+			return igbinary_unserialize($this->result);
 		}
 		return $this->result;
 	}
@@ -128,7 +128,7 @@ abstract class AsyncTask extends Collectable{
 	 * @return void
 	 */
 	public function setResult($result){
-		$this->result = ($this->serialized = !is_scalar($result)) ? serialize($result) : $result;
+		$this->result = ($this->serialized = !is_scalar($result)) ? igbinary_serialize($result) : $result;
 	}
 
 	/**
@@ -210,7 +210,7 @@ abstract class AsyncTask extends Collectable{
 	 * @return void
 	 */
 	public function publishProgress($progress){
-		$this->progressUpdates[] = serialize($progress);
+		$this->progressUpdates[] = igbinary_serialize($progress);
 	}
 
 	/**
@@ -221,7 +221,7 @@ abstract class AsyncTask extends Collectable{
 	public function checkProgressUpdates(Server $server){
 		while($this->progressUpdates->count() !== 0){
 			$progress = $this->progressUpdates->shift();
-			$this->onProgressUpdate($server, unserialize($progress));
+			$this->onProgressUpdate($server, igbinary_unserialize($progress));
 		}
 	}
 
