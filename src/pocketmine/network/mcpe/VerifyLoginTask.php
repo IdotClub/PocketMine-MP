@@ -31,16 +31,16 @@ use function base64_decode;
 use function chr;
 use function count;
 use function explode;
-use function igbinary_serialize;
-use function igbinary_unserialize;
 use function json_decode;
 use function ltrim;
 use function openssl_verify;
 use function ord;
+use function serialize;
 use function str_split;
 use function strlen;
 use function strtr;
 use function time;
+use function unserialize;
 use function wordwrap;
 use const OPENSSL_ALGO_SHA384;
 
@@ -71,13 +71,13 @@ class VerifyLoginTask extends AsyncTask{
 
 	public function __construct(Player $player, LoginPacket $packet){
 		$this->storeLocal([$player, $packet]);
-		$this->chainJwts = igbinary_serialize($packet->chainData["chain"]);
+		$this->chainJwts = serialize($packet->chainData["chain"]);
 		$this->clientDataJwt = $packet->clientDataJwt;
 	}
 
 	public function onRun(){
 		/** @var string[] $chainJwts */
-		$chainJwts = igbinary_unserialize($this->chainJwts); //Get it in a local variable to make sure it stays unserialized
+		$chainJwts = unserialize($this->chainJwts); //Get it in a local variable to make sure it stays unserialized
 
 		try{
 			$currentKey = null;

@@ -30,8 +30,8 @@ use pocketmine\level\Level;
 use pocketmine\level\SimpleChunkManager;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\Random;
-use function igbinary_serialize;
-use function igbinary_unserialize;
+use function serialize;
+use function unserialize;
 
 class GeneratorRegisterTask extends AsyncTask{
 
@@ -56,7 +56,7 @@ class GeneratorRegisterTask extends AsyncTask{
 	 */
 	public function __construct(Level $level, string $generatorClass, array $generatorSettings = []){
 		$this->generatorClass = $generatorClass;
-		$this->settings = igbinary_serialize($generatorSettings);
+		$this->settings = serialize($generatorSettings);
 		$this->seed = $level->getSeed();
 		$this->levelId = $level->getId();
 		$this->worldHeight = $level->getWorldHeight();
@@ -73,7 +73,7 @@ class GeneratorRegisterTask extends AsyncTask{
 		 * @var Generator $generator
 		 * @see Generator::__construct()
 		 */
-		$generator = new $this->generatorClass(igbinary_unserialize($this->settings));
+		$generator = new $this->generatorClass(unserialize($this->settings));
 		$generator->init($manager, new Random($manager->getSeed()));
 		$this->saveToThreadStore("generation.level{$this->levelId}.generator", $generator);
 	}
