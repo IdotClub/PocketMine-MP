@@ -54,6 +54,28 @@ final class PlayerInventory extends BaseInventory{
 		parent::__construct();
 	}
 
+	public static function buildCache(int $protocol) : void {
+		if (!isset(self::$cachedCreativeContent[$protocol])) {
+			$nextEntryId = 1;
+			$pk = CreativeContentPacket::create(array_map(function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
+				return new CreativeContentEntry($nextEntryId++, clone $item);
+			}, Item::getCreativeItems()));
+			$pk->protocol = $protocol;
+			$pk->encode();
+			self::$cachedCreativeContent[$protocol] = $pk;
+		}
+
+		if (!isset(self::$cachedEmptyCreativeContent[$protocol])) {
+			$nextEntryId = 1;
+			$pk = CreativeContentPacket::create(array_map(function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
+				return new CreativeContentEntry($nextEntryId++, clone $item);
+			}, []));
+			$pk->protocol = $protocol;
+			$pk->encode();
+			self::$cachedEmptyCreativeContent[$protocol] = $pk;
+		}
+	}
+
 	public function getName() : string{
 		return "Player";
 	}
@@ -207,25 +229,7 @@ final class PlayerInventory extends BaseInventory{
 
 		$protocol = $holder->getProtocol();
 
-		if(!isset(self::$cachedCreativeContent[$protocol])){
-			$nextEntryId = 1;
-			$pk = CreativeContentPacket::create(array_map(function(Item $item) use (&$nextEntryId) : CreativeContentEntry{
-				return new CreativeContentEntry($nextEntryId++, clone $item);
-			}, Item::getCreativeItems()));
-			$pk->protocol = $protocol;
-			$pk->encode();
-			self::$cachedCreativeContent[$protocol] = $pk;
-		}
-
-		if(!isset(self::$cachedEmptyCreativeContent[$protocol])){
-			$nextEntryId = 1;
-			$pk = CreativeContentPacket::create(array_map(function(Item $item) use (&$nextEntryId) : CreativeContentEntry{
-				return new CreativeContentEntry($nextEntryId++, clone $item);
-			}, []));
-			$pk->protocol = $protocol;
-			$pk->encode();
-			self::$cachedCreativeContent[$protocol] = $pk;
-		}
+		self::buildCache($protocol);
 		$holder->sendDataPacket($holder->isSpectator() ? self::$cachedEmptyCreativeContent[$protocol] : self::$cachedCreativeContent[$protocol]); //fill it for all gamemodes except spectator
 	}
 
