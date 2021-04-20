@@ -984,23 +984,17 @@ class Level implements ChunkManager, Metadatable{
 				if(!($b instanceof Vector3)){
 					throw new \TypeError("Expected Vector3 in blocks array, got " . (is_object($b) ? get_class($b) : gettype($b)));
 				}
-				$pk = new UpdateBlockPacket();
-
 				$first = false;
 				if(!isset($chunks[$index = Level::chunkHash($b->x >> 4, $b->z >> 4)])){
 					$chunks[$index] = true;
 					$first = true;
 				}
 
-				$pk->x = $b->x;
-				$pk->y = $b->y;
-				$pk->z = $b->z;
-
 				if($b instanceof Block){
-					$pk->block = $b;
+					$pk = UpdateBlockPacket::create($b->x, $b->y, $b->z, $b->getId(), $b->getDamage());
 				}else{
 					$fullBlock = $this->getFullBlock($b->x, $b->y, $b->z);
-					$pk->block = Block::get($fullBlock >> 4, $fullBlock & 0xf);
+					$pk = UpdateBlockPacket::create($b->x, $b->y, $b->z, $fullBlock >> 4, $fullBlock & 0xf);
 				}
 
 				$pk->flags = $first ? $flags : UpdateBlockPacket::FLAG_NONE;
@@ -1012,17 +1006,12 @@ class Level implements ChunkManager, Metadatable{
 				if(!($b instanceof Vector3)){
 					throw new \TypeError("Expected Vector3 in blocks array, got " . (is_object($b) ? get_class($b) : gettype($b)));
 				}
-				$pk = new UpdateBlockPacket();
-
-				$pk->x = $b->x;
-				$pk->y = $b->y;
-				$pk->z = $b->z;
 
 				if($b instanceof Block){
-					$pk->block = $b;
+					$pk = UpdateBlockPacket::create($b->x, $b->y, $b->z, $b->getId(), $b->getDamage());
 				}else{
 					$fullBlock = $this->getFullBlock($b->x, $b->y, $b->z);
-					$pk->block = Block::get($fullBlock >> 4, $fullBlock & 0xf);
+					$pk = UpdateBlockPacket::create($b->x, $b->y, $b->z, $fullBlock >> 4, $fullBlock & 0xf);
 				}
 
 				$pk->flags = $flags;

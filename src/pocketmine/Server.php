@@ -1567,7 +1567,7 @@ class Server{
 
 		/** @var array[] $batches */
 		$batches = [];
-		$targets = array_filter($players, function(Player $player) : bool{ return $player->isConnected(); });
+		$targets = array_filter($players, static function(Player $player) : bool{ return $player->isConnected(); });
 
 		if(count($targets) > 0){
 			foreach ($targets as $target) {
@@ -1578,6 +1578,7 @@ class Server{
 					foreach($packets as $originPacket){
 						$p = clone $originPacket;
 						$p->protocol = $protocol;
+						$p->offset = 0;
 						$p->encode();
 						$batch->addPacket($p);
 					}

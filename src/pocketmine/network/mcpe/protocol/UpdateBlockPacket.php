@@ -53,21 +53,33 @@ class UpdateBlockPacket extends DataPacket{
 	/** @var Block */
 	public $block;
 	/** @var int */
+	public $blockId;
+	/** @var int */
+	public $blockMeta;
+	/** @var int */
 	public $flags;
 	/** @var int */
 	public $dataLayerId = self::DATA_LAYER_NORMAL;
 
+	public static function create(int $x, int $y, int $z, int $blockId, int $blockMeta, int $dataLayerId = self::DATA_LAYER_NORMAL) : self{
+		$result = new self;
+		[$result->x, $result->y, $result->z] = [$x, $y, $z];
+		$result->blockId = $blockId;
+		$result->blockMeta = $blockMeta;
+		$result->dataLayerId = $dataLayerId;
+		return $result;
+	}
+
 	protected function decodePayload(){
 		$this->getBlockPosition($this->x, $this->y, $this->z);
-		[$id, $meta] = RuntimeBlockMapping::getMapping($this->protocol)->fromStaticRuntimeId($this->getUnsignedVarInt());
-		$this->block = Block::get($id, $meta);
+		[$this->blockId, $this->blockMeta] = RuntimeBlockMapping::getMapping($this->protocol)->fromStaticRuntimeId($this->getUnsignedVarInt());
 		$this->flags = $this->getUnsignedVarInt();
 		$this->dataLayerId = $this->getUnsignedVarInt();
 	}
 
 	protected function encodePayload(){
 		$this->putBlockPosition($this->x, $this->y, $this->z);
-		$this->putUnsignedVarInt(RuntimeBlockMapping::getMapping($this->protocol)->toStaticRuntimeId($this->block->getId(), $this->block->getDamage()));
+		$this->putUnsignedVarInt(RuntimeBlockMapping::getMapping($this->protocol)->toStaticRuntimeId($this->blockId, $this->blockMeta));
 		$this->putUnsignedVarInt($this->flags);
 		$this->putUnsignedVarInt($this->dataLayerId);
 	}
