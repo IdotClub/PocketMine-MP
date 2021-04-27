@@ -36,7 +36,7 @@ use function array_map;
 use function in_array;
 use function is_array;
 
-class PlayerInventory extends BaseInventory{
+final class PlayerInventory extends BaseInventory{
 
 	/** @var Human */
 	protected $holder;
@@ -44,9 +44,36 @@ class PlayerInventory extends BaseInventory{
 	/** @var int */
 	protected $itemInHandIndex = 0;
 
+	/** @var CreativeContentPacket[] */
+	protected static $cachedCreativeContent = [];
+	/** @var CreativeContentPacket[] */
+	protected static $cachedEmptyCreativeContent = [];
+
 	public function __construct(Human $player){
 		$this->holder = $player;
 		parent::__construct();
+	}
+
+	public static function buildCache(int $protocol) : void {
+		if (!isset(self::$cachedCreativeContent[$protocol])) {
+			$nextEntryId = 1;
+			$pk = CreativeContentPacket::create(array_map(function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
+				return new CreativeContentEntry($nextEntryId++, clone $item);
+			}, Item::getCreativeItems()));
+			$pk->protocol = $protocol;
+			$pk->encode();
+			self::$cachedCreativeContent[$protocol] = $pk;
+		}
+
+		if (!isset(self::$cachedEmptyCreativeContent[$protocol])) {
+			$nextEntryId = 1;
+			$pk = CreativeContentPacket::create(array_map(function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
+				return new CreativeContentEntry($nextEntryId++, clone $item);
+			}, []));
+			$pk->protocol = $protocol;
+			$pk->encode();
+			self::$cachedEmptyCreativeContent[$protocol] = $pk;
+		}
 	}
 
 	public function getName() : string{
@@ -200,10 +227,10 @@ class PlayerInventory extends BaseInventory{
 			throw new \LogicException("Cannot send creative inventory contents to non-player inventory holder");
 		}
 
-		$nextEntryId = 1;
-		$holder->sendDataPacket(CreativeContentPacket::create(array_map(function(Item $item) use (&$nextEntryId) : CreativeContentEntry{
-			return new CreativeContentEntry($nextEntryId++, clone $item);
-		}, $holder->isSpectator() ? [] : Item::getCreativeItems()))); //fill it for all gamemodes except spectator
+		$protocol = $holder->getProtocol();
+
+		self::buildCache($protocol);
+		$holder->sendDataPacket($holder->isSpectator() ? self::$cachedEmptyCreativeContent[$protocol] : self::$cachedCreativeContent[$protocol]); //fill it for all gamemodes except spectator
 	}
 
 	/**

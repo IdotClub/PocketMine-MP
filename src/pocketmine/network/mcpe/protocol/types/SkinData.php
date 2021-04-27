@@ -32,7 +32,7 @@ class SkinData{
 
 	/** @var string */
 	private $skinId;
-	/** @var string|null */
+	/** @var string */
 	private $playFabId;
 	/** @var string */
 	private $resourcePatch;
@@ -72,7 +72,7 @@ class SkinData{
 	 * @param PersonaSkinPiece[]      $personaPieces
 	 * @param PersonaPieceTintColor[] $pieceTintColors
 	 */
-	public function __construct(string $skinId, ?string $playFabId, string $resourcePatch, SkinImage $skinImage, array $animations = [], SkinImage $capeImage = null, string $geometryData = "", string $animationData = "", bool $premium = false, bool $persona = false, bool $personaCapeOnClassic = false, string $capeId = "", ?string $fullSkinId = null, string $armSize = self::ARM_SIZE_WIDE, string $skinColor = "", array $personaPieces = [], array $pieceTintColors = [], bool $isVerified = true){
+	public function __construct(string $skinId, string $playFabId, string $resourcePatch, SkinImage $skinImage, array $animations = [], SkinImage $capeImage = null, string $geometryData = "", string $animationData = "", bool $premium = false, bool $persona = false, bool $personaCapeOnClassic = false, string $capeId = "", ?string $fullSkinId = null, string $armSize = self::ARM_SIZE_WIDE, string $skinColor = "", array $personaPieces = [], array $pieceTintColors = [], bool $isVerified = true){
 		$this->skinId = $skinId;
 		$this->playFabId = $playFabId;
 		$this->resourcePatch = $resourcePatch;
@@ -98,7 +98,7 @@ class SkinData{
 		return $this->skinId;
 	}
 
-	public function getPlayFabId(): ?string {
+	public function getPlayFabId(): string {
 		return $this->playFabId;
 	}
 

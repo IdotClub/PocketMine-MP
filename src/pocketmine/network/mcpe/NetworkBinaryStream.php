@@ -286,6 +286,11 @@ class NetworkBinaryStream extends BinaryStream{
 			if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
 				$extraData->getLLong(); //"blocking tick" (ffs mojang)
 			}
+
+			if(!$extraData->feof()){
+				throw new \UnexpectedValueException("Unexpected trailing extradata for network item $netId");
+			}
+
 			if($nbt !== null){
 				if($nbt->hasTag(self::DAMAGE_TAG, IntTag::class)){
 					$meta = $nbt->getInt(self::DAMAGE_TAG);
@@ -331,8 +336,15 @@ class NetworkBinaryStream extends BinaryStream{
 
 		$writeExtraCrapInTheMiddle($this);
 
-		$block = $item->getBlock();
-		$this->putVarInt($block->getId() === BlockIds::AIR ? 0 : RuntimeBlockMapping::toStaticRuntimeId($block->getId(), $block->getDamage()));
+		$blockRuntimeId = 0;
+		$isBlockItem = $item->getId() < 256;
+		if($isBlockItem){
+			$block = $item->getBlock();
+			if($block->getId() !== BlockIds::AIR){
+				$blockRuntimeId = RuntimeBlockMapping::toStaticRuntimeId($block->getId(), $block->getDamage());
+			}
+		}
+		$this->putVarInt($blockRuntimeId);
 
 		$nbt = null;
 		if($item->hasCompoundTag()){
@@ -349,7 +361,7 @@ class NetworkBinaryStream extends BinaryStream{
 				$nbt = new CompoundTag();
 			}
 			$nbt->setInt(self::DAMAGE_TAG, $coreData);
-		}elseif($block->getId() !== BlockIds::AIR && $coreData !== 0){
+		}elseif($isBlockItem && $coreData !== 0){
 			//TODO HACK: This foul-smelling code ensures that we can correctly deserialize an item when the
 			//client sends it back to us, because as of 1.16.220, blockitems quietly discard their metadata
 			//client-side. Aside from being very annoying, this also breaks various server-side behaviours.
