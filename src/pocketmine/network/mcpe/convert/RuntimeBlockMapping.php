@@ -31,7 +31,6 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\utils\AssumptionFailedError;
 use function file_get_contents;
 use function json_decode;
-use const pocketmine\RESOURCE_PATH;
 
 /**
  * @internal
@@ -60,7 +59,17 @@ final class RuntimeBlockMapping{
 		}
 		self::$bedrockKnownStates = $list;
 
+		self::setupJSONPalette(BedrockProtocolInfo::PROTOCOL_1_16_200);
+		self::setupJSONPalette(BedrockProtocolInfo::PROTOCOL_1_16_100);
+
 		self::$mappings[BedrockProtocolInfo::PROTOCOL_1_16_210] = self::setupLegacyMappings();
+	}
+
+	private static function setupJSONPalette(int $protocol) : void {
+		$path = \pocketmine\RESOURCE_PATH . "palette/";
+		$legacyToRuntimeMap = json_decode(file_get_contents($path . sprintf("%s_%s.json", $protocol, "legacyToRuntimeMap")), true);
+		$runtimeToLegacyMap = json_decode(file_get_contents($path . sprintf("%s_%s.json", $protocol, "runtimeToLegacyMap")), true);
+		self::$mappings[$protocol] = new BlockMapping($legacyToRuntimeMap, $runtimeToLegacyMap);
 	}
 
 	private static function setupLegacyMappings() : BlockMapping{
