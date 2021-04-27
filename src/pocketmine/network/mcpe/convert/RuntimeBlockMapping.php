@@ -60,11 +60,6 @@ final class RuntimeBlockMapping{
 		}
 		self::$bedrockKnownStates = $list;
 
-		self::$mappings[BedrockProtocolInfo::PROTOCOL_1_16_20] = new BlockMapping(
-			json_decode(file_get_contents(RESOURCE_PATH . "pallet/408/legacy.json"), true),
-			json_decode(file_get_contents(RESOURCE_PATH . "pallet/408/runtime.json"), true)
-		);
-
 		self::$mappings[BedrockProtocolInfo::PROTOCOL_1_16_210] = self::setupLegacyMappings();
 	}
 

@@ -37,7 +37,7 @@ interface ProtocolInfo{
 	 */
 
 	/** Actual Minecraft: PE protocol version */
-	public const CURRENT_PROTOCOL = 408;
+	public const CURRENT_PROTOCOL = BedrockProtocolInfo::PROTOCOL_1_16_100;
 	/** Accept Minecraft: PE protocol version */
 	public const ACCEPT_PROTOCOL = [
 		419, 420, 421, 422,
