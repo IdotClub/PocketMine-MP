@@ -63,6 +63,9 @@ class Bow extends Tool{
 		$diff = $player->getItemUseDuration();
 		$p = $diff / 20;
 		$baseForce = min((($p ** 2) + $p * 2) / 3, 1);
+		if($baseForce < 0.1){
+			return false;
+		}
 
 		$entity = Entity::createEntity("Arrow", $player->getLevelNonNull(), $nbt, $player, $baseForce >= 1);
 		if($entity instanceof Projectile){

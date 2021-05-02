@@ -48,8 +48,8 @@ class Arrow extends Projectile{
 
 	private const TAG_PICKUP = "pickup"; //TAG_Byte
 
-	public $width = 0.25;
-	public $height = 0.25;
+	public $width = 0.5;
+	public $height = 0.5;
 
 	protected $gravity = 0.05;
 	protected $drag = 0.01;
