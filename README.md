@@ -3,10 +3,6 @@
 	<b>A highly customisable, open source server software for Minecraft: Bedrock Edition written in PHP</b>
 </p>
 
-![CI](https://github.com/Blackjack200/pmmp/workflows/CI/badge.svg)
-
-![Build Status](http://jenkins.elaina.host/job/PMMP/badge/icon)
-
 ## Getting started
 - [Documentation](http://pmmp.readthedocs.org/)
 - [Installation instructions](https://pmmp.readthedocs.io/en/rtfd/installation.html)
