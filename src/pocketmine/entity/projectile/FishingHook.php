@@ -20,7 +20,7 @@ final class FishingHook extends Projectile {
 
 	public $height = 0.25;
 	public $width = 0.25;
-	protected $gravity = 0.1;
+	protected $gravity = 0.09;
 	protected $drag = 0.05;
 
 	public function __construct(Level $level, CompoundTag $nbt, ?Entity $owner = null) {
@@ -32,40 +32,38 @@ final class FishingHook extends Projectile {
 		}
 	}
 
-	public function handleHookCasting(float $x, float $y, float $z, float $f1, float $f2): void {
+	public function handleHookCasting(float $x, float $y, float $z, float $ff1, float $ff2) : void {
 		$rand = new Random();
 		$f = sqrt($x * $x + $y * $y + $z * $z);
-		$x = $x / $f;
-		$y = $y / $f;
-		$z = $z / $f;
-		$x = $x + $rand->nextSignedFloat() * 0.007499999832361937 * $f2;
-		$y = $y + $rand->nextSignedFloat() * 0.007499999832361937 * $f2;
-		$z = $z + $rand->nextSignedFloat() * 0.007499999832361937 * $f2;
-		$x = $x * $f1;
-		$y = $y * $f1;
-		$z = $z * $f1;
-		$this->motion->x += $x;
-		$this->motion->y += $y;
-		$this->motion->z += $z;
+		$x /= $f;
+		$y /= $f;
+		$z /= $f;
+		$x = $x + $rand->nextSignedFloat() * 0.007499999832361937 * $ff2;
+		$y = $y + $rand->nextSignedFloat() * 0.007499999832361937 * $ff2;
+		$z = $z + $rand->nextSignedFloat() * 0.007499999832361937 * $ff2;
+		$x *= $ff1;
+		$y *= $ff1;
+		$z *= $ff1;
+		$this->motion->x = $x;
+		$this->motion->y = $y;
+		$this->motion->z = $z;
 	}
 
 	public function onHitEntity(Entity $entityHit, RayTraceResult $hitResult): void {
-		$damage = $this->getResultDamage();
-
-		if ($this->getOwningEntity() !== null) {
-			$ev = new EntityDamageByEntityEvent($this, $entityHit, EntityDamageEvent::CAUSE_PROJECTILE, $damage);
-			$entityHit->attack($ev);
-			$entityHit->setMotion($this->getOwningEntity()->getDirectionVector()->multiply(0.3)->add(0, 0.3, 0));
+		$entityHit->attack(new EntityDamageByEntityEvent($this, $entityHit, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0));
+		if ($entityHit === $this->getOwningEntity()) {
+			$this->flagForDespawn();
+			return;
 		}
 		$this->isCollided = true;
-		$this->flagForDespawn();
+		$this->setTargetEntity($entityHit);
 	}
 
 	public function entityBaseTick(int $tickDiff = 1): bool {
 		$hasUpdate = parent::entityBaseTick($tickDiff);
 		$owner = $this->getOwningEntity();
 		if ($owner instanceof Player) {
-			if (!$owner->getInventory()->getItemInHand() instanceof FishingRod || !$owner->isAlive() || $owner->isClosed()) {
+			if ($owner->isClosed() or !$owner->isAlive() or !($owner->getInventory()->getItemInHand() instanceof FishingRod) or $owner->distanceSquared($this) > 1024) {
 				$this->flagForDespawn();
 			}
 		} else {
@@ -75,12 +73,32 @@ final class FishingHook extends Projectile {
 		return $hasUpdate;
 	}
 
-	public function close(): void {
+	public function close() : void {
 		parent::close();
 
 		$owner = $this->getOwningEntity();
 		if ($owner instanceof Player) {
 			$owner->setFishingHook(null);
+		}
+	}
+
+	public function handleHookRetraction() : void {
+		$angler = $this->getOwningEntity();
+		if ($this->isValid() and $angler instanceof Player) {
+			$target = $this->getTargetEntity();
+			if ($target !== null) {
+				$dx = $angler->x - $this->x;
+				$dy = $angler->y - $this->y;
+				$dz = $angler->z - $this->z;
+				$sqrt = sqrt($dx * $dx + $dy * $dy + $dz * $dz);
+				$target->setMotion(
+					$target->motion->add(
+						$dx * 0.1,
+						$dy * 0.1 + sqrt($sqrt) * 0.08,
+						$dz * 0.1
+					)
+				);
+			}
 		}
 	}
 }
