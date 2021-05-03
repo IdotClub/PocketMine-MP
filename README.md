@@ -1,6 +1,7 @@
 <p align="center">
 	<a href="https://pmmp.io"><img src="http://cdn.pocketmine.net/img/PocketMine-MP-h.png"></img></a><br>
-	<b>A highly customisable, open source server software for Minecraft: Bedrock Edition written in PHP</b>
+	<b>A highly customisable, open source server software for Minecraft: Bedrock Edition written in PHP</b><br>
+	<img src="http://proxy.elaina.host:8080/job/PocketMine-MP/badge/icon/" alt="Build Status"/>
 </p>
 
 ## Getting started
@@ -8,7 +9,7 @@
 - [Installation instructions](https://pmmp.readthedocs.io/en/rtfd/installation.html)
 - [Docker image](https://hub.docker.com/r/pmmp/pocketmine-mp)
 - [Plugin repository](https://poggit.pmmp.io/plugins)
-- [Jenkins](http://jenkins.elaina.host/job/PMMP/)
+- [Jenkins](http://proxy.elaina.host:8080/job/PocketMine-MP/)
 
 ## Discussion/Help
 - [Forums](https://forums.pmmp.io/)
