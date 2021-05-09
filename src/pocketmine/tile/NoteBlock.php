@@ -12,7 +12,7 @@ use function intval;
 use function max;
 use function min;
 
-class NoteBlock extends Spawnable {
+class NoteBlock extends Spawnable{
 
 	public const TAG_NOTE = "note";
 	public const TAG_POWERED = "powered";
@@ -22,29 +22,29 @@ class NoteBlock extends Spawnable {
 	/** @var bool */
 	protected $powered = false;
 
-	protected function readSaveData(CompoundTag $nbt): void {
+	protected function readSaveData(CompoundTag $nbt) : void{
 		$this->note = max(0, min(24, $nbt->getByte(self::TAG_NOTE, 0, true)));
 		$this->powered = (bool) $nbt->getByte(self::TAG_POWERED, 0);
 	}
 
-	public function setNote(int $note): void {
+	public function setNote(int $note) : void{
 		$this->note = $note;
 	}
 
-	public function getNote(): int {
+	public function getNote() : int{
 		return $this->note;
 	}
 
-	public function changePitch(): void {
+	public function changePitch() : void{
 		$this->note = ($this->note + 1) % 25;
 	}
 
-	public function triggerNote(): bool {
-		if ($this->getLevelNonNull()->getBlock($this->getSide(Vector3::SIDE_UP))->getId() === Block::AIR) {
+	public function triggerNote() : bool{
+		if($this->getLevelNonNull()->getBlock($this->getSide(Vector3::SIDE_UP))->getId() === Block::AIR){
 			$below = $this->getLevelNonNull()->getBlock($this->getSide(Vector3::SIDE_DOWN));
 			$instrument = NoteBlockSound::INSTRUMENT_PIANO;
 
-			switch ($below->getId()) {
+			switch($below->getId()){
 				case Block::WOOD:
 				case Block::WOOD2:
 				case Block::PLANKS:
@@ -129,24 +129,24 @@ class NoteBlock extends Spawnable {
 		return false;
 	}
 
-	public function setPowered(bool $value): void {
+	public function setPowered(bool $value) : void{
 		$this->powered = $value;
 	}
 
-	public function isPowered(): bool {
+	public function isPowered() : bool{
 		return $this->powered;
 	}
 
-	public function getDefaultName(): string {
+	public function getDefaultName() : string{
 		return "NoteBlock";
 	}
 
-	protected function writeSaveData(CompoundTag $nbt): void {
+	protected function writeSaveData(CompoundTag $nbt) : void{
 		$nbt->setByte(self::TAG_NOTE, $this->note, true);
 		$nbt->setByte(self::TAG_POWERED, intval($this->powered));
 	}
 
-	public function addAdditionalSpawnData(CompoundTag $nbt): void {
+	public function addAdditionalSpawnData(CompoundTag $nbt) : void{
 
 	}
 }
