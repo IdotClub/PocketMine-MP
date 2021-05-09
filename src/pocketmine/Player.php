@@ -42,7 +42,6 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\player\cheat\PlayerIllegalMoveEvent;
-use pocketmine\event\player\PlayerAchievementAwardedEvent;
 use pocketmine\event\player\PlayerAnimationEvent;
 use pocketmine\event\player\PlayerBedEnterEvent;
 use pocketmine\event\player\PlayerBedLeaveEvent;
@@ -348,8 +347,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	/** @var bool */
 	protected $removeFormat = true;
 
-	/** @var bool[] name of achievement => bool */
-	protected $achievements = [];
 	/** @var bool */
 	protected $playedBefore;
 	/** @var int */
@@ -1331,45 +1328,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		}
 	}
 
-	public function hasAchievement(string $achievementId) : bool{
-		if(!isset(Achievement::$list[$achievementId])){
-			return false;
-		}
-
-		return $this->achievements[$achievementId] ?? false;
-	}
-
-	public function awardAchievement(string $achievementId) : bool{
-		if(isset(Achievement::$list[$achievementId]) and !$this->hasAchievement($achievementId)){
-			foreach(Achievement::$list[$achievementId]["requires"] as $requirementId){
-				if(!$this->hasAchievement($requirementId)){
-					return false;
-				}
-			}
-			$ev = new PlayerAchievementAwardedEvent($this, $achievementId);
-			$ev->call();
-			if(!$ev->isCancelled()){
-				$this->achievements[$achievementId] = true;
-				Achievement::broadcast($this, $achievementId);
-
-				return true;
-			}else{
-				return false;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * @return void
-	 */
-	public function removeAchievement(string $achievementId){
-		if($this->hasAchievement($achievementId)){
-			$this->achievements[$achievementId] = false;
-		}
-	}
-
 	public function getGamemode() : int{
 		return $this->gamemode;
 	}
@@ -2101,7 +2059,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 				if($kickForXUIDMismatch($p->getXuid())){
 					return;
 				}
-				if(!$p->kick("logged in from another location")){
+				if(!$p->kick("disconnectionScreen.loggedinOtherLocation")){
 					$this->close($this->getLeaveMessage(), "Logged in from another location");
 					return;
 				}
@@ -2141,14 +2099,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			]));
 		}else{
 			$this->setLevel($level);
-		}
-
-		$this->achievements = [];
-
-		$achievements = $this->namedtag->getCompoundTag("Achievements") ?? [];
-		/** @var ByteTag $achievement */
-		foreach($achievements as $achievement){
-			$this->achievements[$achievement->getName()] = $achievement->getValue() !== 0;
 		}
 
 		$this->sendPlayStatus(PlayStatusPacket::LOGIN_SUCCESS);
@@ -2514,8 +2464,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 				return false;
 			}
-
-			//TODO: fix achievement for getting iron from furnace
 
 			return true;
 		}elseif($packet->trData instanceof MismatchTransactionData){
@@ -3805,12 +3753,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			}
 		}
 
-		$achievements = new CompoundTag("Achievements");
-		foreach($this->achievements as $achievement => $status){
-			$achievements->setByte($achievement, $status ? 1 : 0);
-		}
-		$this->namedtag->setTag($achievements);
-
 		$this->namedtag->setInt("playerGameType", $this->gamemode);
 		$this->namedtag->setLong("lastPlayed", (int) floor(microtime(true) * 1000));
 
@@ -3865,11 +3807,6 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	}
 
 	protected function respawn() : void{
-		if($this->server->isHardcore()){
-			$this->setBanned(true);
-			return;
-		}
-
 		$ev = new PlayerRespawnEvent($this, $this->getSpawn());
 		$ev->call();
 

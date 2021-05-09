@@ -52,10 +52,6 @@ class DifficultyCommand extends VanillaCommand{
 
 		$difficulty = Level::getDifficultyFromString($args[0]);
 
-		if($sender->getServer()->isHardcore()){
-			$difficulty = Level::DIFFICULTY_HARD;
-		}
-
 		if($difficulty !== -1){
 			$sender->getServer()->setConfigInt("difficulty", $difficulty);
 

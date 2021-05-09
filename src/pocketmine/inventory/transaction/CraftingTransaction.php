@@ -166,47 +166,4 @@ class CraftingTransaction extends InventoryTransaction{
 		$pk->server = true;
 		$this->source->dataPacket($pk);
 	}
-
-	public function execute() : bool{
-		if(parent::execute()){
-			foreach($this->outputs as $item){
-				switch($item->getId()){
-					case Item::CRAFTING_TABLE:
-						$this->source->awardAchievement("buildWorkBench");
-						break;
-					case Item::WOODEN_PICKAXE:
-						$this->source->awardAchievement("buildPickaxe");
-						break;
-					case Item::FURNACE:
-						$this->source->awardAchievement("buildFurnace");
-						break;
-					case Item::WOODEN_HOE:
-						$this->source->awardAchievement("buildHoe");
-						break;
-					case Item::BREAD:
-						$this->source->awardAchievement("makeBread");
-						break;
-					case Item::CAKE:
-						$this->source->awardAchievement("bakeCake");
-						break;
-					case Item::STONE_PICKAXE:
-					case Item::GOLDEN_PICKAXE:
-					case Item::IRON_PICKAXE:
-					case Item::DIAMOND_PICKAXE:
-						$this->source->awardAchievement("buildBetterPickaxe");
-						break;
-					case Item::WOODEN_SWORD:
-						$this->source->awardAchievement("buildSword");
-						break;
-					case Item::DIAMOND:
-						$this->source->awardAchievement("diamond");
-						break;
-				}
-			}
-
-			return true;
-		}
-
-		return false;
-	}
 }

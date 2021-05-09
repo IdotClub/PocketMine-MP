@@ -198,15 +198,6 @@ class ItemEntity extends Entity{
 			return;
 		}
 
-		switch($item->getId()){
-			case Item::WOOD:
-				$player->awardAchievement("mineWood");
-				break;
-			case Item::DIAMOND:
-				$player->awardAchievement("diamond");
-				break;
-		}
-
 		$pk = new TakeItemActorPacket();
 		$pk->eid = $player->getId();
 		$pk->target = $this->getId();

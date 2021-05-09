@@ -507,10 +507,6 @@ class Server{
 		return true;
 	}
 
-	public function isHardcore() : bool{
-		return $this->getConfigBool("hardcore", false);
-	}
-
 	public function getDefaultGamemode() : int{
 		return $this->getConfigInt("gamemode", 0) & 0b11;
 	}
@@ -1183,14 +1179,13 @@ class Server{
 			$this->logger->info("Loading server properties...");
 			$this->properties = new Config($this->dataPath . "server.properties", Config::PROPERTIES, [
 				"motd" => \pocketmine\NAME . " Server",
+				"server-ip" => "0.0.0.0",
 				"server-port" => 19132,
 				"white-list" => false,
-				"announce-player-achievements" => true,
 				"spawn-protection" => 16,
 				"max-players" => 20,
 				"gamemode" => 0,
 				"force-gamemode" => false,
-				"hardcore" => false,
 				"pvp" => true,
 				"difficulty" => Level::DIFFICULTY_NORMAL,
 				"generator-settings" => "",
@@ -1199,7 +1194,7 @@ class Server{
 				"level-type" => "DEFAULT",
 				"enable-query" => true,
 				"enable-rcon" => false,
-				"rcon.password" => substr(base64_encode(random_bytes(20)), 3, 10),
+				"rcon.password" => substr(base64_encode(random_bytes(32)), 3, 10),
 				"auto-save" => true,
 				"view-distance" => 8,
 				"xbox-auth" => true,
@@ -1303,10 +1298,6 @@ class Server{
 				$this->logger->warning($this->getLanguage()->translateString("pocketmine.server.auth.disabled"));
 				$this->logger->warning($this->getLanguage()->translateString("pocketmine.server.authWarning"));
 				$this->logger->warning($this->getLanguage()->translateString("pocketmine.server.authProperty.disabled"));
-			}
-
-			if($this->getConfigBool("hardcore", false) and $this->getDifficulty() < Level::DIFFICULTY_HARD){
-				$this->setConfigInt("difficulty", Level::DIFFICULTY_HARD);
 			}
 
 			if(\pocketmine\DEBUG >= 0){

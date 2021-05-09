@@ -95,7 +95,6 @@ class OfflinePlayerDataManager {
 			//new ByteTag("SpawnForced", 1), //TODO
 			new ListTag("Inventory", [], NBT::TAG_Compound),
 			new ListTag("EnderChestInventory", [], NBT::TAG_Compound),
-			new CompoundTag("Achievements", []),
 			new IntTag("playerGameType", Server::getInstance()->getGamemode()),
 			new ListTag("Motion", [
 				new DoubleTag("", 0.0),
