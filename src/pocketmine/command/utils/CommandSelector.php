@@ -11,26 +11,26 @@ use function array_rand;
 use function count;
 use function mb_strtolower;
 
-class CommandSelector {
+class CommandSelector{
 	public const SELECTOR_ALL_PLAYERS = "@a";
 	public const SELECTOR_ALL_ENTITIES = "@e";
 	public const SELECTOR_CLOSEST_PLAYER = "@p";
 	public const SELECTOR_RANDOM_PLAYER = "@r";
 	public const SELECTOR_YOURSELF = "@s";
 
-	private function __construct() {
+	private function __construct(){
 		// NOOP
 	}
 
 	/**
 	 * @return Entity[]|null
 	 */
-	public static function findTarget(string $selector, ?Level $level = null): ?array {
-		switch (mb_strtolower($selector)) {
+	public static function findTarget(string $selector, ?Level $level = null) : ?array{
+		switch(mb_strtolower($selector)){
 			case self::SELECTOR_ALL_PLAYERS:
 				return Server::getInstance()->getOnlinePlayers();
 			case self::SELECTOR_ALL_ENTITIES:
-				if ($level !== null) {
+				if($level !== null){
 					return $level->getEntities();
 				}
 				break;

@@ -8,16 +8,16 @@ use function file_exists;
 use function file_get_contents;
 use function is_dir;
 
-class SourcePluginLoader implements PluginLoader {
+class SourcePluginLoader implements PluginLoader{
 
 	/** @var \ClassLoader */
 	private $loader;
 
-	public function __construct(\ClassLoader $loader) {
+	public function __construct(\ClassLoader $loader){
 		$this->loader = $loader;
 	}
 
-	public function canLoadPlugin(string $path): bool {
+	public function canLoadPlugin(string $path) : bool{
 		return is_dir($path) &&
 			file_exists($path . "/plugin.yml") &&
 			file_exists($path . "/src/");
@@ -26,7 +26,7 @@ class SourcePluginLoader implements PluginLoader {
 	/**
 	 * Loads the plugin contained in $file
 	 */
-	public function loadPlugin(string $file): void {
+	public function loadPlugin(string $file) : void{
 		/*$composer = "$file/vendor/composer/";
 		if (is_dir($composer) && file_exists("$composer/autoload_classmap.php")) {
 			$arr = require "$composer/autoload_classmap.php";
@@ -43,10 +43,10 @@ class SourcePluginLoader implements PluginLoader {
 	/**
 	 * Gets the PluginDescription from the file
 	 */
-	public function getPluginDescription(string $file): ?PluginDescription {
-		if (is_dir($file) && file_exists($file . "/plugin.yml")) {
+	public function getPluginDescription(string $file) : ?PluginDescription{
+		if(is_dir($file) && file_exists($file . "/plugin.yml")){
 			$yaml = @file_get_contents($file . "/plugin.yml");
-			if ($yaml !== "" && $yaml !== false) {
+			if($yaml !== "" && $yaml !== false){
 				return new PluginDescription($yaml);
 			}
 		}
@@ -54,7 +54,7 @@ class SourcePluginLoader implements PluginLoader {
 		return null;
 	}
 
-	public function getAccessProtocol(): string {
+	public function getAccessProtocol() : string{
 		return "";
 	}
 }

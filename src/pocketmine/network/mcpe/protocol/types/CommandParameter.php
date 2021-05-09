@@ -26,7 +26,7 @@ namespace pocketmine\network\mcpe\protocol\types;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function is_string;
 
-class CommandParameter {
+class CommandParameter{
 	public const FLAG_FORCE_COLLAPSE_ENUM = 0x1;
 	public const FLAG_HAS_ENUM_CONSTRAINT = 0x2;
 
@@ -46,13 +46,13 @@ class CommandParameter {
 	/**
 	 * @param CommandEnum|string $extraData
 	 */
-	public function __construct(string $name = "args", int $type = AvailableCommandsPacket::ARG_TYPE_RAWTEXT, bool $optional = true, $extraData = null, int $flags = 0) {
+	public function __construct(string $name = "args", int $type = AvailableCommandsPacket::ARG_TYPE_RAWTEXT, bool $optional = true, $extraData = null, int $flags = 0){
 		$this->paramName = $name;
 		$this->paramType = $type | AvailableCommandsPacket::ARG_FLAG_VALID;
 		$this->isOptional = $optional;
-		if ($extraData instanceof CommandEnum) {
+		if($extraData instanceof CommandEnum){
 			$this->enum = $extraData;
-		} elseif (is_string($extraData)) {
+		}elseif(is_string($extraData)){
 			$this->postfix = $extraData;
 		}
 		$this->flags = $flags;

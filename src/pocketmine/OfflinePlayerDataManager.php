@@ -22,57 +22,57 @@ use function is_object;
 use function microtime;
 use function strtolower;
 
-class OfflinePlayerDataManager {
+class OfflinePlayerDataManager{
 	/** @var \LevelDB */
 	private $db;
 	/** @var string */
 	private $path;
 
-	public function __construct(string $path) {
+	public function __construct(string $path){
 		$this->path = $path;
 		$this->db = new \LevelDB($path, [
 			"compression" => LEVELDB_ZLIB_RAW_COMPRESSION
 		]);
 	}
 
-	public function close() : void {
+	public function close() : void{
 		unset($this->db);
 	}
 
-	public function saveOfflinePlayerData(string $name, CompoundTag $nbtTag) : void {
+	public function saveOfflinePlayerData(string $name, CompoundTag $nbtTag) : void{
 		$ev = new PlayerDataSaveEvent($nbtTag, $name);
 		$ev->setCancelled(!Server::getInstance()->shouldSavePlayerData());
 
 		$ev->call();
 
-		if (!$ev->isCancelled()) {
+		if(!$ev->isCancelled()){
 			$nbt = new BigEndianNBTStream();
-			try {
+			try{
 				$this->db->put(strtolower($name), $nbt->writeCompressed($ev->getSaveData()));
-			} catch (\Throwable $e) {
+			}catch(\Throwable $e){
 				Server::getInstance()->getLogger()->critical(Server::getInstance()->getLanguage()->translateString("pocketmine.data.saveError", [$name, $e->getMessage()]));
 				Server::getInstance()->getLogger()->logException($e);
 			}
 		}
 	}
 
-	public function getOfflinePlayerData(string $name) : CompoundTag {
+	public function getOfflinePlayerData(string $name) : CompoundTag{
 		$name = strtolower($name);
-		if (Server::getInstance()->shouldSavePlayerData()) {
-			if ($this->hasOfflinePlayerData($name)) {
-				try {
+		if(Server::getInstance()->shouldSavePlayerData()){
+			if($this->hasOfflinePlayerData($name)){
+				try{
 					$nbt = new BigEndianNBTStream();
 					$compound = $nbt->readCompressed($this->db->get($name));
-					if (!($compound instanceof CompoundTag)) {
+					if(!($compound instanceof CompoundTag)){
 						throw new \RuntimeException("Invalid data found in \"$name.dat\", expected " . CompoundTag::class . ", got " . (is_object($compound) ? get_class($compound) : gettype($compound)));
 					}
 
 					return $compound;
-				} catch (\Throwable $e) { //zlib decode error / corrupt data
+				}catch(\Throwable $e){ //zlib decode error / corrupt data
 					$this->db->delete($name);
 					Server::getInstance()->getLogger()->notice(Server::getInstance()->getLanguage()->translateString("pocketmine.data.playerCorrupted", [$name]));
 				}
-			} else {
+			}else{
 				Server::getInstance()->getLogger()->notice(Server::getInstance()->getLanguage()->translateString("pocketmine.data.playerNotFound", [$name]));
 			}
 		}
@@ -120,7 +120,7 @@ class OfflinePlayerDataManager {
 	/**
 	 * Returns whether the server has stored any saved data for this player.
 	 */
-	public function hasOfflinePlayerData(string $name) : bool {
+	public function hasOfflinePlayerData(string $name) : bool{
 		return $this->db->get(strtolower($name)) !== false;
 	}
 }

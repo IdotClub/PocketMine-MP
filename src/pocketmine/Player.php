@@ -231,7 +231,7 @@ use const PHP_INT_MAX;
 /**
  * Main class that handles networking, recovery, and packet sending to the server part
  */
-class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
+class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 	public const SURVIVAL = 0;
 	public const CREATIVE = 1;
@@ -2266,7 +2266,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 		$pk = $this->server->getCraftingManager()->getCraftingDataPacket($this->protocol);
 		if($pk !== null){
 			$this->dataPacket($pk);
-		} else {
+		}else{
 			//TODO
 			$this->dataPacket(new CraftingDataPacket());
 		}
@@ -2869,7 +2869,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 				$tile = $this->level->getTile($pos);
 				if($tile instanceof ItemFrame and $tile->hasItem()){
-					if (lcg_value() <= $tile->getItemDropChance()){
+					if(lcg_value() <= $tile->getItemDropChance()){
 						$this->level->dropItem($tile->getBlock(), $tile->getItem());
 					}
 					$tile->setItem(null);
@@ -2931,7 +2931,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 			case PlayerActionPacket::ACTION_CRACK_BREAK:
 				$block = $this->level->getBlock($pos);
 				$this->level->broadcastLevelEvent($pos, LevelEventPacket::EVENT_PARTICLE_PUNCH_BLOCK, -1,
-					function (int $protocol) use ($block) : int {
+					function(int $protocol) use ($block) : int{
 						return RuntimeBlockMapping::getMapping($protocol)->toStaticRuntimeId($block->getId(), $block->getDamage());
 					}
 				);
@@ -4049,7 +4049,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 	/**
 	 * Removes an inventory window from the player.
 	 *
-	 * @param bool      $force Forces removal of permanent windows such as normal inventory, cursor
+	 * @param bool $force Forces removal of permanent windows such as normal inventory, cursor
 	 *
 	 * @return void
 	 * @throws \InvalidArgumentException if trying to remove a fixed inventory window without the `force` parameter as true
@@ -4134,19 +4134,19 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer {
 
 	}
 
-	public function getLoaderId(): int {
+	public function getLoaderId() : int{
 		return $this->loaderId;
 	}
 
-	public function isLoaderActive(): bool {
+	public function isLoaderActive() : bool{
 		return $this->isConnected();
 	}
 
-	public function getFishingHook(): ?FishingHook {
+	public function getFishingHook() : ?FishingHook{
 		return $this->fishingHook;
 	}
 
-	public function setFishingHook(?FishingHook $fishingHook): void {
+	public function setFishingHook(?FishingHook $fishingHook) : void{
 		$this->fishingHook = $fishingHook;
 	}
 }

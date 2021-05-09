@@ -1346,7 +1346,7 @@ class Server{
 			$this->pluginManager = new PluginManager($this, $this->commandMap, ((bool) $this->getProperty("plugins.legacy-data-dir", true)) ? null : $this->getDataPath() . "plugin_data" . DIRECTORY_SEPARATOR);
 			$this->profilingTickRate = (float) $this->getProperty("settings.profile-report-trigger", 20);
 			$this->pluginManager->registerInterface(new PharPluginLoader($this->autoloader));
-			if((bool) $this->config->get("plugins.builtin-source-loader", false)) {
+			if((bool) $this->config->get("plugins.builtin-source-loader", false)){
 				$this->pluginManager->registerInterface(new SourcePluginLoader($this->autoloader));
 			}
 			$this->pluginManager->registerInterface(new ScriptPluginLoader());
@@ -1561,7 +1561,7 @@ class Server{
 		$targets = array_filter($players, static function(Player $player) : bool{ return $player->isConnected(); });
 
 		if(count($targets) > 0){
-			foreach ($targets as $target) {
+			foreach($targets as $target){
 				$protocol = $target->getProtocol();
 				if(!isset($batches[$protocol])){
 					$batch = new BatchPacket();
@@ -1579,7 +1579,7 @@ class Server{
 				$batches[$protocol][1][] = $target;
 			}
 
-			foreach ($batches as $batchData) {
+			foreach($batches as $batchData){
 				$pk = &$batchData[0];
 				$targets = &$batchData[1];
 				if(Network::$BATCH_THRESHOLD >= 0 and strlen($pk->payload) >= Network::$BATCH_THRESHOLD){
@@ -2027,7 +2027,7 @@ class Server{
 		return $this->forceLanguage;
 	}
 
-	public function getOfflinePlayerDataManager() : OfflinePlayerDataManager {
+	public function getOfflinePlayerDataManager() : OfflinePlayerDataManager{
 		return $this->offlinePlayerDataManager;
 	}
 

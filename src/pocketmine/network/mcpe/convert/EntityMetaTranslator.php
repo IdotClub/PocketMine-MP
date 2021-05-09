@@ -7,12 +7,12 @@ namespace pocketmine\network\mcpe\convert;
 use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\utils\SingletonTrait;
 
-final class EntityMetaTranslator {
+final class EntityMetaTranslator{
 	use SingletonTrait;
 
-	public function translateLegacyEntityMetaId(int $id, int $protocol): ?int {
-		if ($protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
-			switch ($id) {
+	public function translateLegacyEntityMetaId(int $id, int $protocol) : ?int{
+		if($protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
+			switch($id){
 				case 80:
 					return 81;
 				case 81:
@@ -22,9 +22,9 @@ final class EntityMetaTranslator {
 		return null;
 	}
 
-	public function translateNewEntityMetaId(int $id, int $protocol): ?int {
-		if ($protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210) {
-			switch ($id) {
+	public function translateNewEntityMetaId(int $id, int $protocol) : ?int{
+		if($protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
+			switch($id){
 				case 81:
 					return 80;
 				case 83:

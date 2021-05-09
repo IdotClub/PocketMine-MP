@@ -387,7 +387,7 @@ class MemoryManager{
 		do{
 			$continue = false;
 			foreach($objects as $hash => $object){
-				try {
+				try{
 					if(!is_object($object)){
 						continue;
 					}

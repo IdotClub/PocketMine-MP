@@ -79,7 +79,7 @@ abstract class Command{
 	/**
 	 * @param string[] $aliases
 	 */
-	public function __construct(string $name, string $description = "", string $usageMessage = null, array $aliases = []) {
+	public function __construct(string $name, string $description = "", string $usageMessage = null, array $aliases = []){
 		$this->name = $name;
 		$this->setLabel($name);
 		$this->setDescription($description);
@@ -288,48 +288,48 @@ abstract class Command{
 		}
 	}
 
-	public function addParameter(CommandParameter $parameter, int $overloadIndex = 0): void {
+	public function addParameter(CommandParameter $parameter, int $overloadIndex = 0) : void{
 		$this->overloads[$overloadIndex][] = $parameter;
 	}
 
-	public function setParameter(CommandParameter $parameter, int $parameterIndex, int $overloadIndex = 0): void {
+	public function setParameter(CommandParameter $parameter, int $parameterIndex, int $overloadIndex = 0) : void{
 		$this->overloads[$overloadIndex][$parameterIndex] = $parameter;
 	}
 
 	/**
 	 * @param CommandParameter[] $parameters
 	 */
-	public function setParameters(array $parameters, int $overloadIndex = 0): void {
+	public function setParameters(array $parameters, int $overloadIndex = 0) : void{
 		$this->overloads[$overloadIndex] = $parameters;
 	}
 
-	public function removeParameter(int $parameterIndex, int $overloadIndex = 0): void {
+	public function removeParameter(int $parameterIndex, int $overloadIndex = 0) : void{
 		unset($this->overloads[$overloadIndex][$parameterIndex]);
 	}
 
-	public function removeAllParameters(): void {
+	public function removeAllParameters() : void{
 		$this->overloads = [];
 	}
 
-	public function removeOverload(int $overloadIndex): void {
+	public function removeOverload(int $overloadIndex) : void{
 		unset($this->overloads[$overloadIndex]);
 	}
 
 	/**
 	 * @return CommandParameter[]|null
 	 */
-	public function getOverload(int $index): ?array {
+	public function getOverload(int $index) : ?array{
 		return $this->overloads[$index] ?? null;
 	}
 
 	/**
 	 * @return CommandParameter[][]
 	 */
-	public function getOverloads(): array {
+	public function getOverloads() : array{
 		return $this->overloads;
 	}
 
-	public function __toString(): string {
+	public function __toString() : string{
 		return $this->name;
 	}
 }
