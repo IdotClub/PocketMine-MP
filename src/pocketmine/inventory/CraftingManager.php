@@ -122,15 +122,15 @@ class CraftingManager{
 		$batch->setCompressionLevel(Server::getInstance()->networkCompressionLevel);
 		$batch->encode();
 
-		$this->craftingDataCache = $batch;
+		$this->craftingDataCache[$protocol] = $batch;
 		Timings::$craftingDataCacheRebuildTimer->stopTiming();
 	}
 
 	/**
 	 * Returns a pre-compressed CraftingDataPacket for sending to players. Rebuilds the cache if it is not found.
 	 */
-	public function getCraftingDataPacket(int $protocol=ProtocolInfo::CURRENT_PROTOCOL) : ?BatchPacket{
-		if($this->craftingDataCache === null){
+	public function getCraftingDataPacket(int $protocol = ProtocolInfo::CURRENT_PROTOCOL) : ?BatchPacket{
+		if(!isset($this->craftingDataCache[$protocol])){
 			$this->buildCraftingDataCache($protocol);
 		}
 
