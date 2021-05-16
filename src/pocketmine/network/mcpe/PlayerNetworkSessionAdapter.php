@@ -67,6 +67,7 @@ use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\mcpe\protocol\ShowCreditsPacket;
 use pocketmine\network\mcpe\protocol\SpawnExperienceOrbPacket;
 use pocketmine\network\mcpe\protocol\TextPacket;
+use pocketmine\network\mcpe\protocol\TickSyncPacket;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -89,6 +90,8 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 	private $player;
 	/** @var int */
 	private $protocol;
+	/** @var bool */
+	private $tickSync = false;
 
 	public function __construct(Server $server, Player $player){
 		$this->server = $server;
@@ -232,9 +235,9 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 		return true;
 	}
 
-	public function handlePacketViolationWarning(PacketViolationWarningPacket $packet): bool {
-		$this->server->getLogger()->warning("Received PacketViolationWarning: type: {$packet->getType()} severity={$packet->getSeverity()} packet=" . PacketPool::getPacketById($packet->getPacketId())->getName() . "({$packet->getPacketId()}) message: " . base64_encode($packet->getMessage()));
-		return false;
+	public function handlePacketViolationWarning(PacketViolationWarningPacket $packet) : bool{
+		$this->server->getLogger()->warning("Received PacketViolationWarning: type={$packet->getType()} severity={$packet->getSeverity()} packet=" . PacketPool::getPacketById($packet->getPacketId())->getName() . "({$packet->getPacketId()}) message=" . base64_encode($packet->getMessage()));
+		return true;
 	}
 
 	public function handleItemFrameDropItem(ItemFrameDropItemPacket $packet) : bool{
@@ -331,5 +334,16 @@ class PlayerNetworkSessionAdapter extends NetworkSession{
 
 	public function handleNetworkStackLatency(NetworkStackLatencyPacket $packet) : bool{
 		return true; //TODO: implement this properly - this is here to silence debug spam from MCPE dev builds
+	}
+
+	public function handleTickSync(TickSyncPacket $packet) : bool{
+		if(!$this->tickSync){
+			$pk = TickSyncPacket::response($packet->getClientSendTime(), Server::getInstance()->getTick());
+			$this->player->dataPacket($pk);
+			$this->server->getLogger()->debug("Handled TickSync from {$this->player->getName()} ServerReceiveTime={$pk->getServerReceiveTime()}");
+			$this->tickSync = true;
+			return true;
+		}
+		return false;
 	}
 }
