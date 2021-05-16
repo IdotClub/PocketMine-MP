@@ -63,7 +63,7 @@ class EntityDeathEvent extends EntityEvent{
 	 * @param Item[] $drops
 	 */
 	public function setDrops(array $drops) : void{
-		Utils::validateArrayValueType($drops, function(Item $_) : void{});
+		Utils::validateArrayValueType($drops, static function(Item $_) : void{});
 		$this->drops = $drops;
 	}
 

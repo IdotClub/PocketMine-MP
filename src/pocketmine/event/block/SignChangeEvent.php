@@ -80,7 +80,7 @@ class SignChangeEvent extends BlockEvent implements Cancellable{
 		if(count($lines) !== 4){
 			throw new \InvalidArgumentException("Array size must be 4!");
 		}
-		Utils::validateArrayValueType($lines, function(string $_) : void{});
+		Utils::validateArrayValueType($lines, static function(string $_) : void{});
 		$this->lines = $lines;
 	}
 

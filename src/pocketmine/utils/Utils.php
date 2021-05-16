@@ -563,7 +563,7 @@ class Utils{
 					$args = $trace[$i]["params"];
 				}
 
-				$params = implode(", ", array_map(function($value) use($maxStringLength) : string{
+				$params = implode(", ", array_map(static function($value) use($maxStringLength) : string{
 					if(is_object($value)){
 						return "object " . self::getNiceClassName($value);
 					}

@@ -50,7 +50,7 @@ class PluginsCommand extends VanillaCommand{
 			return true;
 		}
 
-		$list = array_map(function(Plugin $plugin) : string{
+		$list = array_map(static function(Plugin $plugin) : string{
 			return ($plugin->isEnabled() ? TextFormat::GREEN : TextFormat::RED) . $plugin->getDescription()->getFullName();
 		}, $sender->getServer()->getPluginManager()->getPlugins());
 		sort($list, SORT_STRING);

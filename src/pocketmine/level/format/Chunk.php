@@ -641,7 +641,7 @@ class Chunk{
 	 * @return Entity[]
 	 */
 	public function getSavableEntities() : array{
-		return array_filter($this->entities, function(Entity $entity) : bool{ return $entity->canSaveWithChunk() and !$entity->isClosed(); });
+		return array_filter($this->entities, static function(Entity $entity) : bool{ return $entity->canSaveWithChunk() and !$entity->isClosed(); });
 	}
 
 	/**

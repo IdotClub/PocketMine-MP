@@ -724,7 +724,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		return array_filter(array_merge(
 			$this->inventory !== null ? array_values($this->inventory->getContents()) : [],
 			$this->armorInventory !== null ? array_values($this->armorInventory->getContents()) : []
-		), function(Item $item) : bool{ return !$item->hasEnchantment(Enchantment::VANISHING); });
+		), static function(Item $item) : bool{ return !$item->hasEnchantment(Enchantment::VANISHING); });
 	}
 
 	public function saveNBT() : void{

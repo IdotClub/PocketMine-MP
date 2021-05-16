@@ -146,7 +146,7 @@ class QueryRegenerateEvent extends ServerEvent{
 	 * @param Plugin[] $plugins
 	 */
 	public function setPlugins(array $plugins) : void{
-		Utils::validateArrayValueType($plugins, function(Plugin $_) : void{});
+		Utils::validateArrayValueType($plugins, static function(Plugin $_) : void{});
 		$this->plugins = $plugins;
 		$this->destroyCache();
 	}
@@ -162,7 +162,7 @@ class QueryRegenerateEvent extends ServerEvent{
 	 * @param Player[] $players
 	 */
 	public function setPlayerList(array $players) : void{
-		Utils::validateArrayValueType($players, function(Player $_) : void{});
+		Utils::validateArrayValueType($players, static function(Player $_) : void{});
 		$this->players = $players;
 		$this->destroyCache();
 	}

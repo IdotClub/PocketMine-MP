@@ -219,7 +219,7 @@ class NetworkBinaryStream extends BinaryStream{
 		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $this instanceof DataPacket) {
 			return $this->getSlot();
 		}
-		return $this->getItemStack(function () : void {
+		return $this->getItemStack(static function () : void {
 			//NOOP
 		});
 	}
@@ -229,7 +229,7 @@ class NetworkBinaryStream extends BinaryStream{
 			$this->putSlot($item);
 			return;
 		}
-		$this->putItemStack($item, function () : void {
+		$this->putItemStack($item, static function () : void {
 			//NOOP
 		});
 	}

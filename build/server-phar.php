@@ -50,7 +50,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
  * @return string[]
  */
 function preg_quote_array(array $strings, string $delim) : array{
-	return array_map(function(string $str) use ($delim) : string{ return preg_quote($str, $delim); }, $strings);
+	return array_map(static function(string $str) use ($delim) : string{ return preg_quote($str, $delim); }, $strings);
 }
 
 /**
@@ -62,7 +62,7 @@ function preg_quote_array(array $strings, string $delim) : array{
  */
 function buildPhar(string $pharPath, string $basePath, array $includedPaths, array $metadata, string $stub, int $signatureAlgo = \Phar::SHA1, ?int $compression = null){
 	$basePath = rtrim(str_replace("/", DIRECTORY_SEPARATOR, $basePath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-	$includedPaths = array_map(function(string $path) : string{
+	$includedPaths = array_map(static function(string $path) : string{
 		return rtrim(str_replace("/", DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 	}, $includedPaths);
 	yield "Creating output file $pharPath";

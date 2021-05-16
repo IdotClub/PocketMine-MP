@@ -480,7 +480,7 @@ class Item implements ItemIds, \JsonSerializable{
 	public function getLore() : array{
 		$display = $this->getNamedTagEntry(self::TAG_DISPLAY);
 		if($display instanceof CompoundTag and ($lore = $display->getListTag(self::TAG_DISPLAY_LORE)) !== null){
-			return array_map(function(NamedTag $line) : string{
+			return array_map(static function(NamedTag $line) : string{
 				if(!($line instanceof StringTag)){
 					throw new AssumptionFailedError("Nobody bothered to handle this error case and we can't fix it until PM4, oops ... #blameshoghi");
 				}
@@ -502,7 +502,7 @@ class Item implements ItemIds, \JsonSerializable{
 			$display = new CompoundTag(self::TAG_DISPLAY, []);
 		}
 
-		$display->setTag(new ListTag(self::TAG_DISPLAY_LORE, array_map(function(string $str) : StringTag{
+		$display->setTag(new ListTag(self::TAG_DISPLAY_LORE, array_map(static function(string $str) : StringTag{
 			return new StringTag("", $str);
 		}, $lines), NBT::TAG_String));
 

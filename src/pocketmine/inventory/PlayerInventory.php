@@ -57,7 +57,7 @@ final class PlayerInventory extends BaseInventory{
 	public static function buildCache(int $protocol) : void {
 		if (!isset(self::$cachedCreativeContent[$protocol])) {
 			$nextEntryId = 1;
-			$pk = CreativeContentPacket::create(array_map(function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
+			$pk = CreativeContentPacket::create(array_map(static function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
 				return new CreativeContentEntry($nextEntryId++, clone $item);
 			}, Item::getCreativeItems()));
 			$pk->protocol = $protocol;
@@ -67,7 +67,7 @@ final class PlayerInventory extends BaseInventory{
 
 		if (!isset(self::$cachedEmptyCreativeContent[$protocol])) {
 			$nextEntryId = 1;
-			$pk = CreativeContentPacket::create(array_map(function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
+			$pk = CreativeContentPacket::create(array_map(static function (Item $item) use (&$nextEntryId) : CreativeContentEntry {
 				return new CreativeContentEntry($nextEntryId++, clone $item);
 			}, []));
 			$pk->protocol = $protocol;

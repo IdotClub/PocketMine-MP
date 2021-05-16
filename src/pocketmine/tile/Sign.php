@@ -66,7 +66,7 @@ class Sign extends Spawnable{
 				}
 			}
 		}
-		$this->text = array_map(function(string $line) : string{
+		$this->text = array_map(static function(string $line) : string{
 			return mb_scrub($line, 'UTF-8');
 		}, $this->text);
 	}
@@ -176,7 +176,7 @@ class Sign extends Spawnable{
 
 		$removeFormat = $player->getRemoveFormat();
 
-		$ev = new SignChangeEvent($this->getBlock(), $player, array_map(function(string $line) use ($removeFormat) : string{ return TextFormat::clean($line, $removeFormat); }, $lines));
+		$ev = new SignChangeEvent($this->getBlock(), $player, array_map(static function(string $line) use ($removeFormat) : string{ return TextFormat::clean($line, $removeFormat); }, $lines));
 		if($this->editorEntityRuntimeId === null || $this->editorEntityRuntimeId !== $player->getId()){
 			$ev->setCancelled();
 		}

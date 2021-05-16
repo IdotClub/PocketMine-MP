@@ -91,7 +91,7 @@ class ShapedRecipe implements CraftingRecipe{
 			$this->setIngredient($char, $i);
 		}
 
-		$this->results = array_map(function(Item $item) : Item{ return clone $item; }, $results);
+		$this->results = array_map(static function(Item $item) : Item{ return clone $item; }, $results);
 	}
 
 	public function getWidth() : int{
@@ -106,7 +106,7 @@ class ShapedRecipe implements CraftingRecipe{
 	 * @return Item[]
 	 */
 	public function getResults() : array{
-		return array_map(function(Item $item) : Item{ return clone $item; }, $this->results);
+		return array_map(static function(Item $item) : Item{ return clone $item; }, $this->results);
 	}
 
 	/**

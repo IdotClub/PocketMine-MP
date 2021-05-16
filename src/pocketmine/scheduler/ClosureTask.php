@@ -49,7 +49,7 @@ class ClosureTask extends Task{
 	 * @phpstan-param \Closure(int) : void $closure
 	 */
 	public function __construct(\Closure $closure){
-		Utils::validateCallableSignature(function(int $currentTick) : void{}, $closure);
+		Utils::validateCallableSignature(static function(int $currentTick) : void{}, $closure);
 		$this->closure = $closure;
 	}
 

@@ -68,7 +68,7 @@ class EntityExplodeEvent extends EntityEvent implements Cancellable{
 	 * @param Block[] $blocks
 	 */
 	public function setBlockList(array $blocks) : void{
-		Utils::validateArrayValueType($blocks, function(Block $_) : void{});
+		Utils::validateArrayValueType($blocks, static function(Block $_) : void{});
 		$this->blocks = $blocks;
 	}
 
