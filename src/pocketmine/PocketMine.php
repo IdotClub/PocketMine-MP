@@ -260,7 +260,7 @@ namespace pocketmine {
 			Terminal::init();
 		}
 
-		$logger = new MainLogger(\pocketmine\DATA . "server.log");
+		$logger = new MainLogger(\pocketmine\DATA . "server.log", DATA . '/log_archive');
 		$logger->registerStatic();
 
 		foreach($tzError as $e){

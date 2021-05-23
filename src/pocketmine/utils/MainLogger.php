@@ -55,9 +55,12 @@ use const PHP_EOL;
 use const PTHREADS_INHERIT_NONE;
 
 class MainLogger extends \AttachableThreadedLogger{
+	private const MAX_FILE_SIZE = 8 * (1 << 20); //8 MB
 
 	/** @var string */
 	protected $logFile;
+	/** @var string */
+	private $archiveDir;
 	/** @var \Threaded */
 	protected $logStream;
 	/** @var bool */
@@ -81,7 +84,7 @@ class MainLogger extends \AttachableThreadedLogger{
 	/**
 	 * @throws \RuntimeException
 	 */
-	public function __construct(string $logFile, bool $logDebug = false){
+	public function __construct(string $logFile, string $archiveDir, bool $logDebug = false){
 		parent::__construct();
 		if(static::$logger instanceof MainLogger){
 			throw new \RuntimeException("MainLogger has been already created");
@@ -90,7 +93,11 @@ class MainLogger extends \AttachableThreadedLogger{
 		$this->logFile = $logFile;
 		$this->logDebug = $logDebug;
 		$this->logStream = new \Threaded;
-
+		if(!@mkdir($archiveDir) && !is_dir($archiveDir)){
+			throw new \RuntimeException("Unable to create archive directory: " . (
+				is_file($archiveDir) ? "it already exists and is not a directory" : "permission denied"));
+		}
+		$this->archiveDir = $archiveDir;
 		//Child threads may not inherit command line arguments, so if there's an override it needs to be recorded here
 		$this->mainThreadHasFormattingCodes = Terminal::hasFormattingCodes();
 		$this->timezone = Timezone::get();
@@ -345,11 +352,15 @@ class MainLogger extends \AttachableThreadedLogger{
 	/**
 	 * @param resource $logResource
 	 */
-	private function writeLogStream($logResource) : void{
+	private function writeLogStream($logResource, int &$offset) : bool{
 		while($this->logStream->count() > 0){
 			/** @var string $chunk */
 			$chunk = $this->logStream->shift();
 			fwrite($logResource, $chunk);
+			$offset += strlen($chunk);
+			if($offset >= self::MAX_FILE_SIZE){
+				return false;
+			}
 		}
 
 		$this->synchronized(function() : void{
@@ -358,19 +369,54 @@ class MainLogger extends \AttachableThreadedLogger{
 				$this->notify(); //if this was due to a sync flush, tell the caller to stop waiting
 			}
 		});
+		return true;
 	}
 
-	/**
-	 * @return void
-	 */
-	public function run(){
-		$logResource = fopen($this->logFile, "ab");
+	/** @return resource */
+	private function openLogFile(string $file, int &$size){
+		$logResource = fopen($file, "ab");
 		if(!is_resource($logResource)){
 			throw new \RuntimeException("Couldn't open log file");
 		}
+		$stat = fstat($logResource);
+		if($stat === false) throw new AssumptionFailedError("ftell() should not fail here");
+		$size = $stat['size'];
+		return $logResource;
+	}
+
+	private function compressLogFile() : void{
+		$i = 0;
+		$date = date("Y-m-d\TH.i.s");
+		do{
+			//this shouldn't be necessary, but in case the user messes with the system time for some reason ...
+			$out = $this->archiveDir . "/server.${date}_$i.log.gz";
+			$i++;
+		}while(file_exists($out));
+
+		$logFile = fopen($this->logFile, 'rb');
+		$archiveFile = gzopen($out, 'wb');
+		if($logFile === false || $archiveFile === false){
+			throw new AssumptionFailedError();
+		}
+
+		if(stream_copy_to_stream($logFile, $archiveFile) === false){
+			throw new AssumptionFailedError("Something is wrong");
+		}
+		fclose($logFile);
+		fclose($archiveFile);
+		@unlink($this->logFile);
+	}
+
+	public function run() : void{
+		$size = 0;
+		$logResource = $this->openLogFile($this->logFile, $size);
 
 		while(!$this->shutdown){
-			$this->writeLogStream($logResource);
+			while(!$this->writeLogStream($logResource, $size)){
+				fclose($logResource);
+				$this->compressLogFile();
+				$logResource = $this->openLogFile($this->logFile, $size);
+			}
 			$this->synchronized(function() : void{
 				if(!$this->shutdown && !$this->syncFlush){
 					$this->wait();
@@ -378,7 +424,7 @@ class MainLogger extends \AttachableThreadedLogger{
 			});
 		}
 
-		$this->writeLogStream($logResource);
+		$this->writeLogStream($logResource, $size);
 
 		fclose($logResource);
 	}
