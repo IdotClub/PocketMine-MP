@@ -18,9 +18,9 @@ use function sqrt;
 final class FishingHook extends Projectile{
 	public const NETWORK_ID = self::FISHING_HOOK;
 
-	public $height = 0.25;
-	public $width = 0.25;
-	protected $gravity = 0.09;
+	public $height = 0.15;
+	public $width = 0.15;
+	protected $gravity = 0.075;
 	protected $drag = 0.05;
 
 	public function __construct(Level $level, CompoundTag $nbt, ?Entity $owner = null){
