@@ -1346,7 +1346,7 @@ class Server{
 			$this->pluginManager = new PluginManager($this, $this->commandMap, ((bool) $this->getProperty("plugins.legacy-data-dir", true)) ? null : $this->getDataPath() . "plugin_data" . DIRECTORY_SEPARATOR);
 			$this->profilingTickRate = (float) $this->getProperty("settings.profile-report-trigger", 20);
 			$this->pluginManager->registerInterface(new PharPluginLoader($this->autoloader));
-			if((bool) $this->config->get("plugins.builtin-source-loader", false)){
+			if($this->config->getNested("plugins.builtin-source-loader", false)){
 				$this->pluginManager->registerInterface(new SourcePluginLoader($this->autoloader));
 			}
 			$this->pluginManager->registerInterface(new ScriptPluginLoader());
@@ -1359,9 +1359,7 @@ class Server{
 
 			$extra = $this->config->getNested("plugins.extra-plugin-folder", []);
 			foreach(is_array($extra) ? $extra : [] as $path){
-				if(is_dir((string) $path)){
-					$this->pluginManager->loadPlugins($this->getDataPath() . (string) $path . DIRECTORY_SEPARATOR);
-				}
+				$this->pluginManager->loadPlugins($this->getDataPath() . $path);
 			}
 
 			$this->enablePlugins(PluginLoadOrder::STARTUP);

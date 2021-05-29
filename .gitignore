@@ -6,6 +6,7 @@ plugins/*
 bin*/*
 timings/*
 crashdumps/*
+log_archive/*
 *.log
 *.txt
 *.phar
