@@ -111,7 +111,8 @@ function buildPhar(string $pharPath, string $basePath, array $includedPaths, arr
 	$iterator = new \RecursiveIteratorIterator($directory);
 	$regexIterator = new \RegexIterator($iterator, $regex);
 
-	$count = count($phar->buildFromIterator($regexIterator, $basePath));
+	$count = count($phar->buildFromIterator($regexIterator, $basePath)) + 1;
+	$phar->addFile($basePath . 'LICENSE','LICENSE');
 	yield "Added $count files";
 
 	if($compression !== null){
