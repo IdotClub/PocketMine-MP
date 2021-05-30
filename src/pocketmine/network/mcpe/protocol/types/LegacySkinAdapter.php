@@ -44,7 +44,7 @@ class LegacySkinAdapter implements SkinAdapter{
 		}
 		return new SkinData(
 			$skin->getSkinId(),
-			$skin->getPlayFabId(),
+			'',
 			json_encode(["geometry" => ["default" => $geometryName]]),
 			SkinImage::fromLegacy($skin->getSkinData()), [],
 			$capeImage,
@@ -54,7 +54,7 @@ class LegacySkinAdapter implements SkinAdapter{
 
 	public function fromSkinData(SkinData $data) : Skin{
 		if($data->isPersona()){
-			return new Skin("Standard_Custom", $data->getPlayFabId(), str_repeat(random_bytes(3) . "\xff", 2048));
+			return new Skin("Standard_Custom", str_repeat(random_bytes(3) . "\xff", 2048));
 		}
 
 		$capeData = $data->isPersonaCapeOnClassic() ? "" : $data->getCapeImage()->getData();
@@ -66,6 +66,6 @@ class LegacySkinAdapter implements SkinAdapter{
 			throw new InvalidSkinException("Missing geometry name field");
 		}
 
-		return new Skin($data->getSkinId(), $data->getPlayFabId(), $data->getSkinImage()->getData(), $capeData, $geometryName, $data->getGeometryData());
+		return new Skin($data->getSkinId(), $data->getSkinImage()->getData(), $capeData, $geometryName, $data->getGeometryData());
 	}
 }

@@ -123,7 +123,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	protected static function deserializeSkinNBT(CompoundTag $skinTag) : Skin{
 		$skin = new Skin(
 			$skinTag->getString("Name"),
-			$skinTag->getString("PlayFabId", ""),
 			$skinTag->hasTag("Data", StringTag::class) ? $skinTag->getString("Data") : $skinTag->getByteArray("Data"), //old data (this used to be saved as a StringTag in older versions of PM)
 			$skinTag->getByteArray("CapeData", ""),
 			$skinTag->getString("GeometryName", ""),
@@ -781,7 +780,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		if($this->skin !== null){
 			$this->namedtag->setTag(new CompoundTag("Skin", [
 				new StringTag("Name", $this->skin->getSkinId()),
-				new StringTag("PlayFabId", $this->skin->getPlayFabId()),
 				new ByteArrayTag("Data", $this->skin->getSkinData()),
 				new ByteArrayTag("CapeData", $this->skin->getCapeData()),
 				new StringTag("GeometryName", $this->skin->getGeometryName()),

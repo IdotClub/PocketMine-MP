@@ -99,7 +99,7 @@ class NetworkBinaryStream extends BinaryStream{
 
 	public function getSkin() : SkinData{
 		$skinId = $this->getString();
-		$playFabId = "";
+		$playFabId = '';
 		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
 			$playFabId = $this->getString();
 		}
@@ -161,7 +161,7 @@ class NetworkBinaryStream extends BinaryStream{
 	public function putSkin(SkinData $skin){
 		$this->putString($skin->getSkinId());
 		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
-			$this->putString($skin->getPlayFabId() ?? "");
+			$this->putString($skin->getPlayFabId() ?? '');
 		}
 		$this->putString($skin->getResourcePatch());
 		$this->putSkinImage($skin->getSkinImage());
