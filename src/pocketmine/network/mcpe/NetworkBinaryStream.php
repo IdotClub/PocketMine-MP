@@ -745,7 +745,7 @@ class NetworkBinaryStream extends BinaryStream{
 		foreach($rules as $name => $rule){
 			$this->putString($name);
 			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_0){
-				$this->putBool($rule[2]);
+				$this->putBool($rule[2] ?? false);
 			}
 			$this->putUnsignedVarInt($rule[0]);
 			switch($rule[0]){
