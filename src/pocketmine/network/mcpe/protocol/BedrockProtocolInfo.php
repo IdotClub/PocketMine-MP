@@ -11,6 +11,7 @@ final class BedrockProtocolInfo {
 	public const PROTOCOL_1_16_200 = 422;
 	public const PROTOCOL_1_16_210 = 428;
 	public const PROTOCOL_1_16_220 = 431;
+	public const PROTOCOL_1_17_0 = 440;
 
 	public static function translateProtocol(int $protocol) : int {
 		if (in_array($protocol, [414, 415, 416, 417, 418, 419, 420, 421, 422], true)) {

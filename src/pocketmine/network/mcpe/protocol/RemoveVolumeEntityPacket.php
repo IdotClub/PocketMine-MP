@@ -27,8 +27,8 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pocketmine\network\mcpe\NetworkSession;
 
-class RemoveEntityPacket extends DataPacket/* implements ClientboundPacket*/{
-	public const NETWORK_ID = ProtocolInfo::REMOVE_ENTITY_PACKET;
+class RemoveVolumeEntityPacket extends DataPacket{
+	public const NETWORK_ID = ProtocolInfo::REMOVE_VOLUME_ENTITY_PACKET;
 
 	/** @var int */
 	private $entityNetId;
@@ -39,9 +39,7 @@ class RemoveEntityPacket extends DataPacket/* implements ClientboundPacket*/{
 		return $result;
 	}
 
-	public function getEntityNetId() : int{
-		return $this->entityNetId;
-	}
+	public function getEntityNetId() : int{ return $this->entityNetId; }
 
 	protected function decodePayload() : void{
 		$this->entityNetId = $this->getUnsignedVarInt();
@@ -52,6 +50,6 @@ class RemoveEntityPacket extends DataPacket/* implements ClientboundPacket*/{
 	}
 
 	public function handle(NetworkSession $handler) : bool{
-		return $handler->handleRemoveEntity($this);
+		return $handler->handleRemoveVolumeEntity($this);
 	}
 }

@@ -42,12 +42,13 @@ interface ProtocolInfo{
 	public const ACCEPT_PROTOCOL = [
 		419, 420, 421, 422,
 		423, 424, 425, 426, 427, 428,
-		431
+		431,
+		440
 	];
 	/** Current Minecraft PE version reported by the server. This is usually the earliest currently supported version. */
-	public const MINECRAFT_VERSION = 'v1.16.100-1.16.220';
+	public const MINECRAFT_VERSION = 'v1.16.100-1.17.0';
 	/** Version number sent to clients in ping responses. */
-	public const MINECRAFT_VERSION_NETWORK = '1.16.220';
+	public const MINECRAFT_VERSION_NETWORK = '1.17.0';
 
 	public const LOGIN_PACKET = 0x01;
 	public const PLAY_STATUS_PACKET = 0x02;
@@ -213,5 +214,8 @@ interface ProtocolInfo{
 	public const ITEM_COMPONENT_PACKET = 0xa2;
 	public const FILTER_TEXT_PACKET = 0xa3;
 	public const CLIENTBOUND_DEBUG_RENDERER_PACKET = 0xa4;
+	public const SYNC_ACTOR_PROPERTY_PACKET = 0xa5;
+	public const ADD_VOLUME_ENTITY_PACKET = 0xa6;
+	public const REMOVE_VOLUME_ENTITY_PACKET = 0xa7;
 
 }

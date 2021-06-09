@@ -25,33 +25,40 @@ namespace pocketmine\network\mcpe\protocol;
 
 #include <rules/DataPacket.h>
 
+use pocketmine\nbt\NetworkLittleEndianNBTStream;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\NetworkSession;
 
-class RemoveEntityPacket extends DataPacket/* implements ClientboundPacket*/{
-	public const NETWORK_ID = ProtocolInfo::REMOVE_ENTITY_PACKET;
+class AddVolumeEntityPacket extends DataPacket{
+	public const NETWORK_ID = ProtocolInfo::ADD_VOLUME_ENTITY_PACKET;
 
 	/** @var int */
 	private $entityNetId;
+	/** @var CompoundTag */
+	private $data;
 
-	public static function create(int $entityNetId) : self{
+	public static function create(int $entityNetId, CompoundTag $data) : self{
 		$result = new self;
 		$result->entityNetId = $entityNetId;
+		$result->data = $data;
 		return $result;
 	}
 
-	public function getEntityNetId() : int{
-		return $this->entityNetId;
-	}
+	public function getEntityNetId() : int{ return $this->entityNetId; }
+
+	public function getData() : CompoundTag{ return $this->data; }
 
 	protected function decodePayload() : void{
 		$this->entityNetId = $this->getUnsignedVarInt();
+		$this->data = $this->getNbtCompoundRoot();
 	}
 
 	protected function encodePayload() : void{
 		$this->putUnsignedVarInt($this->entityNetId);
+		$this->put((new NetworkLittleEndianNBTStream())->write($this->data));
 	}
 
 	public function handle(NetworkSession $handler) : bool{
-		return $handler->handleRemoveEntity($this);
+		return $handler->handleAddVolumeEntity($this);
 	}
 }

@@ -277,7 +277,7 @@ class CraftingDataPacket extends DataPacket{
 		$writer->protocol = $this->protocol;
 		$counter = 0;
 		foreach($this->entries as $d){
-			$entryType = self::writeEntry($d, $writer, $counter++);
+			$entryType = self::writeEntry($d, $writer, ++$counter);
 			if($entryType >= 0){
 				$this->putVarInt($entryType);
 				$this->put($writer->getBuffer());
