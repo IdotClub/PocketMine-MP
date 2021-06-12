@@ -246,7 +246,7 @@ class NetworkBinaryStream extends BinaryStream{
 		$cnt = $this->getLShort();
 		$netData = $this->getUnsignedVarInt();
 
-		[$id, $meta] = ItemTranslator::getInstance()->fromNetworkId($netId, $netData);
+		[$id, $meta] = ItemTranslator::getInstance()->getMapping($this->protocol)->fromNetworkId($netId, $netData);
 
 		$readExtraCrapInTheMiddle($this);
 
@@ -283,7 +283,7 @@ class NetworkBinaryStream extends BinaryStream{
 				$extraData->get($extraData->getLShort());
 			}
 
-			if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
+			if($netId === ItemTypeDictionary::getInstance()->getDictionary($extraData->protocol)->fromStringId("minecraft:shield")){
 				$extraData->getLLong(); //"blocking tick" (ffs mojang)
 			}
 
@@ -328,7 +328,7 @@ class NetworkBinaryStream extends BinaryStream{
 		}
 
 		$coreData = $item->getDamage();
-		[$netId, $netData] = ItemTranslator::getInstance()->toNetworkId($item->getId(), $coreData);
+		[$netId, $netData] = ItemTranslator::getInstance()->getMapping($this->protocol)->toNetworkId($item->getId(), $coreData);
 
 		$this->putVarInt($netId);
 		$this->putLShort($item->getCount());
@@ -387,7 +387,7 @@ class NetworkBinaryStream extends BinaryStream{
 			$extraData->putLInt(0); //CanPlaceOn entry count (TODO)
 			$extraData->putLInt(0); //CanDestroy entry count (TODO)
 
-			if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
+			if($netId === ItemTypeDictionary::getInstance()->getDictionary($extraData->protocol)->fromStringId("minecraft:shield")){
 				$extraData->putLLong(0); //"blocking tick" (ffs mojang)
 			}
 			return $extraData->getBuffer();
@@ -400,7 +400,7 @@ class NetworkBinaryStream extends BinaryStream{
 			return ItemFactory::get(ItemIds::AIR, 0, 0);
 		}
 		$netData = $this->getVarInt();
-		[$id, $meta] = ItemTranslator::getInstance()->fromNetworkIdWithWildcardHandling($netId, $netData);
+		[$id, $meta] = ItemTranslator::getInstance()->getMapping($this->protocol)->fromNetworkIdWithWildcardHandling($netId, $netData);
 		$count = $this->getVarInt();
 		return ItemFactory::get($id, $meta, $count);
 	}
@@ -409,11 +409,12 @@ class NetworkBinaryStream extends BinaryStream{
 		if($item->isNull()){
 			$this->putVarInt(0);
 		}else{
+			$mapping = ItemTranslator::getInstance()->getMapping($this->protocol);
 			if($item->hasAnyDamageValue()){
-				[$netId, ] = ItemTranslator::getInstance()->toNetworkId($item->getId(), 0);
+				[$netId,] = $mapping->toNetworkId($item->getId(), 0);
 				$netData = 0x7fff;
 			}else{
-				[$netId, $netData] = ItemTranslator::getInstance()->toNetworkId($item->getId(), $item->getDamage());
+				[$netId, $netData] = $mapping->toNetworkId($item->getId(), $item->getDamage());
 			}
 			$this->putVarInt($netId);
 			$this->putVarInt($netData);
@@ -906,7 +907,7 @@ class NetworkBinaryStream extends BinaryStream{
 		$netData = $auxValue >> 8;
 		$cnt = $auxValue & 0xff;
 
-		[$id, $meta] = ItemTranslator::getInstance()->fromNetworkId($netId, $netData);
+		[$id, $meta] = ItemTranslator::getInstance()->getMapping($this->protocol)->fromNetworkId($netId, $netData);
 
 		$nbtLen = $this->getLShort();
 
@@ -936,11 +937,12 @@ class NetworkBinaryStream extends BinaryStream{
 			$this->getString();
 		}
 
-		if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
+		if($netId === ItemTypeDictionary::getInstance()->getDictionary($this->protocol)->fromStringId("minecraft:shield")){
 			$this->getVarLong(); //"blocking tick" (ffs mojang)
 		}
 		if($nbt !== null){
-			if($nbt->hasTag(self::DAMAGE_TAG, IntTag::class)){
+
+			 if($nbt->hasTag(self::DAMAGE_TAG, IntTag::class)){
 				$meta = $nbt->getInt(self::DAMAGE_TAG);
 				$nbt->removeTag(self::DAMAGE_TAG);
 				if(($conflicted = $nbt->getTag(self::DAMAGE_TAG_CONFLICT_RESOLUTION)) !== null){
@@ -962,7 +964,7 @@ class NetworkBinaryStream extends BinaryStream{
 			return;
 		}
 
-		[$netId, $netData] = ItemTranslator::getInstance()->toNetworkId($item->getId(), $item->getDamage());
+		[$netId, $netData] = ItemTranslator::getInstance()->getMapping($this->protocol)->toNetworkId($item->getId(), $item->getDamage());
 
 		$this->putVarInt($netId);
 		$auxValue = (($netData & 0x7fff) << 8) | $item->getCount();
@@ -996,7 +998,7 @@ class NetworkBinaryStream extends BinaryStream{
 		$this->putVarInt(0); //CanPlaceOn entry count (TODO)
 		$this->putVarInt(0); //CanDestroy entry count (TODO)
 
-		if($netId === ItemTypeDictionary::getInstance()->fromStringId("minecraft:shield")){
+		if($netId === ItemTypeDictionary::getInstance()->getDictionary($this->protocol)->fromStringId("minecraft:shield")){
 			$this->putVarLong(0); //"blocking tick" (ffs mojang)
 		}
 	}

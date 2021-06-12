@@ -23,10 +23,11 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\convert;
 
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\ItemTypeEntry;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\SingletonTrait;
-use function array_key_exists;
 use function file_get_contents;
 use function is_array;
 use function is_bool;
@@ -37,25 +38,19 @@ use function json_decode;
 final class ItemTypeDictionary{
 	use SingletonTrait;
 
-	/**
-	 * @var ItemTypeEntry[]
-	 * @phpstan-var list<ItemTypeEntry>
-	 */
-	private $itemTypes;
-	/**
-	 * @var string[]
-	 * @phpstan-var array<int, string>
-	 */
-	private $intToStringIdMap = [];
-	/**
-	 * @var int[]
-	 * @phpstan-var array<string, int>
-	 */
-	private $stringToIntMap = [];
+	/** @var ItemTypeDictionaryEntry[] */
+	private $entries = [];
 
-	private static function make() : self{
-		$data = file_get_contents(\pocketmine\RESOURCE_PATH . '/vanilla/required_item_list.json');
-		if($data === false) throw new AssumptionFailedError("Missing required resource file");
+	public function __construct(){
+		$this->setup(ProtocolInfo::CURRENT_PROTOCOL, '/vanilla/required_item_list.json');
+		$this->setup(BedrockProtocolInfo::PROTOCOL_1_17_0, '/item_dictionary/440_required_item_list.json');
+	}
+
+	private function setup(int $protocol, string $path) : void{
+		$data = file_get_contents(\pocketmine\RESOURCE_PATH . $path);
+		if($data === false){
+			throw new AssumptionFailedError("Missing required resource file");
+		}
 		$table = json_decode($data, true);
 		if(!is_array($table)){
 			throw new AssumptionFailedError("Invalid item list format");
@@ -68,39 +63,10 @@ final class ItemTypeDictionary{
 			}
 			$params[] = new ItemTypeEntry($name, $entry["runtime_id"], $entry["component_based"]);
 		}
-		return new self($params);
+		$this->entries[$protocol] = new ItemTypeDictionaryEntry($params);
 	}
 
-	/**
-	 * @param ItemTypeEntry[] $itemTypes
-	 */
-	public function __construct(array $itemTypes){
-		$this->itemTypes = $itemTypes;
-		foreach($this->itemTypes as $type){
-			$this->stringToIntMap[$type->getStringId()] = $type->getNumericId();
-			$this->intToStringIdMap[$type->getNumericId()] = $type->getStringId();
-		}
-	}
-
-	/**
-	 * @return ItemTypeEntry[]
-	 * @phpstan-return list<ItemTypeEntry>
-	 */
-	public function getEntries() : array{
-		return $this->itemTypes;
-	}
-
-	public function fromStringId(string $stringId) : int{
-		if(!array_key_exists($stringId, $this->stringToIntMap)){
-			throw new \InvalidArgumentException("Unmapped string ID \"$stringId\"");
-		}
-		return $this->stringToIntMap[$stringId];
-	}
-
-	public function fromIntId(int $intId) : string{
-		if(!array_key_exists($intId, $this->intToStringIdMap)){
-			throw new \InvalidArgumentException("Unmapped int ID $intId");
-		}
-		return $this->intToStringIdMap[$intId];
+	public function getDictionary(int $protocol = ProtocolInfo::CURRENT_PROTOCOL) : ItemTypeDictionaryEntry{
+		return $this->entries[$protocol] ?? $this->entries[ProtocolInfo::CURRENT_PROTOCOL];
 	}
 }

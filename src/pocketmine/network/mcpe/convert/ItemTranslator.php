@@ -23,9 +23,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\convert;
 
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\SingletonTrait;
-use function array_key_exists;
 use function file_get_contents;
 use function is_array;
 use function is_numeric;
@@ -38,29 +39,56 @@ use function json_decode;
 final class ItemTranslator{
 	use SingletonTrait;
 
-	/**
-	 * @var int[]
-	 * @phpstan-var array<int, int>
-	 */
-	private $simpleCoreToNetMapping = [];
-	/**
-	 * @var int[]
-	 * @phpstan-var array<int, int>
-	 */
-	private $simpleNetToCoreMapping = [];
+	/** @var ItemTranslatorMapping[] */
+	private $mappings = [];
 
 	/**
-	 * runtimeId = array[internalId][metadata]
-	 * @var int[][]
-	 * @phpstan-var array<int, array<int, int>>
+	 * @param int[]   $simpleMappings
+	 * @param int[][] $complexMappings
+	 *
+	 * @phpstan-param array<string, int> $simpleMappings
+	 * @phpstan-param array<string, array<int, int>> $complexMappings
 	 */
-	private $complexCoreToNetMapping = [];
-	/**
-	 * [internalId, metadata] = array[runtimeId]
-	 * @var int[][]
-	 * @phpstan-var array<int, array{int, int}>
-	 */
-	private $complexNetToCoreMapping = [];
+	public function __construct(ItemTypeDictionary $dictionary, array $simpleMappings, array $complexMappings){
+		$default = new ItemTranslatorMapping([], [], [], []);
+		foreach($dictionary->getDictionary()->getEntries() as $entry){
+			$stringId = $entry->getStringId();
+			$netId = $entry->getNumericId();
+			if(isset($complexMappings[$stringId])){
+				[$id, $meta] = $complexMappings[$stringId];
+				$default->complexCoreToNetMapping[$id][$meta] = $netId;
+				$default->complexNetToCoreMapping[$netId] = [$id, $meta];
+			}elseif(isset($simpleMappings[$stringId])){
+				$default->simpleCoreToNetMapping[$simpleMappings[$stringId]] = $netId;
+				$default->simpleNetToCoreMapping[$netId] = $simpleMappings[$stringId];
+			}else{
+				//not all items have a legacy mapping - for now, we only support the ones that do
+				continue;
+			}
+		}
+		$this->mappings[ProtocolInfo::CURRENT_PROTOCOL] = $default;
+		$this->setupJSONMapping(BedrockProtocolInfo::PROTOCOL_1_17_0);
+	}
+
+	private function setupJSONMapping(int $protocol) : void{
+		$this->mappings[$protocol] = new ItemTranslatorMapping(
+			json_decode(
+				file_get_contents(\pocketmine\RESOURCE_PATH .
+					"/item_dictionary/{$protocol}_complexCoreToNetMapping.json"), true
+			),
+			json_decode(
+				file_get_contents(\pocketmine\RESOURCE_PATH .
+					"/item_dictionary/{$protocol}_complexNetToCoreMapping.json"), true
+			),
+			json_decode(
+				file_get_contents(\pocketmine\RESOURCE_PATH .
+					"/item_dictionary/{$protocol}_simpleCoreToNetMapping.json"), true
+			),
+			json_decode(
+				file_get_contents(\pocketmine\RESOURCE_PATH .
+					"/item_dictionary/{$protocol}_simpleNetToCoreMapping.json"), true
+			));
+	}
 
 	private static function make() : self{
 		$data = file_get_contents(\pocketmine\RESOURCE_PATH . '/vanilla/r16_to_current_item_map.json');
@@ -115,77 +143,7 @@ final class ItemTranslator{
 		return new self(ItemTypeDictionary::getInstance(), $simpleMappings, $complexMappings);
 	}
 
-	/**
-	 * @param int[] $simpleMappings
-	 * @param int[][] $complexMappings
-	 * @phpstan-param array<string, int> $simpleMappings
-	 * @phpstan-param array<string, array<int, int>> $complexMappings
-	 */
-	public function __construct(ItemTypeDictionary $dictionary, array $simpleMappings, array $complexMappings){
-		foreach($dictionary->getEntries() as $entry){
-			$stringId = $entry->getStringId();
-			$netId = $entry->getNumericId();
-			if(isset($complexMappings[$stringId])){
-				[$id, $meta] = $complexMappings[$stringId];
-				$this->complexCoreToNetMapping[$id][$meta] = $netId;
-				$this->complexNetToCoreMapping[$netId] = [$id, $meta];
-			}elseif(isset($simpleMappings[$stringId])){
-				$this->simpleCoreToNetMapping[$simpleMappings[$stringId]] = $netId;
-				$this->simpleNetToCoreMapping[$netId] = $simpleMappings[$stringId];
-			}else{
-				//not all items have a legacy mapping - for now, we only support the ones that do
-				continue;
-			}
-		}
-	}
-
-	/**
-	 * @return int[]
-	 * @phpstan-return array{int, int}
-	 */
-	public function toNetworkId(int $internalId, int $internalMeta) : array{
-		if($internalMeta === -1){
-			$internalMeta = 0x7fff;
-		}
-		if(isset($this->complexCoreToNetMapping[$internalId][$internalMeta])){
-			return [$this->complexCoreToNetMapping[$internalId][$internalMeta], 0];
-		}
-		if(array_key_exists($internalId, $this->simpleCoreToNetMapping)){
-			return [$this->simpleCoreToNetMapping[$internalId], $internalMeta];
-		}
-
-		throw new \InvalidArgumentException("Unmapped ID/metadata combination $internalId:$internalMeta");
-	}
-
-	/**
-	 * @return int[]
-	 * @phpstan-return array{int, int}
-	 */
-	public function fromNetworkId(int $networkId, int $networkMeta, ?bool &$isComplexMapping = null) : array{
-		if(isset($this->complexNetToCoreMapping[$networkId])){
-			if($networkMeta !== 0){
-				throw new \UnexpectedValueException("Unexpected non-zero network meta on complex item mapping");
-			}
-			$isComplexMapping = true;
-			return $this->complexNetToCoreMapping[$networkId];
-		}
-		$isComplexMapping = false;
-		if(isset($this->simpleNetToCoreMapping[$networkId])){
-			return [$this->simpleNetToCoreMapping[$networkId], $networkMeta];
-		}
-		throw new \UnexpectedValueException("Unmapped network ID/metadata combination $networkId:$networkMeta");
-	}
-
-	/**
-	 * @return int[]
-	 * @phpstan-return array{int, int}
-	 */
-	public function fromNetworkIdWithWildcardHandling(int $networkId, int $networkMeta) : array{
-		$isComplexMapping = false;
-		if($networkMeta !== 0x7fff){
-			return $this->fromNetworkId($networkId, $networkMeta);
-		}
-		[$id, $meta] = $this->fromNetworkId($networkId, 0, $isComplexMapping);
-		return [$id, $isComplexMapping ? $meta : -1];
+	public function getMapping(int $protocol = ProtocolInfo::CURRENT_PROTOCOL) : ItemTranslatorMapping{
+		return $this->mappings[$protocol] ?? $this->mappings[ProtocolInfo::CURRENT_PROTOCOL];
 	}
 }

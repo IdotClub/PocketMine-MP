@@ -73,6 +73,7 @@ class CraftingDataPacket extends DataPacket{
 	protected function decodePayload(){
 		$this->decodedEntries = [];
 		$recipeCount = $this->getUnsignedVarInt();
+		$mapping = ItemTranslator::getInstance()->getMapping($this->protocol);
 		for($i = 0; $i < $recipeCount; ++$i){
 			$entry = [];
 			$entry["type"] = $recipeType = $this->getVarInt();
@@ -125,10 +126,10 @@ class CraftingDataPacket extends DataPacket{
 				case self::ENTRY_FURNACE_DATA:
 					$inputIdNet = $this->getVarInt();
 					if($recipeType === self::ENTRY_FURNACE){
-						[$inputId, $inputData] = ItemTranslator::getInstance()->fromNetworkIdWithWildcardHandling($inputIdNet, 0x7fff);
+						[$inputId, $inputData] = $mapping->fromNetworkIdWithWildcardHandling($inputIdNet, 0x7fff);
 					}else{
 						$inputMetaNet = $this->getVarInt();
-						[$inputId, $inputData] = ItemTranslator::getInstance()->fromNetworkIdWithWildcardHandling($inputIdNet, $inputMetaNet);
+						[$inputId, $inputData] = $mapping->fromNetworkIdWithWildcardHandling($inputIdNet, $inputMetaNet);
 					}
 					$entry["input"] = ItemFactory::get($inputId, $inputData);
 					$entry["output"] = $out = $this->getItemStackWithoutStackId();
@@ -150,23 +151,23 @@ class CraftingDataPacket extends DataPacket{
 		for($i = 0, $count = $this->getUnsignedVarInt(); $i < $count; ++$i){
 			$inputIdNet = $this->getVarInt();
 			$inputMetaNet = $this->getVarInt();
-			[$input, $inputMeta] = ItemTranslator::getInstance()->fromNetworkId($inputIdNet, $inputMetaNet);
+			[$input, $inputMeta] = $mapping->fromNetworkId($inputIdNet, $inputMetaNet);
 			$ingredientIdNet = $this->getVarInt();
 			$ingredientMetaNet = $this->getVarInt();
-			[$ingredient, $ingredientMeta] = ItemTranslator::getInstance()->fromNetworkId($ingredientIdNet, $ingredientMetaNet);
+			[$ingredient, $ingredientMeta] = $mapping->fromNetworkId($ingredientIdNet, $ingredientMetaNet);
 			$outputIdNet = $this->getVarInt();
 			$outputMetaNet = $this->getVarInt();
-			[$output, $outputMeta] = ItemTranslator::getInstance()->fromNetworkId($outputIdNet, $outputMetaNet);
+			[$output, $outputMeta] = $mapping->fromNetworkId($outputIdNet, $outputMetaNet);
 			$this->potionTypeRecipes[] = new PotionTypeRecipe($input, $inputMeta, $ingredient, $ingredientMeta, $output, $outputMeta);
 		}
 		for($i = 0, $count = $this->getUnsignedVarInt(); $i < $count; ++$i){
 			//TODO: we discard inbound ID here, not safe because netID on its own might map to internalID+internalMeta for us
 			$inputIdNet = $this->getVarInt();
-			[$input, ] = ItemTranslator::getInstance()->fromNetworkId($inputIdNet, 0);
+			[$input, ] = $mapping->fromNetworkId($inputIdNet, 0);
 			$ingredientIdNet = $this->getVarInt();
-			[$ingredient, ] = ItemTranslator::getInstance()->fromNetworkId($ingredientIdNet, 0);
+			[$ingredient, ] = $mapping->fromNetworkId($ingredientIdNet, 0);
 			$outputIdNet = $this->getVarInt();
-			[$output, ] = ItemTranslator::getInstance()->fromNetworkId($outputIdNet, 0);
+			[$output, ] = $mapping->fromNetworkId($outputIdNet, 0);
 			$this->potionContainerRecipes[] = new PotionContainerChangeRecipe($input, $ingredient, $output);
 		}
 		$this->cleanRecipes = $this->getBool();
@@ -237,10 +238,10 @@ class CraftingDataPacket extends DataPacket{
 	private static function writeFurnaceRecipe(FurnaceRecipe $recipe, NetworkBinaryStream $stream) : int{
 		$input = $recipe->getInput();
 		if($input->hasAnyDamageValue()){
-			[$netId, ] = ItemTranslator::getInstance()->toNetworkId($input->getId(), 0);
+			[$netId, ] = ItemTranslator::getInstance()->getMapping($stream->protocol)->toNetworkId($input->getId(), 0);
 			$netData = 0x7fff;
 		}else{
-			[$netId, $netData] = ItemTranslator::getInstance()->toNetworkId($input->getId(), $input->getDamage());
+			[$netId, $netData] = ItemTranslator::getInstance()->getMapping($stream->protocol)->toNetworkId($input->getId(), $input->getDamage());
 		}
 		$stream->putVarInt($netId);
 		$stream->putVarInt($netData);

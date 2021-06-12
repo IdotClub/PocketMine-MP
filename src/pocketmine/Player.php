@@ -2225,7 +2225,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$pk->levelId = "";
 		$pk->worldName = $this->server->getMotd();
 		$pk->experiments = new Experiments([], false);
-		$pk->itemTable = ItemTypeDictionary::getInstance()->getEntries();
+		$pk->itemTable = ItemTypeDictionary::getInstance()->getDictionary($this->protocol)->getEntries();
 		$pk->playerMovementSettings = new PlayerMovementSettings(PlayerMovementType::LEGACY, 0, false);
 		$pk->serverSoftwareVersion = sprintf("%s %s", \pocketmine\NAME, \pocketmine\VERSION);
 		$this->dataPacket($pk);
