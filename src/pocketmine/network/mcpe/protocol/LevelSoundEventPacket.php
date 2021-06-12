@@ -26,6 +26,7 @@ namespace pocketmine\network\mcpe\protocol;
 #include <rules/DataPacket.h>
 
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\convert\EntityTypeDictionary;
 use pocketmine\network\mcpe\NetworkSession;
 
 class LevelSoundEventPacket extends DataPacket{
@@ -366,8 +367,8 @@ class LevelSoundEventPacket extends DataPacket{
 	public $position;
 	/** @var int */
 	public $extraData = -1;
-	/** @var string */
-	public $entityType = ":"; //???
+	/** @var int */
+	public $entityTypeId = -1; //???
 	/** @var bool */
 	public $isBabyMob = false; //...
 	/** @var bool */
@@ -380,7 +381,7 @@ class LevelSoundEventPacket extends DataPacket{
 		$this->sound = $this->getUnsignedVarInt();
 		$this->position = $this->getVector3();
 		$this->extraData = $this->getVarInt();
-		$this->entityType = $this->getString();
+		$this->entityTypeId = EntityTypeDictionary::fromStringId($this->getString());
 		$this->isBabyMob = $this->getBool();
 		$this->disableRelativeVolume = $this->getBool();
 	}
@@ -393,7 +394,7 @@ class LevelSoundEventPacket extends DataPacket{
 		} else {
 			$this->putVarInt($this->extraData);
 		}
-		$this->putString($this->entityType);
+		$this->putString(EntityTypeDictionary::toStringId($this->entityTypeId));
 		$this->putBool($this->isBabyMob);
 		$this->putBool($this->disableRelativeVolume);
 	}

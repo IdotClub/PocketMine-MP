@@ -1834,8 +1834,8 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	}
 
 	protected function resetLastMovements() : void{
-		list($this->lastX, $this->lastY, $this->lastZ) = [$this->x, $this->y, $this->z];
-		list($this->lastYaw, $this->lastPitch) = [$this->yaw, $this->pitch];
+		[$this->lastX, $this->lastY, $this->lastZ] = [$this->x, $this->y, $this->z];
+		[$this->lastYaw, $this->lastPitch] = [$this->yaw, $this->pitch];
 		$this->lastMotion = clone $this->motion;
 	}
 
@@ -1939,7 +1939,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	protected function sendSpawnPacket(Player $player) : void{
 		$pk = new AddActorPacket();
 		$pk->entityRuntimeId = $this->getId();
-		$pk->type = AddActorPacket::LEGACY_ID_MAP_BC[static::NETWORK_ID];
+		$pk->entityTypeId = static::NETWORK_ID;
 		$pk->position = $this->asVector3();
 		$pk->motion = $this->getMotion();
 		$pk->yaw = $this->yaw;
