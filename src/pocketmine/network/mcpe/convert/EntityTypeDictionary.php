@@ -17,11 +17,7 @@ final class EntityTypeDictionary{
 		if(!self::$init){
 			self::init();
 		}
-		$ret = self::$stringToIntMap[$id] ?? null;
-		if($ret !== null){
-			return $ret;
-		}
-		throw new \InvalidArgumentException("Unmapped string entity ID $id");
+		return self::$stringToIntMap[$id] ?? 0;
 	}
 
 	private static function init(){
