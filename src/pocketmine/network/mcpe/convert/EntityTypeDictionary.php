@@ -17,7 +17,7 @@ final class EntityTypeDictionary{
 		if(!self::$init){
 			self::init();
 		}
-		return self::$stringToIntMap[$id] ?? 0;
+		return self::$stringToIntMap[$id] ?? -1;
 	}
 
 	private static function init(){
