@@ -341,7 +341,7 @@ class NetworkBinaryStream extends BinaryStream{
 		if($isBlockItem){
 			$block = $item->getBlock();
 			if($block->getId() !== BlockIds::AIR){
-				$blockRuntimeId = RuntimeBlockMapping::toStaticRuntimeId($block->getId(), $block->getDamage());
+				$blockRuntimeId = RuntimeBlockMapping::getMapping($this->protocol)->toStaticRuntimeId($block->getId(), $block->getDamage());
 			}
 		}
 		$this->putVarInt($blockRuntimeId);
@@ -372,26 +372,26 @@ class NetworkBinaryStream extends BinaryStream{
 		}
 
 		$this->putString(
-		(function() use ($nbt, $netId) : string{
-			$extraData = new NetworkBinaryStream();
-			$extraData->protocol = $this->protocol;
+			(function() use ($nbt, $netId) : string{
+				$extraData = new NetworkBinaryStream();
+				$extraData->protocol = $this->protocol;
 
-			if($nbt !== null){
-				$extraData->putLShort(0xffff);
-				$extraData->putByte(1); //TODO: NBT data version (?)
-				$extraData->put((new LittleEndianNBTStream())->write($nbt));
-			}else{
-				$extraData->putLShort(0);
-			}
+				if($nbt !== null){
+					$extraData->putLShort(0xffff);
+					$extraData->putByte(1); //TODO: NBT data version (?)
+					$extraData->put((new LittleEndianNBTStream())->write($nbt));
+				}else{
+					$extraData->putLShort(0);
+				}
 
-			$extraData->putLInt(0); //CanPlaceOn entry count (TODO)
-			$extraData->putLInt(0); //CanDestroy entry count (TODO)
+				$extraData->putLInt(0); //CanPlaceOn entry count (TODO)
+				$extraData->putLInt(0); //CanDestroy entry count (TODO)
 
-			if($netId === ItemTypeDictionary::getInstance()->getDictionary($extraData->protocol)->fromStringId("minecraft:shield")){
-				$extraData->putLLong(0); //"blocking tick" (ffs mojang)
-			}
-			return $extraData->getBuffer();
-		})());
+				if($netId === ItemTypeDictionary::getInstance()->getDictionary($extraData->protocol)->fromStringId("minecraft:shield")){
+					$extraData->putLLong(0); //"blocking tick" (ffs mojang)
+				}
+				return $extraData->getBuffer();
+			})());
 	}
 
 	public function getRecipeIngredient() : Item{
