@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\convert;
 
-
 use pocketmine\network\mcpe\protocol\types\ItemTypeEntry;
+use function array_key_exists;
 
 class ItemTypeDictionaryEntry{
 	/**

@@ -33,6 +33,7 @@ use function get_class;
 use function is_resource;
 use function preg_replace;
 use function sprintf;
+use function strlen;
 use function time;
 use function touch;
 use function trim;
