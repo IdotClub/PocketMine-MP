@@ -2243,7 +2243,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 
 		$this->server->getLogger()->info($this->getServer()->getLanguage()->translateString("pocketmine.player.logIn", [
 			TextFormat::AQUA . $this->username . TextFormat::WHITE,
-			$this->ip,
+			"[$this->ip]",
 			$this->port,
 			$this->id,
 			$this->level->getName(),
