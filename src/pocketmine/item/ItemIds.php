@@ -38,6 +38,8 @@ interface ItemIds extends BlockIds{
 	public const DIAMOND = 264;
 	public const IRON_INGOT = 265;
 	public const GOLD_INGOT = 266;
+	public const NETHERITE_SCRAP = 752;
+	public const NETHERITE_INGOT = 742;
 	public const IRON_SWORD = 267;
 	public const WOODEN_SWORD = 268;
 	public const WOODEN_SHOVEL = 269;
@@ -51,6 +53,10 @@ interface ItemIds extends BlockIds{
 	public const DIAMOND_SHOVEL = 277;
 	public const DIAMOND_PICKAXE = 278;
 	public const DIAMOND_AXE = 279;
+	public const NETHERITE_SWORD = 743;
+	public const NETHERITE_SHOVEL = 744;
+	public const NETHERITE_PICKAXE = 745;
+	public const NETHERITE_AXE = 746;
 	public const STICK = 280;
 	public const BOWL = 281;
 	public const MUSHROOM_STEW = 282;
@@ -66,6 +72,7 @@ interface ItemIds extends BlockIds{
 	public const IRON_HOE = 292;
 	public const DIAMOND_HOE = 293;
 	public const GOLDEN_HOE = 294, GOLD_HOE = 294;
+	public const NETHERITE_HOE = 747;
 	public const SEEDS = 295, WHEAT_SEEDS = 295;
 	public const WHEAT = 296;
 	public const BREAD = 297;
@@ -89,6 +96,10 @@ interface ItemIds extends BlockIds{
 	public const GOLDEN_CHESTPLATE = 315, GOLD_CHESTPLATE = 315;
 	public const GOLDEN_LEGGINGS = 316, GOLD_LEGGINGS = 316;
 	public const GOLDEN_BOOTS = 317, GOLD_BOOTS = 317;
+	public const NETHERITE_HELMET = 748;
+	public const NETHERITE_CHESTPLATE = 749;
+	public const NETHERITE_LEGGINGS = 750;
+	public const NETHERITE_BOOTS = 751;
 	public const FLINT = 318;
 	public const PORKCHOP = 319, RAW_PORKCHOP = 319;
 	public const COOKED_PORKCHOP = 320;

@@ -66,6 +66,8 @@ class ItemFactory{
 		self::registerItem(new Item(Item::DIAMOND, 0, "Diamond"));
 		self::registerItem(new Item(Item::IRON_INGOT, 0, "Iron Ingot"));
 		self::registerItem(new Item(Item::GOLD_INGOT, 0, "Gold Ingot"));
+		self::registerItem(new Item(Item::NETHERITE_SCRAP, 0, "Netherite Scrap"));
+		self::registerItem(new Item(Item::NETHERITE_INGOT, 0, "Netherite Ingot"));
 		self::registerItem(new Sword(Item::IRON_SWORD, 0, "Iron Sword", TieredTool::TIER_IRON));
 		self::registerItem(new Sword(Item::WOODEN_SWORD, 0, "Wooden Sword", TieredTool::TIER_WOODEN));
 		self::registerItem(new Shovel(Item::WOODEN_SHOVEL, 0, "Wooden Shovel", TieredTool::TIER_WOODEN));
@@ -76,8 +78,11 @@ class ItemFactory{
 		self::registerItem(new Pickaxe(Item::STONE_PICKAXE, 0, "Stone Pickaxe", TieredTool::TIER_STONE));
 		self::registerItem(new Axe(Item::STONE_AXE, 0, "Stone Axe", TieredTool::TIER_STONE));
 		self::registerItem(new Sword(Item::DIAMOND_SWORD, 0, "Diamond Sword", TieredTool::TIER_DIAMOND));
+		self::registerItem(new Sword(Item::NETHERITE_SWORD, 0, "Netherite Sword", TieredTool::TIER_NETHERITE));
 		self::registerItem(new Shovel(Item::DIAMOND_SHOVEL, 0, "Diamond Shovel", TieredTool::TIER_DIAMOND));
+		self::registerItem(new Shovel(Item::NETHERITE_SHOVEL, 0, "Netherite Shovel", TieredTool::TIER_NETHERITE));
 		self::registerItem(new Pickaxe(Item::DIAMOND_PICKAXE, 0, "Diamond Pickaxe", TieredTool::TIER_DIAMOND));
+		self::registerItem(new Pickaxe(Item::NETHERITE_PICKAXE, 0, "Netherite Pickaxe", TieredTool::TIER_NETHERITE));
 		self::registerItem(new Axe(Item::DIAMOND_AXE, 0, "Diamond Axe", TieredTool::TIER_DIAMOND));
 		self::registerItem(new Stick());
 		self::registerItem(new Bowl());
@@ -86,6 +91,7 @@ class ItemFactory{
 		self::registerItem(new Shovel(Item::GOLDEN_SHOVEL, 0, "Gold Shovel", TieredTool::TIER_GOLD));
 		self::registerItem(new Pickaxe(Item::GOLDEN_PICKAXE, 0, "Gold Pickaxe", TieredTool::TIER_GOLD));
 		self::registerItem(new Axe(Item::GOLDEN_AXE, 0, "Gold Axe", TieredTool::TIER_GOLD));
+		self::registerItem(new Axe(Item::NETHERITE_AXE, 0, "Netherite Axe", TieredTool::TIER_NETHERITE));
 		self::registerItem(new StringItem());
 		self::registerItem(new Item(Item::FEATHER, 0, "Feather"));
 		self::registerItem(new Item(Item::GUNPOWDER, 0, "Gunpowder"));
@@ -94,6 +100,7 @@ class ItemFactory{
 		self::registerItem(new Hoe(Item::IRON_HOE, 0, "Iron Hoe", TieredTool::TIER_IRON));
 		self::registerItem(new Hoe(Item::DIAMOND_HOE, 0, "Diamond Hoe", TieredTool::TIER_DIAMOND));
 		self::registerItem(new Hoe(Item::GOLDEN_HOE, 0, "Golden Hoe", TieredTool::TIER_GOLD));
+		self::registerItem(new Hoe(Item::NETHERITE_HOE, 0, "Netherite Hoe", TieredTool::TIER_NETHERITE));
 		self::registerItem(new WheatSeeds());
 		self::registerItem(new Item(Item::WHEAT, 0, "Wheat"));
 		self::registerItem(new Bread());
