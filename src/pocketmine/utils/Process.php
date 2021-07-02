@@ -122,7 +122,7 @@ final class Process{
 
 		//TODO: more OS
 
-		return count(ThreadManager::getInstance()->getAll()) + 3; //RakLib + MainLogger + Main Thread
+		return count(ThreadManager::getInstance()->getAll()) + 4; //RakLib(v4, v6) + MainLogger + Main Thread
 	}
 
 	/**
