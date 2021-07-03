@@ -33,6 +33,11 @@ namespace pocketmine {
 	use pocketmine\utils\Utils;
 	use pocketmine\utils\VersionString;
 	use pocketmine\wizard\SetupWizard;
+	use function count;
+	use function define;
+	use function defined;
+	use function dirname;
+	use function extension_loaded;
 
 	require_once __DIR__ . '/VersionInfo.php';
 
@@ -128,7 +133,6 @@ namespace pocketmine {
 	}
 
 	/**
-	 * @param \Logger $logger
 	 * @return void
 	 */
 	function emit_performance_warnings(\Logger $logger){
