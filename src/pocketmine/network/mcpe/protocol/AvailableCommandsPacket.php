@@ -279,7 +279,11 @@ class AvailableCommandsPacket extends DataPacket{
 		$retval = new CommandData();
 		$retval->commandName = $this->getString();
 		$retval->commandDescription = $this->getString();
-		$retval->flags = $this->getByte();
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_10){
+			$retval->flags = $this->getLShort();
+		}else{
+			$retval->flags = $this->getByte();
+		}
 		$retval->permission = $this->getByte();
 		$retval->aliases = $enums[$this->getLInt()] ?? null;
 
@@ -322,7 +326,11 @@ class AvailableCommandsPacket extends DataPacket{
 	protected function putCommandData(CommandData $data, array $enumIndexes, array $postfixIndexes) : void{
 		$this->putString($data->commandName);
 		$this->putString($data->commandDescription);
-		$this->putByte($data->flags);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_10){
+			$this->putLShort($data->flags);
+		}else{
+			$this->putByte($data->flags);
+		}
 		$this->putByte($data->permission);
 
 		if($data->aliases !== null){

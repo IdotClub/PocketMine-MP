@@ -36,6 +36,7 @@ class NpcRequestPacket extends DataPacket{
 	public const REQUEST_SET_NAME = 3;
 	public const REQUEST_SET_SKIN = 4;
 	public const REQUEST_SET_INTERACTION_TEXT = 5;
+	public const REQUEST_EXECUTE_OPENING_COMMANDS = 6;
 
 	/** @var int */
 	public $entityRuntimeId;
@@ -45,12 +46,18 @@ class NpcRequestPacket extends DataPacket{
 	public $commandString;
 	/** @var int */
 	public $actionType;
+	public string $sceneName;
 
 	protected function decodePayload(){
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
 		$this->requestType = $this->getByte();
 		$this->commandString = $this->getString();
 		$this->actionType = $this->getByte();
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_10){
+			$this->sceneName = $this->getString();
+		}else{
+			$this->sceneName = '';
+		}
 	}
 
 	protected function encodePayload(){
@@ -58,6 +65,9 @@ class NpcRequestPacket extends DataPacket{
 		$this->putByte($this->requestType);
 		$this->putString($this->commandString);
 		$this->putByte($this->actionType);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_10){
+			$this->putString($this->sceneName);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{
