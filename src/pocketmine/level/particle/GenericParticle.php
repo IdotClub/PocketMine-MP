@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\level\particle;
 
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\convert\ParticleTranslator;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
 
 class GenericParticle extends Particle{
@@ -40,7 +41,9 @@ class GenericParticle extends Particle{
 
 	public function encode(){
 		$pk = new LevelEventPacket;
-		$pk->evid = LevelEventPacket::EVENT_ADD_PARTICLE_MASK | $this->id;
+		$pk->preprocessor = function(LevelEventPacket $packet, int $protocol) : void{
+			$packet->evid = LevelEventPacket::EVENT_ADD_PARTICLE_MASK | ParticleTranslator::translateId($this->id, $protocol);
+		};
 		$pk->position = $this->asVector3();
 		$pk->data = $this->data;
 

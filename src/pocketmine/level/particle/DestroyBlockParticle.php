@@ -42,8 +42,8 @@ class DestroyBlockParticle extends Particle{
 		$pk = new LevelEventPacket;
 		$pk->evid = LevelEventPacket::EVENT_PARTICLE_DESTROY;
 		$pk->position = $this->asVector3();
-		$pk->consumer = function (int $protocol) : int {
-			return RuntimeBlockMapping::getMapping($protocol)->toStaticRuntimeId($this->block->getId(), $this->block->getDamage());
+		$pk->preprocessor = function(LevelEventPacket $packet, int $protocol) : void{
+			$packet->data = RuntimeBlockMapping::getMapping($protocol)->toStaticRuntimeId($this->block->getId(), $this->block->getDamage());
 		};
 
 		return $pk;
