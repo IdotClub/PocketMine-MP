@@ -3641,6 +3641,8 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 			$this->stopSleep();
 
 			if($this->spawned){
+				$this->doCloseInventory();
+
 				$ev = new PlayerQuitEvent($this, $message, $reason);
 				$ev->call();
 				if($ev->getQuitMessage() != ""){
