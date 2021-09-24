@@ -27,33 +27,26 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pocketmine\network\mcpe\NetworkSession;
 
-class ActorPickRequestPacket extends DataPacket{
-	public const NETWORK_ID = ProtocolInfo::ACTOR_PICK_REQUEST_PACKET;
+class PhotoInfoRequestPacket extends DataPacket{
+	public const NETWORK_ID = ProtocolInfo::PHOTO_INFO_REQUEST_PACKET;
 
-	/** @var int */
-	public $entityUniqueId;
-	/** @var int */
-	public $hotbarSlot;
-	/** @var bool */
-	public $addUserData;
+	private int $photoId;
 
-	protected function decodePayload(){
-		$this->entityUniqueId = $this->getLLong();
-		$this->hotbarSlot = $this->getByte();
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
-			$this->addUserData = $this->getBool();
-		}
+	public static function create(int $photoId) : self{
+		$result = new self;
+		$result->photoId = $photoId;
+		return $result;
 	}
 
-	protected function encodePayload(){
-		$this->putLLong($this->entityUniqueId);
-		$this->putByte($this->hotbarSlot);
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
-			$this->putBool($this->addUserData);
-		}
+	protected function decodePayload() : void{
+		$this->photoId = $this->getEntityUniqueId();
 	}
 
-	public function handle(NetworkSession $session) : bool{
-		return $session->handleActorPickRequest($this);
+	protected function encodePayload() : void{
+		$this->putEntityUniqueId($this->photoId);
+	}
+
+	public function handle(NetworkSession $handler) : bool{
+		return $handler->handlePhotoInfoRequest($this);
 	}
 }

@@ -98,108 +98,109 @@ class NetworkBinaryStream extends BinaryStream{
 	}
 
 	public function getSkin() : SkinData{
-		$skinId = $this->getString();
-		$playFabId = "";
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
-			$playFabId = $this->getString();
-		}
-		$skinResourcePatch = $this->getString();
-		$skinData = $this->getSkinImage();
-		$animationCount = $this->getLInt();
-		$animations = [];
-		for($i = 0; $i < $animationCount; ++$i){
-			$skinImage = $this->getSkinImage();
-			$animationType = $this->getLInt();
-			$animationFrames = $this->getLFloat();
-			$expressionType = 0;
-			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
+			$skinId = $this->getString();
+			$skinPlayFabId = $this->getString();
+			$skinResourcePatch = $this->getString();
+			$skinData = $this->getSkinImage();
+			$animationCount = $this->getLInt();
+			$animations = [];
+			for($i = 0; $i < $animationCount; ++$i){
+				$skinImage = $this->getSkinImage();
+				$animationType = $this->getLInt();
+				$animationFrames = $this->getLFloat();
 				$expressionType = $this->getLInt();
+				$animations[] = new SkinAnimation($skinImage, $animationType, $animationFrames, $expressionType);
 			}
-			$animations[] = new SkinAnimation($skinImage, $animationType, $animationFrames, $expressionType);
-		}
-		$capeData = $this->getSkinImage();
-		$geometryData = $this->getString();
-		$animationData = $this->getString();
-		$premium = $this->getBool();
-		$persona = $this->getBool();
-		$capeOnClassic = $this->getBool();
-		$capeId = $this->getString();
-		$fullSkinId = $this->getString();
-		$armSize = $this->getString();
-		$skinColor = $this->getString();
-		$personaPieceCount = $this->getLInt();
-		$personaPieces = [];
-		for($i = 0; $i < $personaPieceCount; ++$i){
-			$pieceId = $this->getString();
-			$pieceType = $this->getString();
-			$packId = $this->getString();
-			$isDefaultPiece = $this->getBool();
-			$productId = $this->getString();
-			$personaPieces[] = new PersonaSkinPiece($pieceId, $pieceType, $packId, $isDefaultPiece, $productId);
-		}
-		$pieceTintColorCount = $this->getLInt();
-		$pieceTintColors = [];
-		for($i = 0; $i < $pieceTintColorCount; ++$i){
-			$pieceType = $this->getString();
-			$colorCount = $this->getLInt();
-			$colors = [];
-			for($j = 0; $j < $colorCount; ++$j){
-				$colors[] = $this->getString();
+			$capeData = $this->getSkinImage();
+			$geometryData = $this->getString();
+			$geometryDataVersion = $this->getString();
+			$animationData = $this->getString();
+			$capeId = $this->getString();
+			$fullSkinId = $this->getString();
+			$armSize = $this->getString();
+			$skinColor = $this->getString();
+			$personaPieceCount = $this->getLInt();
+			$personaPieces = [];
+			for($i = 0; $i < $personaPieceCount; ++$i){
+				$pieceId = $this->getString();
+				$pieceType = $this->getString();
+				$packId = $this->getString();
+				$isDefaultPiece = $this->getBool();
+				$productId = $this->getString();
+				$personaPieces[] = new PersonaSkinPiece($pieceId, $pieceType, $packId, $isDefaultPiece, $productId);
 			}
-			$pieceTintColors[] = new PersonaPieceTintColor(
-				$pieceType,
-				$colors
-			);
-		}
+			$pieceTintColorCount = $this->getLInt();
+			$pieceTintColors = [];
+			for($i = 0; $i < $pieceTintColorCount; ++$i){
+				$pieceType = $this->getString();
+				$colorCount = $this->getLInt();
+				$colors = [];
+				for($j = 0; $j < $colorCount; ++$j){
+					$colors[] = $this->getString();
+				}
+				$pieceTintColors[] = new PersonaPieceTintColor(
+					$pieceType,
+					$colors
+				);
+			}
+			$premium = $this->getBool();
+			$persona = $this->getBool();
+			$capeOnClassic = $this->getBool();
+			$isPrimaryUser = $this->getBool();
 
-		return new SkinData($skinId, $playFabId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId, $fullSkinId, $armSize, $skinColor, $personaPieces, $pieceTintColors);
+			return new SkinData($skinId, $skinPlayFabId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $geometryDataVersion, $animationData, $capeId, $fullSkinId, $armSize, $skinColor, $personaPieces, $pieceTintColors, true, $premium, $persona, $capeOnClassic, $isPrimaryUser);
+		}
+		return $this->getSkinLegacy();
 	}
 
 	/**
 	 * @return void
 	 */
 	public function putSkin(SkinData $skin){
-		$this->putString($skin->getSkinId());
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
-			$this->putString($skin->getPlayFabId() ?? "");
-		}
-		$this->putString($skin->getResourcePatch());
-		$this->putSkinImage($skin->getSkinImage());
-		$this->putLInt(count($skin->getAnimations()));
-		foreach($skin->getAnimations() as $animation){
-			$this->putSkinImage($animation->getImage());
-			$this->putLInt($animation->getType());
-			$this->putLFloat($animation->getFrames());
-			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100) {
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
+			$this->putString($skin->getSkinId());
+			$this->putString($skin->getPlayFabId());
+			$this->putString($skin->getResourcePatch());
+			$this->putSkinImage($skin->getSkinImage());
+			$this->putLInt(count($skin->getAnimations()));
+			foreach($skin->getAnimations() as $animation){
+				$this->putSkinImage($animation->getImage());
+				$this->putLInt($animation->getType());
+				$this->putLFloat($animation->getFrames());
 				$this->putLInt($animation->getExpressionType());
 			}
-		}
-		$this->putSkinImage($skin->getCapeImage());
-		$this->putString($skin->getGeometryData());
-		$this->putString($skin->getAnimationData());
-		$this->putBool($skin->isPremium());
-		$this->putBool($skin->isPersona());
-		$this->putBool($skin->isPersonaCapeOnClassic());
-		$this->putString($skin->getCapeId());
-		$this->putString($skin->getFullSkinId());
-		$this->putString($skin->getArmSize());
-		$this->putString($skin->getSkinColor());
-		$this->putLInt(count($skin->getPersonaPieces()));
-		foreach($skin->getPersonaPieces() as $piece){
-			$this->putString($piece->getPieceId());
-			$this->putString($piece->getPieceType());
-			$this->putString($piece->getPackId());
-			$this->putBool($piece->isDefaultPiece());
-			$this->putString($piece->getProductId());
-		}
-		$this->putLInt(count($skin->getPieceTintColors()));
-		foreach($skin->getPieceTintColors() as $tint){
-			$this->putString($tint->getPieceType());
-			$this->putLInt(count($tint->getColors()));
-			foreach($tint->getColors() as $color){
-				$this->putString($color);
+			$this->putSkinImage($skin->getCapeImage());
+			$this->putString($skin->getGeometryData());
+			$this->putString($skin->getGeometryDataEngineVersion());
+			$this->putString($skin->getAnimationData());
+			$this->putString($skin->getCapeId());
+			$this->putString($skin->getFullSkinId());
+			$this->putString($skin->getArmSize());
+			$this->putString($skin->getSkinColor());
+			$this->putLInt(count($skin->getPersonaPieces()));
+			foreach($skin->getPersonaPieces() as $piece){
+				$this->putString($piece->getPieceId());
+				$this->putString($piece->getPieceType());
+				$this->putString($piece->getPackId());
+				$this->putBool($piece->isDefaultPiece());
+				$this->putString($piece->getProductId());
 			}
+			$this->putLInt(count($skin->getPieceTintColors()));
+			foreach($skin->getPieceTintColors() as $tint){
+				$this->putString($tint->getPieceType());
+				$this->putLInt(count($tint->getColors()));
+				foreach($tint->getColors() as $color){
+					$this->putString($color);
+				}
+			}
+			$this->putBool($skin->isPremium());
+			$this->putBool($skin->isPersona());
+			$this->putBool($skin->isPersonaCapeOnClassic());
+			$this->putBool($skin->isPrimaryUser());
+			return;
 		}
+		$this->putSkinLegacy($skin);
 	}
 
 	private function getSkinImage() : SkinImage{
@@ -216,20 +217,20 @@ class NetworkBinaryStream extends BinaryStream{
 	}
 
 	public function getItemStackWithoutStackId() : Item{
-		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $this instanceof DataPacket) {
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220 && $this instanceof DataPacket){
 			return $this->getSlot();
 		}
-		return $this->getItemStack(static function () : void {
+		return $this->getItemStack(static function() : void{
 			//NOOP
 		});
 	}
 
 	public function putItemStackWithoutStackId(Item $item) : void{
-		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220) {
+		if($this->protocol < BedrockProtocolInfo::PROTOCOL_1_16_220){
 			$this->putSlot($item);
 			return;
 		}
-		$this->putItemStack($item, static function () : void {
+		$this->putItemStack($item, static function() : void{
 			//NOOP
 		});
 	}
@@ -484,6 +485,7 @@ class NetworkBinaryStream extends BinaryStream{
 	 * Writes entity metadata to the packet buffer.
 	 *
 	 * @param mixed[][] $metadata
+	 *
 	 * @phpstan-param array<int, array{0: int, 1: mixed}> $metadata
 	 */
 	public function putEntityMetadata(array $metadata) : void{
@@ -739,6 +741,7 @@ class NetworkBinaryStream extends BinaryStream{
 	 * TODO: implement this properly
 	 *
 	 * @param mixed[][] $rules
+	 *
 	 * @phpstan-param array<string, array{0: int, 1: bool|int|float, 2: bool}> $rules
 	 */
 	public function putGameRules(array $rules) : void{
@@ -942,7 +945,7 @@ class NetworkBinaryStream extends BinaryStream{
 		}
 		if($nbt !== null){
 
-			 if($nbt->hasTag(self::DAMAGE_TAG, IntTag::class)){
+			if($nbt->hasTag(self::DAMAGE_TAG, IntTag::class)){
 				$meta = $nbt->getInt(self::DAMAGE_TAG);
 				$nbt->removeTag(self::DAMAGE_TAG);
 				if(($conflicted = $nbt->getTag(self::DAMAGE_TAG_CONFLICT_RESOLUTION)) !== null){
@@ -1003,18 +1006,120 @@ class NetworkBinaryStream extends BinaryStream{
 		}
 	}
 
-	public function putItem(ItemStackWrapper $item) : void {
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220) {
+	public function putItem(ItemStackWrapper $item) : void{
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220){
 			$item->write($this);
 			return;
 		}
 		$this->putSlot($item->getItemStack());
 	}
 
-	public function getItem() : ItemStackWrapper {
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220) {
+	public function getItem() : ItemStackWrapper{
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_220){
 			return ItemStackWrapper::read($this);
 		}
 		return ItemStackWrapper::legacy($this->getSlot());
+	}
+
+	protected function putSkinLegacy(SkinData $skin) : void{
+		$this->putString($skin->getSkinId());
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
+			$this->putString($skin->getPlayFabId() ?? "");
+		}
+		$this->putString($skin->getResourcePatch());
+		$this->putSkinImage($skin->getSkinImage());
+		$this->putLInt(count($skin->getAnimations()));
+		foreach($skin->getAnimations() as $animation){
+			$this->putSkinImage($animation->getImage());
+			$this->putLInt($animation->getType());
+			$this->putLFloat($animation->getFrames());
+			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100){
+				$this->putLInt($animation->getExpressionType());
+			}
+		}
+		$this->putSkinImage($skin->getCapeImage());
+		$this->putString($skin->getGeometryData());
+		$this->putString($skin->getAnimationData());
+		$this->putBool($skin->isPremium());
+		$this->putBool($skin->isPersona());
+		$this->putBool($skin->isPersonaCapeOnClassic());
+		$this->putString($skin->getCapeId());
+		$this->putString($skin->getFullSkinId());
+		$this->putString($skin->getArmSize());
+		$this->putString($skin->getSkinColor());
+		$this->putLInt(count($skin->getPersonaPieces()));
+		foreach($skin->getPersonaPieces() as $piece){
+			$this->putString($piece->getPieceId());
+			$this->putString($piece->getPieceType());
+			$this->putString($piece->getPackId());
+			$this->putBool($piece->isDefaultPiece());
+			$this->putString($piece->getProductId());
+		}
+		$this->putLInt(count($skin->getPieceTintColors()));
+		foreach($skin->getPieceTintColors() as $tint){
+			$this->putString($tint->getPieceType());
+			$this->putLInt(count($tint->getColors()));
+			foreach($tint->getColors() as $color){
+				$this->putString($color);
+			}
+		}
+	}
+
+	protected function getSkinLegacy() : SkinData{
+		$skinId = $this->getString();
+		$playFabId = "";
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_210){
+			$playFabId = $this->getString();
+		}
+		$skinResourcePatch = $this->getString();
+		$skinData = $this->getSkinImage();
+		$animationCount = $this->getLInt();
+		$animations = [];
+		for($i = 0; $i < $animationCount; ++$i){
+			$skinImage = $this->getSkinImage();
+			$animationType = $this->getLInt();
+			$animationFrames = $this->getLFloat();
+			$expressionType = 0;
+			if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_16_100){
+				$expressionType = $this->getLInt();
+			}
+			$animations[] = new SkinAnimation($skinImage, $animationType, $animationFrames, $expressionType);
+		}
+		$capeData = $this->getSkinImage();
+		$geometryData = $this->getString();
+		$animationData = $this->getString();
+		$premium = $this->getBool();
+		$persona = $this->getBool();
+		$capeOnClassic = $this->getBool();
+		$capeId = $this->getString();
+		$fullSkinId = $this->getString();
+		$armSize = $this->getString();
+		$skinColor = $this->getString();
+		$personaPieceCount = $this->getLInt();
+		$personaPieces = [];
+		for($i = 0; $i < $personaPieceCount; ++$i){
+			$pieceId = $this->getString();
+			$pieceType = $this->getString();
+			$packId = $this->getString();
+			$isDefaultPiece = $this->getBool();
+			$productId = $this->getString();
+			$personaPieces[] = new PersonaSkinPiece($pieceId, $pieceType, $packId, $isDefaultPiece, $productId);
+		}
+		$pieceTintColorCount = $this->getLInt();
+		$pieceTintColors = [];
+		for($i = 0; $i < $pieceTintColorCount; ++$i){
+			$pieceType = $this->getString();
+			$colorCount = $this->getLInt();
+			$colors = [];
+			for($j = 0; $j < $colorCount; ++$j){
+				$colors[] = $this->getString();
+			}
+			$pieceTintColors[] = new PersonaPieceTintColor(
+				$pieceType,
+				$colors
+			);
+		}
+
+		return new SkinData($skinId, $playFabId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, '', $animationData, $capeId, $fullSkinId, $armSize, $skinColor, $personaPieces, $pieceTintColors, true, $premium, $persona, $capeOnClassic, true);
 	}
 }

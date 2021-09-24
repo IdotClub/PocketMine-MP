@@ -34,15 +34,23 @@ class HurtArmorPacket extends DataPacket{
 	public $cause;
 	/** @var int */
 	public $health;
+	/** @var int */
+	public $armorSlotFlags;
 
 	protected function decodePayload(){
 		$this->cause = $this->getVarInt();
 		$this->health = $this->getVarInt();
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
+			$this->armorSlotFlags = $this->getUnsignedVarLong();
+		}
 	}
 
 	protected function encodePayload(){
 		$this->putVarInt($this->cause);
 		$this->putVarInt($this->health);
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
+			$this->putUnsignedVarLong($this->armorSlotFlags);
+		}
 	}
 
 	public function handle(NetworkSession $session) : bool{

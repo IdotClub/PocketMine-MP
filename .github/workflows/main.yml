@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         image: [ubuntu-20.04]
-        php: [7.4.22, 8.0.9]
+        php: [7.4.23, 8.0.10]
 
     steps:
       - uses: actions/checkout@v2 #needed for build.sh
@@ -27,6 +27,7 @@ jobs:
       - name: Compile PHP
         if: steps.php-build-cache.outputs.cache-hit != 'true'
         run: ./tests/gh-actions/build.sh "${{ matrix.php }}"
+
   phpunit:
     name: PHPUnit tests
     needs: build-php
@@ -35,7 +36,7 @@ jobs:
       fail-fast: false
       matrix:
         image: [ubuntu-20.04]
-        php: [7.4.22, 8.0.9]
+        php: [7.4.23, 8.0.10]
 
     steps:
       - uses: actions/checkout@v2
@@ -87,7 +88,7 @@ jobs:
       fail-fast: false
       matrix:
         image: [ubuntu-20.04]
-        php: [7.4.22, 8.0.9]
+        php: [7.4.23, 8.0.10]
 
     steps:
       - uses: actions/checkout@v2
@@ -140,7 +141,7 @@ jobs:
       fail-fast: false
       matrix:
         image: [ubuntu-20.04]
-        php: [7.4.22, 8.0.9]
+        php: [7.4.23, 8.0.10]
 
     steps:
       - uses: actions/checkout@v2
@@ -194,7 +195,7 @@ jobs:
           cp -r "$VENDOR_PM" "$VENDOR_PM_BACKUP"
           for f in $(ls $VENDOR_PM/pocketmine); do
             echo "Processing directory \"$f\"..."
-            php "$PM_PREPROCESSOR_PATH/PreProcessor.php" --path="$VENDOR_PM/pocketmine/$f" --multisize || (echo "Preprocessor exited with code $?" && exit 1)
+            php "$PM_PREPROCESSOR_PATH/PreProcessor.php" --path="$VENDOR_PM/pocketmine/$f/src" --multisize || (echo "Preprocessor exited with code $?" && exit 1)
             echo "Checking for changes in \"$f\"..."
             DIFF=$(git diff --no-index "$VENDOR_PM_BACKUP/pocketmine/$f" "$VENDOR_PM/pocketmine/$f" || true)
             if [ "$DIFF" != "" ]; then

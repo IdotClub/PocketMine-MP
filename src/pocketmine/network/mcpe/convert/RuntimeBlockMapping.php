@@ -64,6 +64,7 @@ final class RuntimeBlockMapping{
 
 		self::setupJSONPalette(BedrockProtocolInfo::PROTOCOL_1_17_0);
 		self::setupJSONPalette(BedrockProtocolInfo::PROTOCOL_1_17_10);
+		self::setupJSONPalette(BedrockProtocolInfo::PROTOCOL_1_17_30);
 
 		self::$mappings[BedrockProtocolInfo::PROTOCOL_1_16_210] = self::setupLegacyMappings();
 	}

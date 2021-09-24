@@ -26,34 +26,30 @@ namespace pocketmine\network\mcpe\protocol;
 #include <rules/DataPacket.h>
 
 use pocketmine\network\mcpe\NetworkSession;
+use pocketmine\network\mcpe\protocol\types\EducationUriResource;
 
-class ActorPickRequestPacket extends DataPacket{
-	public const NETWORK_ID = ProtocolInfo::ACTOR_PICK_REQUEST_PACKET;
+class EduUriResourcePacket extends DataPacket{
+	public const NETWORK_ID = ProtocolInfo::EDU_URI_RESOURCE_PACKET;
 
-	/** @var int */
-	public $entityUniqueId;
-	/** @var int */
-	public $hotbarSlot;
-	/** @var bool */
-	public $addUserData;
+	private EducationUriResource $resource;
 
-	protected function decodePayload(){
-		$this->entityUniqueId = $this->getLLong();
-		$this->hotbarSlot = $this->getByte();
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
-			$this->addUserData = $this->getBool();
-		}
+	public static function create(EducationUriResource $resource) : self{
+		$result = new self;
+		$result->resource = $resource;
+		return $result;
 	}
 
-	protected function encodePayload(){
-		$this->putLLong($this->entityUniqueId);
-		$this->putByte($this->hotbarSlot);
-		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_30){
-			$this->putBool($this->addUserData);
-		}
+	public function getResource() : EducationUriResource{ return $this->resource; }
+
+	protected function decodePayload() : void{
+		$this->resource = EducationUriResource::read($this);
 	}
 
-	public function handle(NetworkSession $session) : bool{
-		return $session->handleActorPickRequest($this);
+	protected function encodePayload() : void{
+		$this->resource->write($this);
+	}
+
+	public function handle(NetworkSession $handler) : bool{
+		return $handler->handleEduUriResource($this);
 	}
 }
