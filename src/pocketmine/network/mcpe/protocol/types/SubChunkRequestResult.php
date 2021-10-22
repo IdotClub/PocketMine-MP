@@ -21,27 +21,14 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol;
+namespace pocketmine\network\mcpe\protocol\types;
 
-#include <rules/DataPacket.h>
+final class SubChunkRequestResult{
 
-use pocketmine\network\mcpe\NetworkSession;
-
-class RiderJumpPacket extends DataPacket{
-	public const NETWORK_ID = ProtocolInfo::RIDER_JUMP_PACKET;
-
-	/** @var int */
-	public $jumpStrength; //percentage
-
-	protected function decodePayload(){
-		$this->jumpStrength = $this->getVarInt();
-	}
-
-	protected function encodePayload(){
-		$this->putVarInt($this->jumpStrength);
-	}
-
-	public function handle(NetworkSession $session) : bool{
-		return $session->handleRiderJump($this);
-	}
+	public const SUCCESS = 1;
+	//why even respond at all in these cases? ...
+	public const NO_SUCH_CHUNK = 2;
+	public const WRONG_DIMENSION = 3;
+	public const NULL_PLAYER = 4;
+	public const Y_INDEX_OUT_OF_BOUNDS = 5;
 }

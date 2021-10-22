@@ -46,6 +46,7 @@ final class ItemTypeDictionary{
 		$this->setup(BedrockProtocolInfo::PROTOCOL_1_17_0, '/item_dictionary/440_required_item_list.json');
 		$this->setup(BedrockProtocolInfo::PROTOCOL_1_17_10, '/item_dictionary/448_required_item_list.json');
 		$this->setup(BedrockProtocolInfo::PROTOCOL_1_17_30, '/item_dictionary/465_required_item_list.json');
+		$this->setup(BedrockProtocolInfo::PROTOCOL_1_17_40, '/item_dictionary/471_required_item_list.json');
 	}
 
 	private function setup(int $protocol, string $path) : void{

@@ -21,27 +21,27 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
+namespace pocketmine\network\mcpe\protocol;
 
-use pocketmine\network\mcpe\NetworkBinaryStream;
+#include <rules/DataPacket.h>
 
-trait CraftRecipeStackRequestActionTrait{
+use pocketmine\network\mcpe\NetworkSession;
+
+class PassengerJumpPacket extends DataPacket{
+	public const NETWORK_ID = ProtocolInfo::PASSENGER_JUMP_PACKET;
 
 	/** @var int */
-	private $recipeId;
+	public $jumpStrength; //percentage
 
-	final public function __construct(int $recipeId){
-		$this->recipeId = $recipeId;
+	protected function decodePayload(){
+		$this->jumpStrength = $this->getVarInt();
 	}
 
-	public function getRecipeId() : int{ return $this->recipeId; }
-
-	public static function read(NetworkBinaryStream $in) : self{
-		$recipeId = $in->readGenericTypeNetworkId();
-		return new self($recipeId);
+	protected function encodePayload(){
+		$this->putVarInt($this->jumpStrength);
 	}
 
-	public function write(NetworkBinaryStream $out) : void{
-		$out->writeGenericTypeNetworkId($this->recipeId);
+	public function handle(NetworkSession $handler) : bool{
+		return $handler->handlePassengerJump($this);
 	}
 }

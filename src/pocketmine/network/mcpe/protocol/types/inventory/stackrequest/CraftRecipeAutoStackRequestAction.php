@@ -23,12 +23,44 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
 
+use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
+
 /**
  * Tells that the current transaction crafted the specified recipe, using the recipe book. This is effectively the same
  * as the regular crafting result action.
  */
 final class CraftRecipeAutoStackRequestAction extends ItemStackRequestAction{
-	use CraftRecipeStackRequestActionTrait;
+
+	/** @var int */
+	private $recipeId;
+	/** @var int */
+	private $repetitions;
+
+	final public function __construct(int $recipeId, int $repetitions){
+		$this->recipeId = $recipeId;
+		$this->repetitions = $repetitions;
+	}
+
+	public function getRecipeId() : int{ return $this->recipeId; }
+
+	public function getRepetitions() : int{ return $this->repetitions; }
 
 	public static function getTypeId() : int{ return ItemStackRequestActionType::CRAFTING_RECIPE_AUTO; }
+
+	public static function read(NetworkBinaryStream $in) : self{
+		$recipeId = $in->readGenericTypeNetworkId();
+		$repetitions = -1;
+		if($in->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_40){
+			$repetitions = $in->getByte();
+		}
+		return new self($recipeId, $repetitions);
+	}
+
+	public function write(NetworkBinaryStream $out) : void{
+		$out->writeGenericTypeNetworkId($this->recipeId);
+		if($out->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_40){
+			$out->putByte($this->repetitions);
+		}
+	}
 }
