@@ -1112,7 +1112,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		$this->spawnToAll();
 
 		if($this->getHealth() <= 0){
-			$this->respawn();
+			$this->actuallyRespawn();
 		}
 	}
 

@@ -16,7 +16,7 @@
       "ext-openssl": "*",
       "ext-pcre": "*",
       "ext-phar": "*",
-      "ext-pthreads": "~3.2.0",
+      "ext-pthreads": "^4.0",
       "ext-reflection": "*",
       "ext-simplexml": "*",
       "ext-sockets": "*",
@@ -39,9 +39,9 @@
    },
    "require-dev": {
       "friendsofphp/php-cs-fixer": "^3.0",
-      "phpstan/phpstan": "0.12.99",
-      "phpstan/phpstan-phpunit": "^0.12.6",
-      "phpstan/phpstan-strict-rules": "^0.12.2",
+      "phpstan/phpstan": "1.0.2",
+      "phpstan/phpstan-phpunit": "^1.0.0",
+      "phpstan/phpstan-strict-rules": "^1.0.0",
       "phpunit/phpunit": "^9.2"
    },
    "autoload": {
