@@ -1,7 +1,13 @@
 <p align="center">
 	<a href="https://pmmp.io"><img src="http://cdn.pocketmine.net/img/PocketMine-MP-h.png"></img></a><br>
-	<b>A highly customisable, open source server software for Minecraft: Bedrock Edition written in PHP</b><br>
-	<img src="http://proxy.elaina.host:8080/job/PocketMine-MP/badge/icon/" alt="Build Status"/>
+	<b>A highly customisable, open source server software for Minecraft: Bedrock Edition written in PHP</b>
+</p>
+
+<p align="center">
+	<img src="https://github.com/pmmp/PocketMine-MP/workflows/CI/badge.svg" alt="CI" />
+	<img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/pmmp/PocketMine-MP?label=release&sort=semver">
+	<a href="https://hub.docker.com/r/pmmp/pocketmine-mp"><img src="https://img.shields.io/docker/v/pmmp/pocketmine-mp?logo=docker&label=image" alt="Docker image version (latest semver)" /></a>
+	<a href="https://discord.gg/bmSAZBG"><img src="https://img.shields.io/discord/373199722573201408?label=discord&color=7289DA&logo=discord" alt="Discord" /></a>
 </p>
 
 ## Getting started
