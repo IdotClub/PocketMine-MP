@@ -182,6 +182,8 @@ class StartGamePacket extends DataPacket{
 	/** @var string */
 	public $serverSoftwareVersion;
 
+	public int $blockPaletteChecksum;
+
 	protected function decodePayload(){
 		$this->entityUniqueId = $this->getEntityUniqueId();
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
@@ -270,8 +272,11 @@ class StartGamePacket extends DataPacket{
 		$this->enableNewInventorySystem = $this->getBool();
 		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_0){
 			$this->serverSoftwareVersion = $this->getString();
-		} else {
+		}else{
 			$this->serverSoftwareVersion = '';
+		}
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_18_0){
+			$this->blockPaletteChecksum = $this->getLLong();
 		}
 	}
 
@@ -359,6 +364,9 @@ class StartGamePacket extends DataPacket{
 		$this->putBool($this->enableNewInventorySystem);
 		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_17_0){
 			$this->putString($this->serverSoftwareVersion);
+		}
+		if($this->protocol >= BedrockProtocolInfo::PROTOCOL_1_18_0){
+			$this->putLLong($this->blockPaletteChecksum);
 		}
 	}
 

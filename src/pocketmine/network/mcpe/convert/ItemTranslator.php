@@ -71,6 +71,7 @@ final class ItemTranslator{
 		$this->setupJSONMapping(BedrockProtocolInfo::PROTOCOL_1_17_10);
 		$this->setupJSONMapping(BedrockProtocolInfo::PROTOCOL_1_17_30);
 		$this->setupJSONMapping(BedrockProtocolInfo::PROTOCOL_1_17_40);
+		$this->setupJSONMapping(BedrockProtocolInfo::PROTOCOL_1_18_0);
 	}
 
 	private function setupJSONMapping(int $protocol) : void{

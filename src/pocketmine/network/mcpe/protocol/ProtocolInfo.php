@@ -46,12 +46,13 @@ interface ProtocolInfo{
 		440,
 		448,
 		465,
-		471
+		471,
+		475,
 	];
 	/** Current Minecraft PE version reported by the server. This is usually the earliest currently supported version. */
-	public const MINECRAFT_VERSION = 'v1.16.100-1.17.40';
+	public const MINECRAFT_VERSION = 'v1.16.100-1.18.0';
 	/** Version number sent to clients in ping responses. */
-	public const MINECRAFT_VERSION_NETWORK = '1.17.40';
+	public const MINECRAFT_VERSION_NETWORK = '1.18.0';
 
 	public const LOGIN_PACKET = 0x01;
 	public const PLAY_STATUS_PACKET = 0x02;
