@@ -156,7 +156,7 @@ class Level implements ChunkManager, Metadatable{
 	/** @var Block[][] */
 	private $blockCache = [];
 
-	/** @var BatchPacket[] */
+	/** @var BatchPacket[][] */
 	private $chunkCache = [];
 
 	/** @var int */
@@ -2505,7 +2505,7 @@ class Level implements ChunkManager, Metadatable{
 			foreach($this->chunkSendQueue[$index] as $player){
 				/** @var Player $player */
 				if($player->isConnected() and isset($player->usedChunks[$index])){
-					$player->sendChunk($x, $z, $this->chunkCache[$index]);
+					$player->sendChunk($x, $z, $this->chunkCache[$index][$player->getProtocol()]);
 				}
 			}
 			unset($this->chunkSendQueue[$index]);
@@ -2551,15 +2551,25 @@ class Level implements ChunkManager, Metadatable{
 	}
 
 	/**
+	 * @param string[] $payload
+	 *
 	 * @return void
 	 */
-	public function chunkRequestCallback(int $x, int $z, BatchPacket $payload){
+	public function chunkRequestCallback(int $x, int $z, array $payload){
+		$n = [];
+		foreach($payload as $p => $i){
+			$batch = new BatchPacket($i);
+			$batch->protocol=$p;
+			assert(strlen($batch->buffer) > 0);
+			$batch->isEncoded = true;
+			$n[$p] = $batch;
+		}
 		$this->timings->syncChunkSendTimer->startTiming();
 
 		$index = Level::chunkHash($x, $z);
 		unset($this->chunkSendTasks[$index]);
 
-		$this->chunkCache[$index] = $payload;
+		$this->chunkCache[$index] = $n;
 		$this->sendChunkFromCache($x, $z);
 		if(!$this->server->getMemoryManager()->canUseChunkCache()){
 			unset($this->chunkCache[$index]);

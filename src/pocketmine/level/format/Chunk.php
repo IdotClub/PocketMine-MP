@@ -33,6 +33,7 @@ use pocketmine\level\Level;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
+use pocketmine\network\mcpe\protocol\BedrockProtocolInfo;
 use pocketmine\Player;
 use pocketmine\tile\Spawnable;
 use pocketmine\tile\Tile;
@@ -843,10 +844,7 @@ class Chunk{
 		}
 	}
 
-	/**
-	 * Serializes the chunk for sending to players
-	 */
-	public function networkSerialize(?string $networkSerializedTiles) : string{
+	private function networkSerializeNew(?string $networkSerializedTiles) : string{
 		$result = "";
 		$subChunkCount = $this->getSubChunkSendCount();
 
@@ -869,6 +867,30 @@ class Chunk{
 		$result .= $networkSerializedTiles ?? $this->networkSerializeTiles();
 
 		return $result;
+	}
+
+	private function networkSerializeOld(?string $networkSerializedTiles) : string{
+		$result = "";
+		$subChunkCount = $this->getSubChunkSendCount();
+		for($y = 0; $y < $subChunkCount; ++$y){
+			$result .= $this->subChunks[$y]->networkSerialize();
+		}
+		$result .= $this->biomeIds . chr(0); //border block array count
+		//Border block entry format: 1 byte (4 bits X, 4 bits Z). These are however useless since they crash the regular client.
+
+		$result .= $networkSerializedTiles ?? $this->networkSerializeTiles();
+
+		return $result;
+	}
+
+	/**
+	 * Serializes the chunk for sending to players
+	 */
+	public function networkSerialize(int $protocol, ?string $networkSerializedTiles) : string{
+		if($protocol >= BedrockProtocolInfo::PROTOCOL_1_18_0){
+			return $this->networkSerializeNew($networkSerializedTiles);
+		}
+		return $this->networkSerializeOld($networkSerializedTiles);
 	}
 
 	/**
