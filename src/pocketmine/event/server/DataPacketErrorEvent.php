@@ -22,15 +22,15 @@ class DataPacketErrorEvent extends ServerEvent {
 		$this->throwable = $throwable;
 	}
 
-	public function getPacket(): BatchPacket {
+	public function getPacket() : BatchPacket {
 		return $this->packet;
 	}
 
-	public function getThrowable(): Throwable {
+	public function getThrowable() : Throwable {
 		return $this->throwable;
 	}
 
-	public function getPlayer(): Player {
+	public function getPlayer() : Player {
 		return $this->player;
 	}
 }

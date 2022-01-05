@@ -28,6 +28,8 @@ use pocketmine\entity\projectile\FishingHook;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
 use pocketmine\Player;
+use function cos;
+use function sin;
 
 class FishingRod extends Item{
 	public function __construct(int $meta = 0){

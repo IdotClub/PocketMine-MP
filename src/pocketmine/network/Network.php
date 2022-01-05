@@ -178,11 +178,11 @@ class Network{
 	/**
 	 * @return RawPacketHandler[]
 	 */
-	public function getRawPacketHandlers(): array {
+	public function getRawPacketHandlers() : array {
 		return $this->rawPacketHandlers;
 	}
 
-	public function addRawPacketHandlers(RawPacketHandler $handler): void {
+	public function addRawPacketHandlers(RawPacketHandler $handler) : void {
 		$this->rawPacketHandlers[] = $handler;
 	}
 

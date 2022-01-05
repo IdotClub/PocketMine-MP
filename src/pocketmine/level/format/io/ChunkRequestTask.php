@@ -31,8 +31,6 @@ use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use function assert;
-use function strlen;
 
 class ChunkRequestTask extends AsyncTask{
 

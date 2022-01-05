@@ -160,7 +160,6 @@ class LevelEventPacket extends DataPacket{
 	/** @var (callable(self $packet, int $protocol) : void)| null */
 	public $preprocessor;
 
-
 	protected function decodePayload(){
 		$this->evid = $this->getVarInt();
 		$this->position = $this->getVector3();

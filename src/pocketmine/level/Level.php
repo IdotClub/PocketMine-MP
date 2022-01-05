@@ -106,6 +106,7 @@ use function max;
 use function microtime;
 use function min;
 use function mt_rand;
+use function strlen;
 use function strtolower;
 use function trim;
 use const INT32_MAX;
@@ -2559,7 +2560,7 @@ class Level implements ChunkManager, Metadatable{
 		$n = [];
 		foreach($payload as $p => $i){
 			$batch = new BatchPacket($i);
-			$batch->protocol=$p;
+			$batch->protocol = $p;
 			assert(strlen($batch->buffer) > 0);
 			$batch->isEncoded = true;
 			$n[$p] = $batch;

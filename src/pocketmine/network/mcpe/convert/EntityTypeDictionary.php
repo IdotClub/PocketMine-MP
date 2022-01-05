@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\convert;
 
 use pocketmine\utils\AssumptionFailedError;
+use function file_get_contents;
 use function is_array;
+use function json_decode;
 
 final class EntityTypeDictionary{
 	/** @var int[] */
