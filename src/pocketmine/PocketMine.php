@@ -81,6 +81,7 @@ namespace pocketmine {
 		$extensions = [
 			"chunkutils2" => "PocketMine ChunkUtils v2",
 			"curl" => "cURL",
+			"crypto" => "php-crypto",
 			"ctype" => "ctype",
 			"date" => "Date",
 			"hash" => "Hash",

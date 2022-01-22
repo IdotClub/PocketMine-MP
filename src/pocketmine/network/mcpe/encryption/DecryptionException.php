@@ -21,31 +21,8 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\utils;
+namespace pocketmine\network\mcpe\encryption;
 
-trait SingletonTrait{
-	/** @var static|null */
-	private static $instance = null;
+final class DecryptionException extends \RuntimeException{
 
-	/** @return self */
-	private static function make() : self{
-		return new self;
-	}
-
-	/** @return self */
-	public static function getInstance() : self{
-		if(self::$instance === null){
-			self::$instance = self::make();
-		}
-		return self::$instance;
-	}
-
-	/** @param self $instance */
-	public static function setInstance(self $instance) : void{
-		self::$instance = $instance;
-	}
-
-	public static function reset() : void{
-		self::$instance = null;
-	}
 }
